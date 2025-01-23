@@ -10,4 +10,29 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+# include "Webserver.hpp"
 
+int main(int argc, char **argv){
+    if (argc != 2){
+        std::cout << "Usage: ./webserv <configfile.conf>" <<  std::endl;
+        return (1); 
+    }
+
+    std::cout << "\nOpening program..\n\n" << std::endl;
+
+    ConfParser  configParse(argv[1]);
+    if (!configParse.fileValidation())
+    {
+        std::cout << "File validation failed, shutting down.." << std::endl;
+        return 1; 
+    }
+    if (!configParse.parseFile())
+    {
+        std::cout << "File parsing failed, shutting down.." << std::endl;
+        return 1;
+    }
+    if (DEBUG == 1)
+        configParse.display();
+
+    return (0);
+}
