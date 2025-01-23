@@ -1,10 +1,11 @@
 NAME	= webserv
-SRC		= main.cpp
+SRC_DIR = src
+SRC		= $(SRC_DIR)/main.cpp $(SRC_DIR)/ConfParser.cpp
 OBJ_DIR	= .obj
-OBJ		= $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
+OBJ		= $(addprefix $(OBJ_DIR)/, $(notdir $(SRC:.cpp=.o)))
 CC		= c++
 RM		= rm -fr
-FLAGS	= -Wall -Wextra -Werror -std=c++11
+FLAGS	= -Wall -Wextra -Werror -std=c++11 -Iincs
 
 WHITE_B	= \33[1;97m
 RESET 	= \033[0m
@@ -15,7 +16,7 @@ $(NAME): $(OBJ)
 	$(CC) $(FLAGS) $(OBJ) -o $(NAME)
 	@echo "$(WHITE_B)BUILT SUCCESFULLY$(RESET)"
 
-$(OBJ_DIR)/%.o: %.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
 	@$(CC) $(FLAGS) -c $< -o $@
 
