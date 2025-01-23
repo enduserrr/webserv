@@ -78,12 +78,20 @@ bool ConfParser::parseFile(){
     int         block = 0;
     while (std::getline(file, line)) {
         line = removeComments(line);
-        checkServerBlock(line, block);
+        if (checkServerBlock(line, block)){
+            _serverBlocks ++;
+        }
         if (!line.empty() && line.find_first_not_of(" \t") != std::string::npos) {      
             _fileLines.push_back(line);
         }
     }
     file.close();
+    if (!BracketsClosed(block)){
+        return false;
+    }
+    if (!parseData()) {
+        return false; 
+    }
     return true;
 }
 
@@ -95,9 +103,10 @@ std::string ConfParser::removeComments(const std::string &line){
     return line;
 }
 
-void ConfParser::checkServerBlock(const std::string &line, int &block) {
-    if(block == 0 && line.find("server") != std::string::npos) {
-        _serverBlocks ++;
+bool ConfParser::checkServerBlock(const std::string &line, int &block) {
+    if(block == 0 && line.find(SERVER) != std::string::npos) {
+        block ++;
+        return true;
     }
     if(line.find("{") != std::string::npos) {
         block ++;
@@ -105,10 +114,66 @@ void ConfParser::checkServerBlock(const std::string &line, int &block) {
     if(line.find("}") != std::string::npos) {
         block --;
     }
+    return false; 
 }
 
+bool ConfParser::BracketsClosed(int block){
+    if (block > 0) {
+         std::cerr << "Unclosed curly brackets in configuration File" << std::endl;
+        return false;
+    }
+    return true;  
+}
+
+// parsing the information 
+
+bool ConfParser::parseData() {
+
+    int block = 0;
+    int serverIndex = -1; 
+
+    for (size_t i = 0; i < _fileLines.size(); ++i) {
+        if (checkServerBlock(_fileLines[i], block)) {
+            std::cout << "serverblock starts.." << std::endl;
+            serverIndex ++;
+            _servers.push_back(ServerBlock());
+        }
+        if (block > 0) {
+            keyWordFinder(_fileLines[i], serverIndex);
+        }
+    }
+    std::cout << _servers[0].getServerName() << std::endl;
+    std::cout << _servers[1].getServerName() << std::endl;
+    std::cout << _servers[2].getServerName() << std::endl;
+    return true;
+}
+
+void ConfParser::keyWordFinder(std::string line, int serverIndex) {
+    
+    std::istringstream ss(line);
+    std:: string word;
+    while(ss >> word) {
+        if (word == SERVER_NAME) {
+            if (ss >> word) {
+                _servers[serverIndex].setServerName(word);
+            }
+        }
+        else if (word == PORT) {
+            if (ss >> word) {
+                _servers[serverIndex].setPort(word);
+            }
+        }
+        else if (word == BODY_SIZE) {
+            if (ss >> word) {
+                _servers[serverIndex].setBodySize(word);
+            }
+        }
+    }
+}
+
+
 // Debug
-void ConfParser::display(){
+void ConfParser::display() {
 
     std::cout << "\n\nParser information\n" << std::endl;
     std::cout << "File name: " <<_fileName << std::endl;
@@ -117,6 +182,13 @@ void ConfParser::display(){
     std::cout << "\nParsed file now: " << std::endl;
     for (size_t i = 0; i < _fileLines.size(); ++i) {
         std::cout << _fileLines[i] << std::endl;
+    }
+    std::cout << "\nServer(s): " << std::endl;
+    for (size_t i = 0; i < _servers.size(); ++i) {
+        std::cout << "server_name:   " << _servers[i].getServerName() << std::endl;
+        std::cout << "listen:        " << _servers[i].getPort() << std::endl;
+        std::cout << "max_body_size: " << _servers[i].getBodySize() << std::endl;
+
     }
 }
 
