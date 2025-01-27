@@ -1,4 +1,4 @@
-#include "ConfParser.hpp"
+#include "../incs/ConfParser.hpp"
 
 // Constructor
 ConfParser::ConfParser(std::string filename) : _fileName(filename) {
@@ -23,7 +23,7 @@ ConfParser::~ConfParser() {}
 // }
 
 
-// Basic checks 
+// Basic checks
 bool ConfParser::fileValidation(){
     if (!fileExists())
         std::cout << "File: " << _fileName << " does not exists" << std::endl;
@@ -49,7 +49,7 @@ bool ConfParser::fileExists(){
         _fileSize = buffer.st_size;                  //for handling filesize
         return true;
     }
-    return false; 
+    return false;
 }
 
 
@@ -65,8 +65,8 @@ bool ConfParser::fileExtension(){
 // Parsing the file
 
 bool ConfParser::parseFile(){
-    std::ifstream file;       
-    
+    std::ifstream file;
+
     // Open file
     file.open(_fileName.c_str());
     if (!file.is_open()){
@@ -81,7 +81,7 @@ bool ConfParser::parseFile(){
         if (checkServerBlock(line, block)){
             _serverBlocks ++;
         }
-        if (!line.empty() && line.find_first_not_of(" \t") != std::string::npos) {      
+        if (!line.empty() && line.find_first_not_of(" \t") != std::string::npos) {
             _fileLines.push_back(line);
         }
     }
@@ -90,7 +90,7 @@ bool ConfParser::parseFile(){
         return false;
     }
     if (!parseData()) {
-        return false; 
+        return false;
     }
     return true;
 }
@@ -114,7 +114,7 @@ bool ConfParser::checkServerBlock(const std::string &line, int &block) {
     if(line.find("}") != std::string::npos) {
         block --;
     }
-    return false; 
+    return false;
 }
 
 bool ConfParser::BracketsClosed(int block){
@@ -122,15 +122,15 @@ bool ConfParser::BracketsClosed(int block){
          std::cerr << "Unclosed curly brackets in configuration File" << std::endl;
         return false;
     }
-    return true;  
+    return true;
 }
 
-// parsing the information 
+// parsing the information
 
 bool ConfParser::parseData() {
 
     int block = 0;
-    int serverIndex = -1; 
+    int serverIndex = -1;
 
     for (size_t i = 0; i < _fileLines.size(); ++i) {
         if (checkServerBlock(_fileLines[i], block)) {
@@ -149,7 +149,7 @@ bool ConfParser::parseData() {
 }
 
 void ConfParser::keyWordFinder(std::string line, int serverIndex) {
-    
+
     std::istringstream ss(line);
     std:: string word;
     while(ss >> word) {
@@ -191,4 +191,5 @@ void ConfParser::display() {
 
     }
 }
+
 
