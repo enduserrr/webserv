@@ -13,14 +13,15 @@
 #ifndef WEBSERVER_HPP
 # define WEBSERVER_HPP
 
-//parsing 
+//parsing
 #define FILE_SIZE_MAX 1000000000
 #define FILE_SIZE_MIN 0
 
 
 #include <iostream>
-#include <string> 
+#include <string>
 #include "ConfParser.hpp"
+#include "ServerLoop.hpp"
 
 #include <fstream>
 
@@ -34,7 +35,7 @@
 
 
 
-//DEBUG 
+//DEBUG
 #define DEBUG 1
 
-#endif 
+#endif
