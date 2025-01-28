@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   HttpParser.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
+/*   Updated: 2025/01/28 18:42:52 by eleppala         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "HttpParser.hpp"
 #include <sstream>
 #include <iomanip>      //for debugging muotoilu
