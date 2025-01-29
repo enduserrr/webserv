@@ -14,6 +14,7 @@
 # define SERVERLOOP_HPP
 
 # include "ServerBlock.hpp"
+# include "ErrorHandler.hpp"
 # include <vector>
 # include <poll.h>// Pollfd
 # include <map>// For storing client data
@@ -31,6 +32,7 @@ class ServerLoop {
         std::vector<struct pollfd> _pollFds; // Fd's for polling
         std::map<int, std::string> _clientData; // Store client data (like requests)
         time_t _startUpTime; // Server starting timestamp
+        ErrorHandler _errorHandler;
 
         void setupServerSockets();
         void acceptNewConnection(int serverSocket);
@@ -40,8 +42,6 @@ class ServerLoop {
     public:
         ServerLoop();
         ServerLoop(const std::vector<ServerBlock> &serverBlocks);
-        ServerLoop(const ServerLoop &copy);
-        ServerLoop& operator=(const ServerLoop &copy);
         ~ServerLoop();
 
         void startServer();

@@ -13,6 +13,7 @@
 #ifndef SERVERBLOCK_HPP
 #define SERVERBLOCK_HPP
 
+#include "ErrorHandler.hpp"
 #include <iostream>
 #include <vector>
 #include "Location.hpp"
@@ -20,7 +21,7 @@
 class ServerBlock {
 private:
     std::string              _serverName;
-    std::string              _port;         // str now, but maybe int? 
+    std::string              _port;         // str now, but maybe int?
     std::string              _bodySize;
 
     // std::vector<Location>    _Locations;
@@ -43,4 +44,4 @@ public:
     // void display() const;
 };
 
-#endif // SERVERBLOCK_HPP
+#endif
