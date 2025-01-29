@@ -21,16 +21,18 @@
 class ErrorHandler {
     private:
         std::map<int, std::string> _errorPages;
-        std::map<int, std::string> _defaultErrorPages;
+        // std::map<int, std::string> _defaultErrorPages;
+        std::string _defaultErrorPage;
 
     public:
         ErrorHandler();
         ~ErrorHandler();
 
         void    logError(const std::string &message);
-        std::string getErrorPage(int status);
+        std::string getErrorPage(int code);
 
-        void setErrorPage(int status, const std::string &path); // Get an error page (custom if set, default if not)
+        void setCustomErrorPage(int code, const std::string &pageContent);
+        void setDefaultErrorPage(const std::string &pageContent);
 };
 
 

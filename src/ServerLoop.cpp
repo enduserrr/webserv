@@ -97,25 +97,27 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     }
     std::string request(buffer, bytesRead);
     std::cout << "Received request: " << request << std::endl;
+    // Simple validation (e.g., check if request starts with "GET")
     if (request.substr(0, 3) != "GET") {
         std::string errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
                                     + _errorHandler.getErrorPage(400);
         sendResponse(clientSocket, errorResponse);
         return ;
     }
+    // For simplicity, simulate a 404 error if the request is not "GET /"
     if (request.find("GET /") != 0) {
         std::string errorResponse = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n"
                                     + _errorHandler.getErrorPage(404);
         sendResponse(clientSocket, errorResponse);
         return ;
     }
-    std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\nContent-Type: text/html\r\n\r\nAYO!";
+    std::string response = "HTTP/1.1 200 OK";
     sendResponse(clientSocket, response);
 }
 
 void ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
-        _errorHandler.logError("Fail sending a response to client.");
+        _errorHandler.logError("Failed to send response to client.");
         std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                                     + _errorHandler.getErrorPage(500);
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
