@@ -22,6 +22,7 @@
 #include <string>
 #include "ConfParser.hpp"
 #include "ServerLoop.hpp"
+#include "ErrorHandler.hpp"
 
 #include <fstream>
 
