@@ -26,21 +26,21 @@ ServerLoop::~ServerLoop() {
     closeServer();
 }
 
-bool ServerLoop::hasTimedOut() {
+bool    ServerLoop::hasTimedOut() {
     time_t currentTime = time(nullptr);
     return (currentTime - _startUpTime) >= 10;  // 10-second timeout
 }
 
-void ServerLoop::setupServerSockets() {
+void    ServerLoop::setupServerSockets() {
     for (const auto &server : _serverBlocks) {
         int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
         if (serverSocket < 0) {
-            _errorHandler.logError("Failed to create socket for port " + server.getPort());
+            ErrorHandler::getInstance().logError("Failed to create socket for port " + server.getPort());
             continue ;
         }
         int opt = 1;// Set socket options below
         if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-            _errorHandler.logError("Failed to set socket options for port " + server.getPort());
+            ErrorHandler::getInstance().logError("Failed to set socket options for port " + server.getPort());
             close(serverSocket);
             continue ;
         }
@@ -50,12 +50,12 @@ void ServerLoop::setupServerSockets() {
         serverAddr.sin_addr.s_addr = INADDR_ANY;
         serverAddr.sin_port = htons(std::stoi(server.getPort()));
         if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-            _errorHandler.logError("Failed to bind socket for port " + server.getPort());
+            ErrorHandler::getInstance().logError("Failed to bind socket for port " + server.getPort() + ErrorHandler::getInstance().getErrorPage(404));
             close(serverSocket);
             continue ;
         }
         if (listen(serverSocket, SOMAXCONN) < 0) {
-            _errorHandler.logError("Failed to listen on port " + server.getPort());
+            ErrorHandler::getInstance().logError("Failed to listen on port " + server.getPort());
             close(serverSocket);
             continue ;
         }
@@ -67,7 +67,7 @@ void ServerLoop::setupServerSockets() {
     }
 }
 
-void ServerLoop::acceptNewConnection(int serverSocket) {
+void    ServerLoop::acceptNewConnection(int serverSocket) {
     struct sockaddr_in clientAddr;
     socklen_t clientAddrLen = sizeof(clientAddr);
     int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &clientAddrLen);
@@ -82,13 +82,13 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     std::cout << "New client connected: " << inet_ntoa(clientAddr.sin_addr) << std::endl;
 }
 
-void ServerLoop::handleClientRequest(int clientSocket) {
+void    ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[1024];
     memset(buffer, 0, sizeof(buffer));
     ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
 
     if (bytesRead <= 0) {
-        _errorHandler.logError("Client disconnected or error receiving data.");
+        ErrorHandler::getInstance().logError("Client disconnected or error receiving data.");
         close(clientSocket);
         _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
             [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
@@ -100,14 +100,14 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     // Simple validation (e.g., check if request starts with "GET")
     if (request.substr(0, 3) != "GET") {
         std::string errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
-                                    + _errorHandler.getErrorPage(400);
+                                    + ErrorHandler::getInstance().getErrorPage(400);
         sendResponse(clientSocket, errorResponse);
-        return ;
+        return;
     }
-    // For simplicity, simulate a 404 error if the request is not "GET /"
+    // Use the 404 error if the request isn't "GET"
     if (request.find("GET /") != 0) {
         std::string errorResponse = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n"
-                                    + _errorHandler.getErrorPage(404);
+                                    + ErrorHandler::getInstance().getErrorPage(404);
         sendResponse(clientSocket, errorResponse);
         return ;
     }
@@ -115,16 +115,16 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     sendResponse(clientSocket, response);
 }
 
-void ServerLoop::sendResponse(int clientSocket, const std::string &response) {
+void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
-        _errorHandler.logError("Failed to send response to client.");
+        ErrorHandler::getInstance().logError("Failed to send response to client.");
         std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                                    + _errorHandler.getErrorPage(500);
+                                    + ErrorHandler::getInstance().getErrorPage(500);
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
     }
 }
 
-void ServerLoop::startServer() {
+void    ServerLoop::startServer() {
     setupServerSockets();
 
     _startUpTime = time(nullptr); // Set start up time
@@ -155,6 +155,7 @@ void ServerLoop::closeServer() {
     for (const auto &pfd : _pollFds) {
         close(pfd.fd);
     }
+
     _pollFds.clear();
     _clientData.clear();
     std::cout << "Server closed and resources cleaned." << std::endl;

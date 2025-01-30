@@ -13,27 +13,25 @@
 #ifndef ERRORHANDLER_HPP
 # define ERRORHANDLER_HPP
 
-# include <string>
 # include <map>
 # include <iostream>
-# include <fstream>
 
 class ErrorHandler {
     private:
-        std::map<int, std::string> _errorPages;
-        // std::map<int, std::string> _defaultErrorPages;
-        std::string _defaultErrorPage;
+        // Private constructor to prevent multiple instances
+        ErrorHandler();
+        std::map<int, std::string>  _errorPages;
+        std::string                 _defaultErrorPage;
 
     public:
-        ErrorHandler();
         ~ErrorHandler();
 
-        void    logError(const std::string &message);
-        std::string getErrorPage(int code);
+        // Singleton Instance getter function
+        static ErrorHandler &getInstance();
 
-        void setCustomErrorPage(int code, const std::string &pageContent);
-        void setDefaultErrorPage(const std::string &pageContent);
+        void                logError(const std::string &message);
+        std::string         getErrorPage(int code);
+        void                setCustomErrorPage(int code, const std::string &pageContent);
 };
-
 
 #endif

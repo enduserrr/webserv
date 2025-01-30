@@ -17,11 +17,11 @@ ServerBlock::ServerBlock() {
     std::cout << "SERVERBLOCK constructor" << std::endl;
 }
 
-// ServerBlock::ServerBlock(ErrorHandler *errorHandler) : _errorHandler(errorHandler) {}
+/* ServerBlock::ServerBlock(ErrorHandler *errorHandler) : _errorHandler(errorHandler) {}
 
-// void ServerBlock::setServerName(std::string str) { _serverName = str; }
-// void ServerBlock::setPort(std::string str) { _port = str; }
-// void ServerBlock::setBodySize(std::string str) { _bodySize = str; }
+void ServerBlock::setServerName(std::string str) { _serverName = str; }
+void ServerBlock::setPort(std::string str) { _port = str; }
+void ServerBlock::setBodySize(std::string str) { _bodySize = str; } */
 
 // Destructor
 ServerBlock::~ServerBlock() {}
@@ -71,6 +71,13 @@ void ServerBlock::setBodySize(std::string str) {
     str.pop_back();
     }
     _bodySize = str;
+}
+
+void ServerBlock::setErrorPages(const std::map<int, std::string> &errorPages) {
+    ErrorHandler& errorHandler = ErrorHandler::getInstance();  // Get Singleton instance
+    for (const auto& [statusCode, pagePath] : errorPages) {
+        errorHandler.setCustomErrorPage(statusCode, pagePath);
+    }
 }
 
 /* // Member function

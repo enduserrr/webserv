@@ -137,8 +137,6 @@ bool ConfParser::BracketsClosed(int block){
     return true;
 }
 
-// parsing the information
-
 bool ConfParser::parseData() {
 
     int block = 0;
@@ -160,33 +158,66 @@ bool ConfParser::parseData() {
     return true;
 }
 
-void ConfParser::keyWordFinder(std::string line, int serverIndex) {
+// void ConfParser::keyWordFinder(std::string line, int serverIndex) {
 
+//     std::istringstream ss(line);
+//     std:: string word;
+//     while(ss >> word) {
+//         if (word == SERVER_NAME) {
+//             if (ss >> word) {
+//                 _servers[serverIndex].setServerName(word);
+//             }
+//         }
+//         else if (word == PORT) {
+//             if (ss >> word) {
+//                 _servers[serverIndex].setPort(word);
+//             }
+//         }
+//         else if (word == BODY_SIZE) {
+//             if (ss >> word) {
+//                 _servers[serverIndex].setBodySize(word);
+//             }
+//         }
+//     }
+// }
+
+void ConfParser::keyWordFinder(std::string line, int serverIndex) {
     std::istringstream ss(line);
-    std:: string word;
-    while(ss >> word) {
+    std::string word;
+    while (ss >> word) {
         if (word == SERVER_NAME) {
             if (ss >> word) {
                 _servers[serverIndex].setServerName(word);
             }
-        }
-        else if (word == PORT) {
+        } else if (word == PORT) {
             if (ss >> word) {
                 _servers[serverIndex].setPort(word);
             }
-        }
-        else if (word == BODY_SIZE) {
+        } else if (word == BODY_SIZE) {
             if (ss >> word) {
                 _servers[serverIndex].setBodySize(word);
+            }
+        } else if (word == ERROR_PAGE) {
+            int statusCode;
+            std::string pagePath;
+            if (ss >> statusCode >> pagePath) {
+                // Read the custom error page
+                std::ifstream file(pagePath);
+                if (file.is_open()) {
+                    std::stringstream buffer;
+                    buffer << file.rdbuf();
+                    // Store the error page in the temp map
+                    _errorPages[statusCode] = buffer.str();
+                } else {
+                    std::cerr << "Failed to open error page file: " << pagePath << std::endl;
+                }
             }
         }
     }
 }
 
-
 // Debug
 void ConfParser::display() {
-
     std::cout << "\n\nParser information\n" << std::endl;
     std::cout << "File name: " <<_fileName << std::endl;
     std::cout << "File size: "<<_fileSize << std::endl;
@@ -203,4 +234,3 @@ void ConfParser::display() {
 
     }
 }
-

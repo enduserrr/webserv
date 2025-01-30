@@ -32,7 +32,6 @@ class ServerLoop {
         std::vector<struct pollfd> _pollFds; // Fd's for polling
         std::map<int, std::string> _clientData; // Store client data (like requests)
         time_t _startUpTime; // Server starting timestamp
-        ErrorHandler _errorHandler;
 
         void setupServerSockets();
         void acceptNewConnection(int serverSocket);

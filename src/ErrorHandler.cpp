@@ -22,13 +22,21 @@ ErrorHandler::ErrorHandler() {
     _errorPages[403] = "<html><body><h1>403 Forbidden</h1><p>You don't have permission to access this resource.</p></body></html>";
     _errorPages[408] = "<html><body><h1>408 Request Timeout</h1><p>The server timed out waiting for the request.</p></body></html>";
     _defaultErrorPage = "<html><body><h1>Error</h1><p>An unknown error occurred.</p></body></html>";
+    // std::cout << "ErrorHandler Constructor." << std::endl;
 }
 
-ErrorHandler::~ErrorHandler() {}
+ErrorHandler &ErrorHandler::getInstance() {
+    static ErrorHandler instance;
+    return instance;
+}
+
+ErrorHandler::~ErrorHandler() {
+    std::cout << "ErrorHandler Destructor." << std::endl;
+}
 
 // Log to the console
 void ErrorHandler::logError(const std::string &message) {
-    std::cerr << WB "[ErrorHandler]" RES " " << message << std::endl;
+    std::cerr << "[ErrorHandler]: " << message << std::endl;
 }
 
 // Get the error page for a specific status code
@@ -42,9 +50,4 @@ std::string ErrorHandler::getErrorPage(int code) {
 // Add a custom error page for a specific status code
 void ErrorHandler::setCustomErrorPage(int code, const std::string &pageContent) {
     _errorPages[code] = pageContent;
-}
-
-// Set a default error page for unknown status codes
-void ErrorHandler::setDefaultErrorPage(const std::string &pageContent) {
-    _defaultErrorPage = pageContent;
 }

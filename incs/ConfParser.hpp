@@ -22,7 +22,7 @@
 #define SERVER_NAME     "server_name"
 #define PORT            "listen"
 #define BODY_SIZE       "client_max_body_size"
-#define ERROR_PAGE      ""
+#define ERROR_PAGE      "error_pages"
 #define METHODS         "allow_methods"
 #define LOCATION        ""
 
@@ -35,14 +35,14 @@ private:
     std::vector<std::string> _fileLines;
     std::vector<std::string> _fileData;         //for info that needs to store
     std::vector<ServerBlock> _servers;
-
+    // static const std::string ERROR_PAGE;
 
 public:
     ConfParser(std::string filename);
     ~ConfParser();
     // ConfParser(const ConfParser &other);
     // ConfParser& operator=(const ConfParser &other);
-
+    std::map<int, std::string> _errorPages;
 
     //validate file basics before opening
     bool fileValidation();
@@ -60,9 +60,6 @@ public:
     bool        parseData();
     void        keyWordFinder(std::string line, int serverIndex);
 
-    //GETTERS
-    //std::vector<std::string> getListen();
-    // std::vector<ServerBlock> getServers() const;
     std::vector<ServerBlock> getServers() const {
         return _servers;
     }
