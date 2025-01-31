@@ -23,6 +23,7 @@
 #include "ConfParser.hpp"
 #include "ServerLoop.hpp"
 #include "ErrorHandler.hpp"
+#include "HttpParser.hpp"
 
 #include <fstream>
 
@@ -32,6 +33,7 @@
 #include <sys/stat.h>   // stat
 #include <unistd.h>     // access
 #include <vector>       // std::vector
+#include <sstream>      // stringstream
 
 
 
