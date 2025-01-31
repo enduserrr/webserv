@@ -59,6 +59,7 @@ public:
     //parse data
     bool        parseData();
     void        keyWordFinder(std::string line, int serverIndex);
+    size_t      convertBodySize(std::string& word);
 
     std::vector<ServerBlock> getServers() const {
         return _servers;

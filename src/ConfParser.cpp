@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/ConfParser.hpp"
+#include "ConfParser.hpp"
 
 // Constructor
 ConfParser::ConfParser(std::string filename) : _fileName(filename) {
@@ -195,7 +195,7 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex) {
             }
         } else if (word == BODY_SIZE) {
             if (ss >> word) {
-                _servers[serverIndex].setBodySize(word);
+                _servers[serverIndex].setBodySize(convertBodySize(word));
             }
         } else if (word == ERROR_PAGE) {
             int statusCode;
@@ -215,6 +215,31 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex) {
         }
     }
 }
+
+size_t ConfParser::convertBodySize(std::string& word) {
+    char unit = '\0';
+    if (!word.empty() && word.back() == ';') {
+        word.pop_back();
+        std::cerr << "in here we throw exception (later)" << std::endl; 
+    }
+    if (!word.empty() && (word.back() == 'm' || word.back() == 'k' || word.back() == 'g')) {
+        unit = word.back();
+        word.pop_back();
+    }
+    size_t num = std::stoi(word);
+    if(unit == 'k') {
+        num = num * 1000; 
+    }
+    if(unit == 'm') {
+        num = num * 1000000; 
+    }
+    if(unit == 'g') {
+        num = num * 1000000000; 
+    }
+    return num;
+}
+
+
 
 // Debug
 void ConfParser::display() {
