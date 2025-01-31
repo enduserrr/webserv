@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "ServerBlock.hpp"
+#include <iostream>
+
 
 // Constructor
 ServerBlock::ServerBlock() {
@@ -62,15 +64,12 @@ void ServerBlock::setPort(std::string str) {
     _port = str;
 }
 
-std::string ServerBlock::getBodySize() const {
+size_t ServerBlock::getBodySize() const {
     return _bodySize;
 }
 
-void ServerBlock::setBodySize(std::string str) {
-    if (!str.empty() && str.back() == ';') {
-    str.pop_back();
-    }
-    _bodySize = str;
+void ServerBlock::setBodySize(size_t size) {
+    _bodySize = size; 
 }
 
 void ServerBlock::setErrorPages(const std::map<int, std::string> &errorPages) {
