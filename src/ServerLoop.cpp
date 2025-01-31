@@ -31,39 +31,40 @@ bool    ServerLoop::hasTimedOut() {
     return (currentTime - _startUpTime) >= 10;  // 10-second timeout
 }
 
-void    ServerLoop::setupServerSockets() {
-    for (const auto &server : _serverBlocks) {
+void ServerLoop::setupServerSockets() {
+    for (std::vector<ServerBlock>::const_iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
         int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
         if (serverSocket < 0) {
-            ErrorHandler::getInstance().logError("Failed to create socket for port " + server.getPort());
-            continue ;
+            ErrorHandler::getInstance().logError("Failed to create socket for port " + it->getPort());
+            continue;
         }
-        int opt = 1;// Set socket options below
+        int opt = 1;  // Set socket options below
         if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-            ErrorHandler::getInstance().logError("Failed to set socket options for port " + server.getPort());
+            ErrorHandler::getInstance().logError("Failed to set socket options for port " + it->getPort());
             close(serverSocket);
-            continue ;
+            continue;
         }
-        struct sockaddr_in serverAddr;// Bind socket
+        struct sockaddr_in serverAddr;  // Bind socket
         memset(&serverAddr, 0, sizeof(serverAddr));
         serverAddr.sin_family = AF_INET;
         serverAddr.sin_addr.s_addr = INADDR_ANY;
-        serverAddr.sin_port = htons(std::stoi(server.getPort()));
+        serverAddr.sin_port = htons(std::stoi(it->getPort()));
         if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-            ErrorHandler::getInstance().logError("Failed to bind socket for port " + server.getPort() + ErrorHandler::getInstance().getErrorPage(404));
+            ErrorHandler::getInstance().logError("Failed to bind socket for port " + it->getPort() +
+                                                 ErrorHandler::getInstance().getErrorPage(404));
             close(serverSocket);
-            continue ;
+            continue;
         }
         if (listen(serverSocket, SOMAXCONN) < 0) {
-            ErrorHandler::getInstance().logError("Failed to listen on port " + server.getPort());
+            ErrorHandler::getInstance().logError("Failed to listen on port " + it->getPort());
             close(serverSocket);
-            continue ;
+            continue;
         }
-        struct pollfd pfd;// Add to pollfd
+        struct pollfd pfd;  // Add to pollfd
         pfd.fd = serverSocket;
         pfd.events = POLLIN;
         _pollFds.push_back(pfd);
-        std::cout << "Server started on port: " << server.getPort() << std::endl;
+        std::cout << "Server started on port: " << it->getPort() << std::endl;
     }
 }
 
@@ -151,9 +152,19 @@ void    ServerLoop::startServer() {
     }
 }
 
+// void ServerLoop::closeServer() {
+//     for (const auto &pfd : _pollFds) {
+//         close(pfd.fd);
+//     }
+
+//     _pollFds.clear();
+//     _clientData.clear();
+//     std::cout << "Server closed and resources cleaned." << std::endl;
+// }
+
 void ServerLoop::closeServer() {
-    for (const auto &pfd : _pollFds) {
-        close(pfd.fd);
+    for (std::vector<struct pollfd>::const_iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
+        close(it->fd);
     }
 
     _pollFds.clear();

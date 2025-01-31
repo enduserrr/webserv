@@ -75,8 +75,8 @@ void ServerBlock::setBodySize(std::string str) {
 
 void ServerBlock::setErrorPages(const std::map<int, std::string> &errorPages) {
     ErrorHandler& errorHandler = ErrorHandler::getInstance();  // Get Singleton instance
-    for (const auto& [statusCode, pagePath] : errorPages) {
-        errorHandler.setCustomErrorPage(statusCode, pagePath);
+    for (std::map<int, std::string>::const_iterator it = errorPages.begin(); it != errorPages.end(); ++it) {
+        errorHandler.setCustomErrorPage(it->first, it->second);
     }
 }
 

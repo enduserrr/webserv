@@ -8,7 +8,7 @@ OBJ_DIR	= .obj
 OBJ		= $(addprefix $(OBJ_DIR)/, $(notdir $(SRC:.cpp=.o)))
 CC		= c++
 RM		= rm -fr
-FLAGS	= -Wall -Wextra -Werror -std=c++17 -Iincs
+FLAGS	= -Wall -Wextra -Werror -std=c++11 -Iincs
 FSANITIZE = -g3 -fsanitize=address
 
 WHITE_B	= \33[1;97m

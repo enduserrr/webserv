@@ -33,8 +33,8 @@ int main(int argc, char **argv) {
     std::vector<ServerBlock> serverBlocks = configParse.getServers();
     // TRANSFER CUSTOM ERROR PAGES FROM CONF PARSER TO ERRORHANDLER
     ErrorHandler::getInstance().logError("Loading custom error pages...");
-    for (auto &server : serverBlocks) {
-        server.setErrorPages(configParse._errorPages);
+    for (std::vector<ServerBlock>::iterator it = serverBlocks.begin(); it != serverBlocks.end(); ++it) {
+        it->setErrorPages(configParse._errorPages);
     }
 
     ServerLoop serverLoop(serverBlocks);
@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 
 // int main()
 // {
-//     std::string rawDataChunk = 
+//     std::string rawDataChunk =
 //     "POST /upload HTTP/1.1\r\n"
 //     "Host: example.com\r\n"
 //     "Content-Type: application/x-www-form-urlencoded\r\n"
@@ -61,11 +61,11 @@ int main(int argc, char **argv) {
 //     "Host: example2.com\r\n";
 
 //     //Ei toimi viela kahdella requestilla, mutta pilkkoo ensimmaisesta yhden kokonaisen
-//     // std::string rawDataChunk2 = 
+//     // std::string rawDataChunk2 =
 //     // "Content-Type: application/secondreq\r\n"
 //     // "\r\n";
 
-    
+
 //     std::istringstream input(rawDataChunk);
 //     HttpParser parser;
 //     parser.readFullRequest(input);
