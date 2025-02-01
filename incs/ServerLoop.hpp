@@ -13,12 +13,13 @@
 #ifndef SERVERLOOP_HPP
 # define SERVERLOOP_HPP
 
-# include "ServerBlock.hpp"
-# include "ErrorHandler.hpp"
-# include <vector>
-# include <poll.h>// Pollfd
-# include <map>// For storing client data
-# include <ctime>
+#include "ServerBlock.hpp"
+#include "ErrorHandler.hpp"
+#include "HttpParser.hpp"
+#include <vector>
+#include <poll.h>// Pollfd
+#include <map>// For storing client data
+#include <ctime>
 
 #define GC     "\033[3;90m"
 #define WB     "\033[1;97m"
@@ -32,6 +33,7 @@ class ServerLoop {
         std::vector<struct pollfd> _pollFds; // Fd's for polling
         std::map<int, std::string> _clientData; // Store client data (like requests)
         time_t _startUpTime; // Server starting timestamp
+        HttpParser _httpParser;
 
         void setupServerSockets();
         void acceptNewConnection(int serverSocket);
@@ -46,6 +48,7 @@ class ServerLoop {
         void startServer();
         void closeServer();
         bool hasTimedOut();  // Check if the server has timed out
+
 };
 
 #endif

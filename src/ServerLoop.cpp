@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../incs/ServerLoop.hpp"
+#include "../incs/StaticHandler.hpp"
 #include <algorithm>
 #include <iostream>
 #include <cstring> //memset
@@ -88,31 +89,45 @@ void    ServerLoop::handleClientRequest(int clientSocket) {
     memset(buffer, 0, sizeof(buffer));
     ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
 
-    if (bytesRead <= 0) {
-        ErrorHandler::getInstance().logError("Client disconnected or error receiving data.");
+    if (bytesRead == 0) {
+        // Graceful disconnect; client closed connection.
+        std::cout << "Client closed the connection." << std::endl;
         close(clientSocket);
         _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
             [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
             _pollFds.end());
         return ;
+    } else if (bytesRead < 0) {
+        // Actual error occurred.
+        ErrorHandler::getInstance().logError("Error receiving data from client.");
+        close(clientSocket);
+        _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
+            [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
+            _pollFds.end());
+        return;
     }
+    // if (bytesRead <= 0) {
+    //     ErrorHandler::getInstance().logError("Client disconnected or error receiving data.");
+    //     close(clientSocket);
+    //     _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
+    //         [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
+    //         _pollFds.end());
+    //     return ;
+    // }
     std::string request(buffer, bytesRead);
     std::cout << "Received request: " << request << std::endl;
-    // Simple validation (e.g., check if request starts with "GET")
-    if (request.substr(0, 3) != "GET") {
+    // Create an instance of HttpParser and attempt to parse the request.
+    HttpParser parser;
+    if (!parser.parseRequest(request, 100)) { // assuming 100 is the max body size
         std::string errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
                                     + ErrorHandler::getInstance().getErrorPage(400);
         sendResponse(clientSocket, errorResponse);
         return;
     }
-    // Use the 404 error if the request isn't "GET"
-    if (request.find("GET /") != 0) {
-        std::string errorResponse = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n"
-                                    + ErrorHandler::getInstance().getErrorPage(404);
-        sendResponse(clientSocket, errorResponse);
-        return ;
-    }
-    std::string response = "HTTP/1.1 200 OK";
+    // Process the request
+    StaticHandler staticHandler;
+    std::string response = staticHandler.processRequest(parser);
+    // Send the result back to client
     sendResponse(clientSocket, response);
 }
 
@@ -151,16 +166,6 @@ void    ServerLoop::startServer() {
         }
     }
 }
-
-// void ServerLoop::closeServer() {
-//     for (const auto &pfd : _pollFds) {
-//         close(pfd.fd);
-//     }
-
-//     _pollFds.clear();
-//     _clientData.clear();
-//     std::cout << "Server closed and resources cleaned." << std::endl;
-// }
 
 void ServerLoop::closeServer() {
     for (std::vector<struct pollfd>::const_iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {

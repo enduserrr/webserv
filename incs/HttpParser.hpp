@@ -18,23 +18,22 @@
 
 
 // Socket will give rawchunks of data,
-// meaning there might be incomplete requests or 
+// meaning there might be incomplete requests or
 // one request + half of second request at same time
 // or multiple requests.
 
-
 class HttpParser {
 private:
-    std::string                         _pendingData; //used for storing rest of the chunk 
-    
-    
+    std::string                         _pendingData; //used for storing rest of the chunk
+
+
     size_t                              _maxBodySize; //get from ServerBlock
-    std::string                         _method; 
+    std::string                         _method;
     std::string                         _uri;
-    std::map <std::string, std::string> _uriQuery; 
-    std::string                         _httpVersion; 
+    std::map <std::string, std::string> _uriQuery;
+    std::string                         _httpVersion;
     std::map <std::string, std::string> _headers;       //key + value
-    std::string                         _body; 
+    std::string                         _body;
 
 public:
     HttpParser();
@@ -54,13 +53,18 @@ public:
 
     bool setMethod(std::string& method);
     bool parseUriQuery(std::string query);
-    bool parseUri(std::string& uri); 
+    bool parseUri(std::string& uri);
     bool isValidUri(std::string& uri);
-    
+
     bool parseHeaders(std::string& line);
     bool parseBody(std::string& line);
     void whiteSpaceTrim(std::string& str);
     void display() const;
+
+    std::string getUri() {
+        return _uri;
+    }
+
 };
 
-#endif 
+#endif

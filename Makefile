@@ -3,7 +3,7 @@ SRC_DIR = src
 SRC		= $(SRC_DIR)/main.cpp $(SRC_DIR)/ConfParser.cpp \
 		  $(SRC_DIR)/ServerBlock.cpp $(SRC_DIR)/Location.cpp \
 		  $(SRC_DIR)/ServerLoop.cpp $(SRC_DIR)/HttpParser.cpp \
-		  $(SRC_DIR)/ErrorHandler.cpp
+		  $(SRC_DIR)/ErrorHandler.cpp $(SRC_DIR)/StaticHandler.cpp
 OBJ_DIR	= .obj
 OBJ		= $(addprefix $(OBJ_DIR)/, $(notdir $(SRC:.cpp=.o)))
 CC		= c++
@@ -34,6 +34,6 @@ re: fclean all
 
 run: re
 	clear
-	./$(NAME) config/config.conf
+	./$(NAME) config/config3.conf
 
 .PHONY: all clean fclean re run
