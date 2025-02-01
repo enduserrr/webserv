@@ -24,6 +24,7 @@
 #include "ServerLoop.hpp"
 #include "ErrorHandler.hpp"
 #include "HttpParser.hpp"
+#include "StaticHandler.hpp"
 
 #include <fstream>
 
