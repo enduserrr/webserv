@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   Webserver.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 09:06:03 by eleppala          #+#    #+#             */
-/*   Updated: 2025/01/21 09:06:06 by eleppala         ###   ########.fr       */
+/*   Updated: 2025/02/02 12:34:10 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef WEBSERVER_HPP
 # define WEBSERVER_HPP
@@ -20,11 +20,14 @@
 
 #include <iostream>
 #include <string>
+// #include <csignal>
+// #include <atomic>
 #include "ConfParser.hpp"
 #include "ServerLoop.hpp"
 #include "ErrorHandler.hpp"
 #include "HttpParser.hpp"
 #include "StaticHandler.hpp"
+#include "CgiHandler.hpp"
 
 #include <fstream>
 
@@ -37,7 +40,8 @@
 #include <sstream>      // stringstream
 
 
-
+// Global flag to indicate shutdown request.
+// volatile std::sig_atomic_t g_shutdownRequested = 0;
 
 //DEBUG
 #define DEBUG 1

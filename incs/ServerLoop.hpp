@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ServerLoop.hpp                                     :+:      :+:    :+:   */
@@ -6,9 +6,9 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/01/26 16:22:35 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/02 11:10:28 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef SERVERLOOP_HPP
 # define SERVERLOOP_HPP
@@ -16,6 +16,8 @@
 #include "ServerBlock.hpp"
 #include "ErrorHandler.hpp"
 #include "HttpParser.hpp"
+#include "CgiHandler.hpp"
+#include "Webserver.hpp"
 #include <vector>
 #include <poll.h>// Pollfd
 #include <map>// For storing client data
@@ -39,6 +41,7 @@ class ServerLoop {
         void acceptNewConnection(int serverSocket);
         void handleClientRequest(int clientSocket);
         void sendResponse(int clientSocket, const std::string &response);
+        std::string routeRequest(HttpParser &parser);
 
     public:
         ServerLoop();

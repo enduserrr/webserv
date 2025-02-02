@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ServerLoop.cpp                                     :+:      :+:    :+:   */
@@ -6,9 +6,9 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/01/26 16:19:51 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/02 12:38:27 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "../incs/ServerLoop.hpp"
 #include "../incs/StaticHandler.hpp"
@@ -20,7 +20,7 @@
 
 ServerLoop::ServerLoop() {}
 
-ServerLoop::ServerLoop(const std::vector<ServerBlock>& serverBlocks)
+ServerLoop::ServerLoop(const std::vector<ServerBlock> &serverBlocks)
     : _serverBlocks(serverBlocks) {}
 
 ServerLoop::~ServerLoop() {
@@ -84,7 +84,54 @@ void    ServerLoop::acceptNewConnection(int serverSocket) {
     std::cout << "New client connected: " << inet_ntoa(clientAddr.sin_addr) << std::endl;
 }
 
-void    ServerLoop::handleClientRequest(int clientSocket) {
+std::string ServerLoop::routeRequest(HttpParser &parser) {
+    std::string uri = parser.getUri();
+    /* For example, if the URI starts with "/cgi-bin/" or has a CGI file extension */
+    if (uri.find("/cgi-bin/") == 0 ||
+        (uri.size() >= 4 && uri.substr(uri.size()-4) == ".php")) {
+        CgiHandler cgiHandler;
+        return cgiHandler.processRequest(parser);
+    } else {
+        StaticHandler staticHandler;
+        return staticHandler.processRequest(parser);
+    }
+}
+
+void ServerLoop::handleClientRequest(int clientSocket) {
+    char buffer[1024];
+    memset(buffer, 0, sizeof(buffer));
+    ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+
+    /* Client disconnected */
+    if (bytesRead == 0) {
+        std::cout << "Client closed the connection." << std::endl;
+        close(clientSocket);
+        _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
+            [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
+            _pollFds.end());
+        return ;
+    } else if (bytesRead < 0) {/* Error occurred */
+        ErrorHandler::getInstance().logError("Error receiving data from client.");
+        close(clientSocket);
+        _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
+            [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
+            _pollFds.end());
+        return ;
+    }
+    std::string request(buffer, bytesRead);
+    std::cout << "Received request: " << request << std::endl;
+    HttpParser parser;
+    if (!parser.parseRequest(request, 100)) {//Change to take _bodySize from ServerBlock
+        std::string errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
+                                    + ErrorHandler::getInstance().getErrorPage(400);
+        sendResponse(clientSocket, errorResponse);
+        return ;
+    }
+    std::string response = routeRequest(parser);
+    sendResponse(clientSocket, response);
+}
+
+/* void    ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[1024];
     memset(buffer, 0, sizeof(buffer));
     ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
@@ -106,14 +153,6 @@ void    ServerLoop::handleClientRequest(int clientSocket) {
             _pollFds.end());
         return;
     }
-    // if (bytesRead <= 0) {
-    //     ErrorHandler::getInstance().logError("Client disconnected or error receiving data.");
-    //     close(clientSocket);
-    //     _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
-    //         [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
-    //         _pollFds.end());
-    //     return ;
-    // }
     std::string request(buffer, bytesRead);
     std::cout << "Received request: " << request << std::endl;
     // Create an instance of HttpParser and attempt to parse the request.
@@ -129,7 +168,7 @@ void    ServerLoop::handleClientRequest(int clientSocket) {
     std::string response = staticHandler.processRequest(parser);
     // Send the result back to client
     sendResponse(clientSocket, response);
-}
+} */
 
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
