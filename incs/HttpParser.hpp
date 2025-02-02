@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   HttpParser.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:10 by eleppala          #+#    #+#             */
-/*   Updated: 2025/01/28 18:45:12 by eleppala         ###   ########.fr       */
+/*   Updated: 2025/02/02 11:38:45 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef HTTPPARSER_HPP
 #define HTTPPARSER_HPP
@@ -30,7 +30,7 @@ private:
     size_t                              _maxBodySize; //get from ServerBlock
     std::string                         _method;
     std::string                         _uri;
-    std::map <std::string, std::string> _uriQuery;
+    std::map <std::string, std::string> _uriQuery;//should be string as only handling required for only one cgi request
     std::string                         _httpVersion;
     std::map <std::string, std::string> _headers;       //key + value
     std::string                         _body;
@@ -60,6 +60,18 @@ public:
     bool parseBody(std::string& line);
     void whiteSpaceTrim(std::string& str);
     void display() const;
+
+    std::string getMethod() {
+        return _method;
+    }
+
+    std::string getBody() {
+        return _body;
+    }
+
+    std::map<std::string, std::string> getQueryString() {
+        return _uriQuery;
+    }
 
     std::string getUri() {
         return _uri;

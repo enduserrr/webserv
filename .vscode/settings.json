@@ -1,6 +1,8 @@
 {
     "files.associations": {
+        "*.embeddedhtml": "html",
         "map": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "new": "cpp"
     }
 }
