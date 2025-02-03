@@ -24,7 +24,7 @@ private:
     std::string     _port;         // str now, but maybe int?
     size_t          _bodySize;
 
-    // std::vector<Location>    _Locations;
+    std::vector<Location>    _locations;
 
 public:
     ServerBlock();
@@ -35,11 +35,14 @@ public:
     void        setPort(std::string str);
     void        setBodySize(size_t size);
     void        setErrorPages(const std::map<int, std::string> &errorPages);
+    void        setLocation(const Location& loc);
+
 
     std::string getServerName() const;
     std::string getPort() const;
     size_t      getBodySize() const;
-    // void display() const;
+    std::vector<Location>& getLocations();
+
 };
 
 #endif

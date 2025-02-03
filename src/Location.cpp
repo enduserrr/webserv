@@ -36,9 +36,30 @@ Location::~Location() {}
 //     return value;
 // }
 
-// void Location::setValue(int value) {
-//     this->value = value;
-// }
+bool Location::setPath(const std::string& path) {
+    // std::cout << "setpath: "<< path << std::endl; 
+    _path = path;
+    return true;
+}
+
+bool Location::addAllowedMethod(const std::string& method){
+    if (method != "GET" && method != "POST" && method != "DELETE")
+        return false;  
+    _allowedMethods.push_back(method);
+    return true; 
+}
+
+std::string Location::getPath() const {
+    // std::cout << "getpath: "<< _path << std::endl; 
+    return _path;
+}
+
+std::vector<std::string> Location::getAllowedMethods() const {
+    return _allowedMethods;
+}
+
+
+
 
 // // Member function
 // void Location::display() const {

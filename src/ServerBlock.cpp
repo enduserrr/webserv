@@ -47,8 +47,14 @@ std::string ServerBlock::getServerName() const {
 }
 
 void ServerBlock::setServerName(std::string str) {
-    if (!str.empty() && str.back() == ';') {
-    str.pop_back();
+    if (!str.empty() && str.back() != ';') {
+        std::cerr << "Program should stop here: " << std::endl;
+        std::cerr << "server_name has to end by ';' (fix later to throw exception)" << std::endl;
+    }
+    if (!str.empty() && str.back() == ';') {  
+        //after exception fix no need for this if
+        //only str_pop; 
+        str.pop_back();
     }
     _serverName = str;
 }
@@ -58,8 +64,14 @@ std::string ServerBlock::getPort() const {
 }
 
 void ServerBlock::setPort(std::string str) {
-    if (!str.empty() && str.back() == ';') {
-    str.pop_back();
+    if (!str.empty() && str.back() != ';') {
+        std::cerr << "Program should stop here: " << std::endl;
+        std::cerr << "listen has to end by ';' (fix later to throw exception)" << std::endl;
+    }
+    if (!str.empty() && str.back() == ';') {  
+        //after exception fix no need for this if
+        //only str_pop; 
+        str.pop_back();
     }
     _port = str;
 }
@@ -72,6 +84,15 @@ void ServerBlock::setBodySize(size_t size) {
     _bodySize = size; 
 }
 
+void ServerBlock::setLocation(const Location& loc){
+     _locations.push_back(loc);
+}
+
+ std::vector<Location>& ServerBlock::getLocations(){
+    return _locations;
+ }
+
+
 void ServerBlock::setErrorPages(const std::map<int, std::string> &errorPages) {
     ErrorHandler& errorHandler = ErrorHandler::getInstance();  // Get Singleton instance
     for (std::map<int, std::string>::const_iterator it = errorPages.begin(); it != errorPages.end(); ++it) {
@@ -79,7 +100,3 @@ void ServerBlock::setErrorPages(const std::map<int, std::string> &errorPages) {
     }
 }
 
-/* // Member function
-void ServerBlock::display() const {
-    std::cout << "Value: " << value << std::endl;
-} */

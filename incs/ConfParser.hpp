@@ -24,7 +24,7 @@
 #define BODY_SIZE       "client_max_body_size"
 #define ERROR_PAGE      "error_pages"
 #define METHODS         "allow_methods"
-#define LOCATION        ""
+#define LOCATION        "location"
 
 class ConfParser {
 private:
@@ -58,8 +58,9 @@ public:
 
     //parse data
     bool        parseData();
-    void        keyWordFinder(std::string line, int serverIndex);
+    void        keyWordFinder(std::string line, int serverIndex, int i);
     size_t      convertBodySize(std::string& word);
+    bool        parseLocation(int serverIndex, int i);
 
     std::vector<ServerBlock> getServers() const {
         return _servers;
