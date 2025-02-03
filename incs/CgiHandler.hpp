@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:37:11 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/02 12:39:20 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/03 11:01:09 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -15,6 +15,7 @@
 
 #include "HttpParser.hpp"
 #include "ErrorHandler.hpp"
+#include "UploadHandler.hpp"
 #include <vector>
 #include <string>
 

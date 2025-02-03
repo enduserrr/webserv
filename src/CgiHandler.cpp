@@ -6,16 +6,12 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/02 13:08:36 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/03 11:44:47 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "../incs/CgiHandler.hpp"
-// #include "../incs/ErrorHandler.hpp"
-// #include "../incs/HttpParser.hpp"
-// #include <iostream>
 #include <sstream>
-// #include <vector>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
@@ -93,8 +89,10 @@ char **CgiHandler::convertEnvVectorToArray(const std::vector<std::string> &env) 
 std::string CgiHandler::executeCgi(const std::string &cgiExecutable,
                                    const std::string &scriptPath,
                                    HttpParser &parser) {
+    /* ENV variables from the parsed request */
     std::vector<std::string> envVector = buildCgiEnvironment(parser);
-    for (std::vector<std::string>::const_iterator it = envVector.begin(); it != envVector.end(); ++it) {
+    for (std::vector<std::string>::const_iterator it = envVector.begin();
+         it != envVector.end(); ++it) {
         size_t pos = it->find('=');
         if (pos != std::string::npos) {
             std::string key = it->substr(0, pos);
@@ -102,9 +100,17 @@ std::string CgiHandler::executeCgi(const std::string &cgiExecutable,
             setenv(key.c_str(), value.c_str(), 1);
         }
     }
-    /* If method is POST and a body exists, using popen() is tricky. Add tmp and redirect. */
+    /* Call UploadHandler ff method is POST and there is a body (i.e. an upload) */
+    if (parser.getMethod() == "POST" && !parser.getBody().empty()) {
+        UploadHandler uploadHandler;
+        /* Return path instead of full http response (build the http response including the path) */
+        std::string uploadedFilePath = uploadHandler.uploadReturnPath(parser);
+        /* Set an environment variable that the CGI script can use */
+        setenv("UPLOADED_FILE", uploadedFilePath.c_str(), 1);
+        return uploadedFilePath; //For testing purposes returns after processing POST
+    }
+    /* Build the command line to execute the CGI script */
     std::string command = cgiExecutable + " " + scriptPath;
-    /* popen() to execute the CGI command and open a pipe to read its output */
     FILE* pipe = popen(command.c_str(), "r");
     if (!pipe) {
         return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
@@ -116,6 +122,6 @@ std::string CgiHandler::executeCgi(const std::string &cgiExecutable,
         cgiOutput.append(buffer);
     }
     pclose(pipe);
-    /* check returnCode for errors? */
     return cgiOutput;
 }
+

@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/02 11:10:28 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/03 10:46:46 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -17,6 +17,7 @@
 #include "ErrorHandler.hpp"
 #include "HttpParser.hpp"
 #include "CgiHandler.hpp"
+#include "UploadHandler.hpp"
 #include "Webserver.hpp"
 #include <vector>
 #include <poll.h>// Pollfd
