@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/03 11:16:43 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/04 11:13:00 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -24,9 +24,9 @@ UploadHandler::UploadHandler() {
 
 UploadHandler::~UploadHandler() {}
 
-std::string UploadHandler::upload(HttpParser &parser) {
+std::string UploadHandler::upload(HttpRequest &req) {
     /* Get raw data to be uploaded*/
-    std::string body = parser.getBody();
+    std::string body = req.getBody();
 
     /* Generate file name using creation time */
     std::time_t now = std::time(nullptr);
@@ -52,8 +52,8 @@ std::string UploadHandler::upload(HttpParser &parser) {
     return responseStream.str();
 }
 
-std::string UploadHandler::uploadReturnPath(HttpParser &parser) {
-    std::string body = parser.getBody();
+std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
+    std::string body = req.getBody();
     /* Generate file name using creation time */
     std::time_t now = std::time(nullptr);
     std::ostringstream filename;

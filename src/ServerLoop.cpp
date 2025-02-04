@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/03 11:20:35 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/04 11:27:49 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -84,16 +84,29 @@ void    ServerLoop::acceptNewConnection(int serverSocket) {
     std::cout << "New client connected: " << inet_ntoa(clientAddr.sin_addr) << std::endl;
 }
 
-std::string ServerLoop::routeRequest(HttpParser &parser) {
-    std::string uri = parser.getUri();
+// std::string ServerLoop::routeRequest(HttpParser &parser) {
+//     std::string uri = parser.getUri();
+//     /* For example, if the URI starts with "/cgi-bin/" or has a CGI file extension */
+//     if (uri.find("/cgi-bin/") == 0 ||
+//         (uri.size() >= 4 && uri.substr(uri.size()-4) == ".php")) {
+//         CgiHandler cgiHandler;
+//         return cgiHandler.processRequest(parser);
+//     } else {
+//         StaticHandler staticHandler;
+//         return staticHandler.processRequest(parser);
+//     }
+// }
+
+std::string ServerLoop::routeRequest(HttpRequest &req) {
+    std::string uri = req.getUri();
     /* For example, if the URI starts with "/cgi-bin/" or has a CGI file extension */
     if (uri.find("/cgi-bin/") == 0 ||
         (uri.size() >= 4 && uri.substr(uri.size()-4) == ".php")) {
         CgiHandler cgiHandler;
-        return cgiHandler.processRequest(parser);
+        return cgiHandler.processRequest(req);
     } else {
         StaticHandler staticHandler;
-        return staticHandler.processRequest(parser);
+        return staticHandler.processRequest(req);
     }
 }
 
@@ -121,54 +134,17 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     std::string request(buffer, bytesRead);
     std::cout << "Received request: " << request << std::endl;
     HttpParser parser;
-    if (!parser.parseRequest(request, 100)) {//Change to take _bodySize from ServerBlock
+    if (!parser.parseRequest(request, 100)) {//Change to take _bodySize from ServerBlock?
         std::string errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
                                     + ErrorHandler::getInstance().getErrorPage(400);
         sendResponse(clientSocket, errorResponse);
         return ;
     }
-    std::string response = routeRequest(parser);
+    HttpRequest req = parser.getPendingRequest();
+    std::string response = routeRequest(req);
     sendResponse(clientSocket, response);
+    parser.removeRequest();
 }
-
-/* void    ServerLoop::handleClientRequest(int clientSocket) {
-    char buffer[1024];
-    memset(buffer, 0, sizeof(buffer));
-    ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
-
-    if (bytesRead == 0) {
-        // Graceful disconnect; client closed connection.
-        std::cout << "Client closed the connection." << std::endl;
-        close(clientSocket);
-        _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
-            [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
-            _pollFds.end());
-        return ;
-    } else if (bytesRead < 0) {
-        // Actual error occurred.
-        ErrorHandler::getInstance().logError("Error receiving data from client.");
-        close(clientSocket);
-        _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
-            [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
-            _pollFds.end());
-        return;
-    }
-    std::string request(buffer, bytesRead);
-    std::cout << "Received request: " << request << std::endl;
-    // Create an instance of HttpParser and attempt to parse the request.
-    HttpParser parser;
-    if (!parser.parseRequest(request, 100)) { // assuming 100 is the max body size
-        std::string errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
-                                    + ErrorHandler::getInstance().getErrorPage(400);
-        sendResponse(clientSocket, errorResponse);
-        return;
-    }
-    // Process the request
-    StaticHandler staticHandler;
-    std::string response = staticHandler.processRequest(parser);
-    // Send the result back to client
-    sendResponse(clientSocket, response);
-} */
 
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {

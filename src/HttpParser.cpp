@@ -1,43 +1,29 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   HttpParser.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/01/28 18:42:52 by eleppala         ###   ########.fr       */
+/*   Updated: 2025/02/04 11:37:13 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "HttpParser.hpp"
 #include <sstream>
-#include <iomanip>      //for debugging muotoilu
+#include <iomanip>
 
-// Constructor
+/* Constructor */
 HttpParser::HttpParser() {}
 
-// Destructor
+/* Destructor */
 HttpParser::~HttpParser() {}
-
-// Copy Constructor
-// HttpParser::HttpParser(const HttpParser &other) {
-//     *this = other;
-// }
-
-// // Copy Assignment Operator
-// HttpParser& HttpParser::operator=(const HttpParser &other) {
-//     if (this != &other) {
-//         this->value = other.value;
-//     }
-//     return *this;
-// }
-
 
 bool HttpParser::readFullRequest(std::istream& input) {
     char buffer[1024];
     std::string request = _pendingData;
-    _pendingData.clear(); 
+    _pendingData.clear();
 
     while (input.read(buffer, sizeof(buffer)) || input.gcount() > 0) {
         request.append(buffer, input.gcount());
@@ -49,11 +35,11 @@ bool HttpParser::readFullRequest(std::istream& input) {
         if (headerEnd != std::string::npos) {
             size_t contentLengthPos = request.find("Content-Length:");
             if (contentLengthPos == std::string::npos) {
-                _pendingData = request.substr(headerEnd + 4); 
-                request = request.substr(0, headerEnd + 4);  
+                _pendingData = request.substr(headerEnd + 4);
+                request = request.substr(0, headerEnd + 4);
                 return true;
             }
-            
+
             size_t bodyStart = headerEnd + 4;
             int contentLength = std::stoi(request.substr(contentLengthPos + 15));
             if (request.size() >= bodyStart + contentLength) {
@@ -63,15 +49,14 @@ bool HttpParser::readFullRequest(std::istream& input) {
             }
         }
     }
-    return false; // Incomplete request
+    return false;
 }
 
-
 bool HttpParser::parseRequest(std::string& req, size_t max) {
-    
-    //debug 
+
+    //debug
     // std::cout << req << std::endl;
-    
+
     std::istringstream ss(req);
     std::string line;
     _maxBodySize = max;
@@ -79,9 +64,9 @@ bool HttpParser::parseRequest(std::string& req, size_t max) {
     if (!parseStartLine(line)) {
         return false;
     }
-    std::string headers; 
+    std::string headers;
     while (getline(ss, line, '\r') && ss.get() == '\n' && !line.empty()) {
-        headers += line + "\n"; 
+        headers += line + "\n";
     }
     if (!parseHeaders(headers)) {
         return false;
@@ -90,22 +75,20 @@ bool HttpParser::parseRequest(std::string& req, size_t max) {
     if (!parseBody(line)) {
         return false;
     }
+    createRequest();
     return true;
 }
 
-
-
 //STARTLINE SYNTAX: [method] [URI] [HTTP_VERSION]
-
 bool HttpParser::parseStartLine(std::string& line) {
     std::istringstream ss(line);
     std::string word;
 
-    ss >> word; 
+    ss >> word;
     if (!setMethod(word)) {
         return false;
     }
-    ss >> word; 
+    ss >> word;
     if (!parseUri(word)) {
         return false;
     }
@@ -118,7 +101,6 @@ bool HttpParser::parseStartLine(std::string& line) {
     return true;
 }
 
-
 bool HttpParser::setMethod(std::string& method) {
 
     // for now just test if method get post or delete
@@ -128,37 +110,35 @@ bool HttpParser::setMethod(std::string& method) {
         std::cout << method << "No allowed method detected!"<< std::endl;
         return false;
     }
-    _method = method; 
-    return true; 
+    _method = method;
+    return true;
 }
 
-
-//valid syntax: 
+//valid syntax:
 // /dir/subdir?query=string
 // /dir/subdir?color=red&size=large
-
 bool HttpParser::parseUri(std::string& uri){
     bool prev = false;
     for (size_t i = 0; i < uri.length(); i++) {
         if (uri[i] == '/') {
             if (prev) continue;
-            prev = true; 
+            prev = true;
         } else {
-            prev = false; 
+            prev = false;
         }
         if(uri[i] == '?') {
             if (!parseUriQuery(uri.substr(i + 1))) {
-                return false; 
+                return false;
             }
             break ;
         }
         _uri += uri[i];
     }
     if (!isValidUri(_uri)){
-        std::cerr << "uri is not valid" << std::endl; 
-        return false; 
+        std::cerr << "uri is not valid" << std::endl;
+        return false;
     }
-    return true; 
+    return true;
 }
 
 bool HttpParser::parseUriQuery(std::string query) {
@@ -177,22 +157,22 @@ bool HttpParser::parseUriQuery(std::string query) {
             std::string key = token.substr(0, pos);
             std::string value = token.substr(pos + 1);
             if (key.empty()) {
-                return false; 
+                return false;
             }
             _uriQuery[key] = value;
         } else {
             _uriQuery[token] = "true";
         }
     }
-    return true; 
+    return true;
 }
 
 bool HttpParser::isValidUri(std::string& uri) {
-    
-    //should take locations from config file and see if matches for 
-    //uri form reguest. 
 
-    if (uri.empty() || uri[0] != '/') { 
+    //should take locations from config file and see if matches for
+    //uri form reguest.
+
+    if (uri.empty() || uri[0] != '/') {
         std::cout << "URI should start with '/'"<< std::endl;
         return false;
     }
@@ -203,7 +183,7 @@ bool HttpParser::isValidUri(std::string& uri) {
             return false;
         }
     }
-    return true; 
+    return true;
 }
 
 
@@ -232,7 +212,7 @@ bool HttpParser::parseHeaders(std::string& lines) {
 
 bool HttpParser::parseBody(std::string& line) {
     //need more information of what body can be, to make relevant parsing.. :-)
-    //for now it is just one line body.. 
+    //for now it is just one line body..
 
     //needs atleast clientbodysize from ServerBlock
 
@@ -241,7 +221,7 @@ bool HttpParser::parseBody(std::string& line) {
         return false;
     }
     _body = line;
-    return true; 
+    return true;
 }
 
 void HttpParser::whiteSpaceTrim(std::string &str) {
@@ -250,16 +230,45 @@ void HttpParser::whiteSpaceTrim(std::string &str) {
     if (start == std::string::npos || end == std::string::npos) {
         str.clear();
     } else {
-        str = str.substr(start, end - start + 1); 
+        str = str.substr(start, end - start + 1);
     }
 }
 
-// DEBUG 
+bool HttpParser::createRequest(){
+    HttpRequest req;
+    req.setBodySize(_maxBodySize);
+    req.setMethod(_method);
+    req.setUri(_uri);
+    req.setHttpVersion(_httpVersion);
+    req.setUriQuery(_uriQuery);
+    req.setHeaders(_headers); //key + value
+    req.setBody(_body);
+    _requests.push_back(req);
 
+    return true;
+}
+
+/* Return all requests */
+std::vector<HttpRequest>& HttpParser::getRequests() {
+    return _requests;
+}
+
+/* Return one request (FIFO) */
+HttpRequest& HttpParser::getPendingRequest() {
+    return _requests.front();
+}
+
+void HttpParser::removeRequest() {
+    if (!_requests.empty()) {
+        _requests.erase(_requests.begin());
+    }
+}
+
+/* DEBUG */
 void HttpParser::display() const {
-    
+
     std::cout << "\n\n-- HTTP-PARSER DISPLAY --\n" << std::endl;
-    
+
     std::cout << "START-LINE" << std::endl;
     std::cout << "method: " << _method << std::endl;
     std::cout << "uri: " << _uri << std::endl;
@@ -269,7 +278,7 @@ void HttpParser::display() const {
         for (std::map<std::string, std::string>::const_iterator it = _uriQuery.begin(); it != _uriQuery.end(); ++it) {
             std::cout << std::left << std::setw(15) << it->first << "|" << it->second << std::endl;
         }
-    }  
+    }
     std::cout << "http version: " << _httpVersion << std::endl;
     std::cout << "\nHEADERS" << std::endl;
     std::cout << std::left << std::setw(15) << "Key" << "|" << "Value" << std::endl;

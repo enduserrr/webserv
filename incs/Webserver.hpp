@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 09:06:03 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/03 11:39:21 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/04 10:33:29 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -28,6 +28,7 @@
 #include "HttpParser.hpp"
 #include "StaticHandler.hpp"
 #include "CgiHandler.hpp"
+#include "HttpRequest.hpp"
 #include "Webserver.hpp"
 
 //Testing

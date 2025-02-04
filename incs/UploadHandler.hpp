@@ -2,7 +2,7 @@
 #define UPLOADHANDLER_HPP
 
 #include <string>
-#include "HttpParser.hpp"
+#include "HttpRequest.hpp"
 #include "ErrorHandler.hpp"
 
 class UploadHandler {
@@ -12,8 +12,8 @@ class UploadHandler {
         UploadHandler();
         ~UploadHandler();
 
-        std::string upload(HttpParser &parser);
-        std::string uploadReturnPath(HttpParser &parser);
+        std::string upload(HttpRequest &req);
+        std::string uploadReturnPath(HttpRequest &req);
 };
 
 #endif

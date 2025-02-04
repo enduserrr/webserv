@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/03 11:44:47 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/04 11:11:31 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -22,8 +22,8 @@ CgiHandler::CgiHandler() {}
 
 CgiHandler::~CgiHandler() {}
 
-std::string CgiHandler::processRequest(HttpParser &parser) {
-    std::string uri = parser.getUri();
+std::string CgiHandler::processRequest(HttpRequest &req) {
+    std::string uri = req.getUri();
     if (uri.size() < 4 || uri.substr(uri.size() - 4) != ".php") {
         return "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n"
             + ErrorHandler::getInstance().getErrorPage(404);
@@ -32,21 +32,21 @@ std::string CgiHandler::processRequest(HttpParser &parser) {
 /*  For example, assume CGI scripts are stored in "./cgi-bin/" */
     std::string scriptPath = "./cgi-bin" + uri;
     std::string cgiExecutable = "/usr/bin/php-cgi";
-    std::string cgiOutput = executeCgi(cgiExecutable, scriptPath, parser);
+    std::string cgiOutput = executeCgi(cgiExecutable, scriptPath, req);
     /* Build the final HTTP response. */
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 200 OK\r\n" << cgiOutput;
     return responseStream.str();
 }
 
-std::vector<std::string> CgiHandler::buildCgiEnvironment(HttpParser &parser) {
+std::vector<std::string> CgiHandler::buildCgiEnvironment(HttpRequest &req) {
     std::vector<std::string> env;
 
     /* REQUEST_METHOD: GET, POST etc */
-    env.push_back("REQUEST_METHOD=" + parser.getMethod());
+    env.push_back("REQUEST_METHOD=" + req.getMethod());
 
     /* Determine SCRIPT_FILENAME */
-    std::string uri = parser.getUri();
+    std::string uri = req.getUri();
     std::string cgiBase = "./cgi-bin";
     std::string scriptFilename;
     if (uri.find("/cgi-bin/") == 0) {
@@ -59,7 +59,7 @@ std::vector<std::string> CgiHandler::buildCgiEnvironment(HttpParser &parser) {
 
     /* QUERY_STRING from the _uriQuery map */
     std::ostringstream queryStream;
-    std::map<std::string, std::string> queryMap = parser.getQueryString();
+    std::map<std::string, std::string> queryMap = req.getUriQuery();
     bool first = true;
     for (std::map<std::string, std::string>::const_iterator it = queryMap.begin(); it != queryMap.end(); ++it) {
         if (!first) {
@@ -69,7 +69,7 @@ std::vector<std::string> CgiHandler::buildCgiEnvironment(HttpParser &parser) {
         first = false;
     }
     env.push_back("QUERY_STRING=" + queryStream.str());
-    env.push_back("CONTENT_LENGTH=" + std::to_string(parser.getBody().size()));
+    env.push_back("CONTENT_LENGTH=" + std::to_string(req.getBody().size()));
     /* Set REDIRECT_STATUS to bypass PHP CGI's security checks */
     env.push_back(std::string("REDIRECT_STATUS=200"));
     return env;
@@ -88,9 +88,9 @@ char **CgiHandler::convertEnvVectorToArray(const std::vector<std::string> &env) 
 /* Build the CGI environment variables */
 std::string CgiHandler::executeCgi(const std::string &cgiExecutable,
                                    const std::string &scriptPath,
-                                   HttpParser &parser) {
+                                   HttpRequest &req) {
     /* ENV variables from the parsed request */
-    std::vector<std::string> envVector = buildCgiEnvironment(parser);
+    std::vector<std::string> envVector = buildCgiEnvironment(req);
     for (std::vector<std::string>::const_iterator it = envVector.begin();
          it != envVector.end(); ++it) {
         size_t pos = it->find('=');
@@ -101,10 +101,10 @@ std::string CgiHandler::executeCgi(const std::string &cgiExecutable,
         }
     }
     /* Call UploadHandler ff method is POST and there is a body (i.e. an upload) */
-    if (parser.getMethod() == "POST" && !parser.getBody().empty()) {
+    if (req.getMethod() == "POST" && !req.getBody().empty()) {
         UploadHandler uploadHandler;
         /* Return path instead of full http response (build the http response including the path) */
-        std::string uploadedFilePath = uploadHandler.uploadReturnPath(parser);
+        std::string uploadedFilePath = uploadHandler.uploadReturnPath(req);
         /* Set an environment variable that the CGI script can use */
         setenv("UPLOADED_FILE", uploadedFilePath.c_str(), 1);
         return uploadedFilePath; //For testing purposes returns after processing POST

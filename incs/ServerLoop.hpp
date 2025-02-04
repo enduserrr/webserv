@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/03 10:46:46 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/04 11:36:04 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -18,6 +18,8 @@
 #include "HttpParser.hpp"
 #include "CgiHandler.hpp"
 #include "UploadHandler.hpp"
+#include "HttpRequest.hpp"
+#include "HttpParser.hpp"
 #include "Webserver.hpp"
 #include <vector>
 #include <poll.h>// Pollfd
@@ -36,13 +38,14 @@ class ServerLoop {
         std::vector<struct pollfd> _pollFds; // Fd's for polling
         std::map<int, std::string> _clientData; // Store client data (like requests)
         time_t _startUpTime; // Server starting timestamp
-        HttpParser _httpParser;
+        // HttpParser _httpParser;
 
         void setupServerSockets();
         void acceptNewConnection(int serverSocket);
         void handleClientRequest(int clientSocket);
         void sendResponse(int clientSocket, const std::string &response);
-        std::string routeRequest(HttpParser &parser);
+        // std::string routeRequest(HttpParser &parser);
+        std::string routeRequest(HttpRequest &req);
 
     public:
         ServerLoop();
