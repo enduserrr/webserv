@@ -3,6 +3,7 @@
         "*.embeddedhtml": "html",
         "map": "cpp",
         "algorithm": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "iosfwd": "cpp"
     }
 }

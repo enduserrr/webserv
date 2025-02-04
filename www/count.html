@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Count Page</title>
+  <style>
+    /* Set background, font, and text colors */
+    body {
+      background-color: #f9f9f9; /* Slightly off-white */
+      font-family: Helvetica, sans-serif;
+      color: #333; /* Dark grey */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    /* Centered container with right-aligned text */
+    .container {
+      width: 80%;
+      max-width: 800px;
+      text-align: left;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-weight: normal;
+    }
+    p {
+      margin-bottom: 40px;
+      line-height: 1.5;
+    }
+    form {
+      margin-bottom: 40px;
+    }
+    /* Styling for input elements and the select dropdown */
+    input[type="number"], select {
+      font-size: 16px;
+      padding: 8px;
+      margin: 5px;
+      width: 100px;
+    }
+    /* Outline-only button styling */
+    .button-container {
+      text-align: left;
+      margin-top: 20px;
+    }
+    .button-container input[type="submit"] {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: transparent; /* no fill */
+      border: 2px solid #333;
+      color: #333;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .button-container input[type="submit"]:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Counter</h1>
+    <h2>Simple Calculator Page</h2>
+    <p>Enter two numbers and choose an operation from the dropdown to calculate the result.</p>
+    <form action="calculate" method="POST">
+      <input type="number" name="number1" placeholder="Number 1" required>
+      <select name="operator">
+        <option value="+">+</option>
+        <option value="-">-</option>
+        <option value="*">*</option>
+        <option value="/">/</option>
+      </select>
+      <input type="number" name="number2" placeholder="Number 2" required>
+      <div class="button-container">
+        <input type="submit" value="Calculate">
+      </div>
+    </form>
+  </div>
+</body>
+</html>

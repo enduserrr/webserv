@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:10 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/02 11:38:45 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/04 11:31:12 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -15,6 +15,9 @@
 
 #include <iostream>
 #include <map>
+#include <vector>
+#include "Webserver.hpp"
+#include "HttpRequest.hpp"
 
 
 // Socket will give rawchunks of data,
@@ -24,13 +27,13 @@
 
 class HttpParser {
 private:
-    std::string                         _pendingData; //used for storing rest of the chunk
+    std::string                         _pendingData;   //used for storing rest of the chunk
+    std::vector<HttpRequest>            _requests;
 
-
-    size_t                              _maxBodySize; //get from ServerBlock
+    size_t                              _maxBodySize;   //get from ServerBlock
     std::string                         _method;
     std::string                         _uri;
-    std::map <std::string, std::string> _uriQuery;//should be string as only handling required for only one cgi request
+    std::map <std::string, std::string> _uriQuery;
     std::string                         _httpVersion;
     std::map <std::string, std::string> _headers;       //key + value
     std::string                         _body;
@@ -38,14 +41,7 @@ private:
 public:
     HttpParser();
     ~HttpParser();
-    // HttpParser(const HttpParser &other);
-    // HttpParser& operator=(const HttpParser &other);
 
-    // // Getters and Setters
-    // int getValue() const;
-    // void setValue(int value);
-
-    // // Member functions
 
     bool readFullRequest(std::istream& input);
     bool parseRequest(std::string& req, size_t max);
@@ -60,6 +56,12 @@ public:
     bool parseBody(std::string& line);
     void whiteSpaceTrim(std::string& str);
     void display() const;
+    void removeRequest();
+
+    /* Creates new request to HttpRequests vector after parsing */
+    bool createRequest();
+    std::vector<HttpRequest> &getRequests();
+    HttpRequest &getPendingRequest();
 
     std::string getMethod() {
         return _method;

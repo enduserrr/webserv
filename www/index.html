@@ -1,1 +1,69 @@
-THIS IS INDEX.HTML FILE. NICE!
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Index Page</title>
+  <style>
+    body {
+      background-color: #f9f9f9; /* Slightly off-white background */
+      font-family: Helvetica, sans-serif;
+      color: #333; /* Dark grey font */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    /* Text container centered on page with right-aligned text */
+    .container {
+      width: 80%;
+      max-width: 800px;
+      text-align: left;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-weight: normal;
+    }
+    p {
+      margin-bottom: 40px;
+      line-height: 1.5;
+    }
+    /* Centered button at the bottom */
+    .button-container {
+      text-align: left;
+    }
+    .button-container a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: transparent; /* No fill */
+        border: 2px solid #333;  /* Outline with dark grey, adjust thickness and color as needed */
+        color: #333;             /* Text color matching the border */
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .button-container a:hover {
+      background-color: #e3d5d5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Good Header</h1>
+    <h2></h2>
+    <p>
+        This is the body text containing some information about the website.
+        <br><br>If nothing else, it's concise!
+    </p>
+    <div class="button-container">
+      <a href="#" role="button">PRESS</a>
+    </div>
+  </div>
+</body>
+</html>
+

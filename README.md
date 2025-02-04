@@ -1,9 +1,7 @@
 # WEBSERV
-
-## To do:
-* Handling for multiple http requests
-* Identifying http requests requiring running a script
-* CGI handling
-* Signal handling
-* Including GET, POST & DELETE as accepted methods
-* Setting multiple custom error pages
+* Allowed to use fcntl() with the following flags: (Any other flag is forbidden.)
+ *F_SETFL
+ *O_NONBLOCK
+ * FD_CLOEXEC
+* Routes wont be using regexp
+* Define a HTTP redirection
