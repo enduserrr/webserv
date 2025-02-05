@@ -72,6 +72,16 @@ void ServerBlock::setBodySize(size_t size) {
     _bodySize = size; 
 }
 
+void ServerBlock::setLocation(const Location& loc){
+     _locations.push_back(loc);
+}
+
+ std::vector<Location>& ServerBlock::getLocations(){
+    return _locations;
+ }
+
+
+
 void ServerBlock::setErrorPages(const std::map<int, std::string> &errorPages) {
     ErrorHandler& errorHandler = ErrorHandler::getInstance();  // Get Singleton instance
     for (std::map<int, std::string>::const_iterator it = errorPages.begin(); it != errorPages.end(); ++it) {

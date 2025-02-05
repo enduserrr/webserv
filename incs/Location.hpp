@@ -17,21 +17,30 @@
 #include <vector>
 
 class Location {
-private:
-    std::string                 _location;
+private: 
+    std::string                 _path; 
     std::vector<std::string>    _allowedMethods;
+
 public:
     Location();
     ~Location();
+
     // Location(const Location &other);
     // Location& operator=(const Location &other);
+    
 
-    // Getters and Setters
-    // int getValue() const;
-    // void setValue(int value);
+    bool setPath(const std::string& path);
+    bool addAllowedMethod(const std::string& method);
+
+    
+    std::string getPath() const;
+    std::vector<std::string> getAllowedMethods() const;
+
 
     // Member functions
+
+
     // void display() const;
 };
 
-#endif // LOCATION_HPP
+#endif 

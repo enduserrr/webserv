@@ -144,44 +144,21 @@ bool ConfParser::parseData() {
 
     for (size_t i = 0; i < _fileLines.size(); ++i) {
         if (checkServerBlock(_fileLines[i], block)) {
-            std::cout << "serverblock starts.." << std::endl;
+            // std::cout << "serverblock starts.." << std::endl;
             serverIndex ++;
             _servers.push_back(ServerBlock());
         }
         if (block > 0) {
-            keyWordFinder(_fileLines[i], serverIndex);
+            keyWordFinder(_fileLines[i], serverIndex, i);
         }
     }
-    std::cout << _servers[0].getServerName() << std::endl;
-    std::cout << _servers[1].getServerName() << std::endl;
-    std::cout << _servers[2].getServerName() << std::endl;
+    // std::cout << _servers[0].getServerName() << std::endl;
+    // std::cout << _servers[1].getServerName() << std::endl;
+    // std::cout << _servers[2].getServerName() << std::endl;
     return true;
 }
 
-// void ConfParser::keyWordFinder(std::string line, int serverIndex) {
-
-//     std::istringstream ss(line);
-//     std:: string word;
-//     while(ss >> word) {
-//         if (word == SERVER_NAME) {
-//             if (ss >> word) {
-//                 _servers[serverIndex].setServerName(word);
-//             }
-//         }
-//         else if (word == PORT) {
-//             if (ss >> word) {
-//                 _servers[serverIndex].setPort(word);
-//             }
-//         }
-//         else if (word == BODY_SIZE) {
-//             if (ss >> word) {
-//                 _servers[serverIndex].setBodySize(word);
-//             }
-//         }
-//     }
-// }
-
-void ConfParser::keyWordFinder(std::string line, int serverIndex) {
+void ConfParser::keyWordFinder(std::string line, int serverIndex, size_t i) {
     std::istringstream ss(line);
     std::string word;
     while (ss >> word) {
@@ -196,6 +173,10 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex) {
         } else if (word == BODY_SIZE) {
             if (ss >> word) {
                 _servers[serverIndex].setBodySize(convertBodySize(word));
+            }
+        } else if (word == LOCATION) {
+            if (!parseLocation(serverIndex, i)) {
+                std::exit(EXIT_FAILURE);
             }
         } else if (word == ERROR_PAGE) {
             int statusCode;
@@ -216,17 +197,59 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex) {
     }
 }
 
+bool ConfParser::parseLocation(int si, int index) {
+       
+    _servers[si].setLocation(Location());
+
+    for (size_t i = index; i < _fileLines.size(); ++i) {
+        if (_fileLines[i].find('}') != std::string::npos){
+            break ;
+        }
+        std::istringstream ss(_fileLines[i]);
+        std::string word;
+        while(ss >> word){
+            if (word == LOCATION) {
+                if (ss >> word){
+                   _servers[si].getLocations().back().setPath(word); 
+                }
+            }
+            if (word == METHODS) {
+                while (ss >> word) {
+                    if (!_servers[si].getLocations().back().addAllowedMethod(word)) {
+                        std::cerr << "Invalid method: " << word << std::endl;
+                        return false; 
+                    }
+                }
+            }
+        }
+        std::cout << _fileLines[i] << std::endl; 
+    }
+    return true; 
+}
+
 size_t ConfParser::convertBodySize(std::string& word) {
     char unit = '\0';
+    if (!word.empty() && word.back() != ';') {
+        std::cerr << "Program should stop here: " << std::endl;
+        std::cerr << "max_body_size has to end by ';' (fix later to throw exception)" << std::endl;
+    }
     if (!word.empty() && word.back() == ';') {
+        //after exception fix no need for this if
+        //only str_pop; 
         word.pop_back();
-        std::cerr << "in here we throw exception (later)" << std::endl; 
     }
     if (!word.empty() && (word.back() == 'm' || word.back() == 'k' || word.back() == 'g')) {
         unit = word.back();
         word.pop_back();
     }
-    size_t num = std::stoi(word);
+    size_t num = 0;
+    try {
+        num = std::stoi(word);
+    } catch (const std::exception &e) {
+        // fix later to for better errorhandling
+        std::cerr << "bodysize has to be number" << std::endl;
+        std::exit(EXIT_FAILURE); 
+    }
     if(unit == 'k') {
         num = num * 1000; 
     }
@@ -247,15 +270,25 @@ void ConfParser::display() {
     std::cout << "File name: " <<_fileName << std::endl;
     std::cout << "File size: "<<_fileSize << std::endl;
     std::cout << "Server blocks: "<<_serverBlocks << std::endl;
-    std::cout << "\nParsed file now: " << std::endl;
-    for (size_t i = 0; i < _fileLines.size(); ++i) {
-        std::cout << _fileLines[i] << std::endl;
-    }
+    // std::cout << "\nParsed file now: " << std::endl;
+    // for (size_t i = 0; i < _fileLines.size(); ++i) {
+    //     std::cout << _fileLines[i] << std::endl;
+    // }
     std::cout << "\nServer(s): " << std::endl;
     for (size_t i = 0; i < _servers.size(); ++i) {
         std::cout << "server_name:   " << _servers[i].getServerName() << std::endl;
         std::cout << "listen:        " << _servers[i].getPort() << std::endl;
         std::cout << "max_body_size: " << _servers[i].getBodySize() << std::endl;
+        std::cout << "location(s)    " << std::endl;
+        for (size_t j = 0; j < _servers[i].getLocations().size(); ++j) {
+            std::cout << "path:          " << _servers[i].getLocations()[j].getPath() << std::endl;
 
+            // Print allowed methods
+            std::cout << "Methods:       ";
+            for (size_t k = 0; k < _servers[i].getLocations()[j].getAllowedMethods().size(); ++k) {
+                std::cout << _servers[i].getLocations()[j].getAllowedMethods()[k] << " ";
+            }
+        std::cout << "\n" << std::endl;
+        }
     }
 }
