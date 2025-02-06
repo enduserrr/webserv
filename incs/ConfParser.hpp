@@ -25,6 +25,8 @@
 #define ERROR_PAGE      "error_pages"
 #define METHODS         "allow_methods"
 #define LOCATION        "location"
+#define ROOT            "root"
+#define AUTOI           "autoindex"
 
 //ERRORS 
 #define CONF_ERROR    "error: configuration file: "
@@ -57,17 +59,18 @@ public:
     //parse file
     bool        parseFile();
     std::string removeComments(const std::string &line);
-    bool        checkServerBlock(const std::string &line, int &block);
+    bool        checkServerBlock(const std::string &line);
     bool        BracketsClosed(int block);
+    int         bracketDepth(std::string line); 
 
     //parse data
     bool        parseData();
     void        keyWordFinder(std::string line, int serverIndex, size_t i);
     size_t      convertBodySize(std::string& word);
-    bool        parseLocation(int serverIndex, int i);
+    bool        parseLocation(int serverIndex, size_t &i);
     bool        parsePort(std::string port, int si);
     bool        parseServerName(std::string name, int si);
-    bool        parseLine(std::string &line);
+    bool        parseLine(std::string &line, int &block);
     bool        validPath(std::string path, int si);
     void        whiteSpaceTrim(std::string &str);
     bool        wordCheck(std::string& word);

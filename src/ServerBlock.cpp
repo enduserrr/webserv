@@ -15,9 +15,7 @@
 
 
 // Constructor
-ServerBlock::ServerBlock() {
-    std::cout << "SERVERBLOCK constructor" << std::endl;
-}
+ServerBlock::ServerBlock() : _autoIndex(false) {}
 
 /* ServerBlock::ServerBlock(ErrorHandler *errorHandler) : _errorHandler(errorHandler) {}
 
@@ -33,8 +31,16 @@ std::string ServerBlock::getServerName() const {
     return _serverName;
 }
 
+std::string ServerBlock::getRoot() const {
+    return _root;
+}
+
 std::vector<int> ServerBlock::getPorts() {
     return _ports;
+}
+
+bool ServerBlock::getAutoIndex() {
+    return _autoIndex;
 }
 
 size_t ServerBlock::getBodySize() const {
@@ -51,8 +57,16 @@ void ServerBlock::setServerName(std::string str) {
     _serverName = str;
 }
 
+void ServerBlock::setRoot(std::string root) {
+    _root = root;
+}
+
 void ServerBlock::setPorts(int port) {
     _ports.push_back(port); 
+}
+
+void ServerBlock::setAutoIndex(bool b) {
+    _autoIndex = b;
 }
 
 void ServerBlock::setBodySize(size_t size) {
@@ -69,8 +83,3 @@ void ServerBlock::setErrorPages(const std::map<int, std::string> &errorPages) {
         errorHandler.setCustomErrorPage(it->first, it->second);
     }
 }
-
-/* // Member function
-void ServerBlock::display() const {
-    std::cout << "Value: " << value << std::endl;
-} */
