@@ -1,15 +1,14 @@
 # WEBSERV
-* Allowed to use fcntl() with the following flags: (Any other flag is forbidden.)
- * F_SETFL
- * O_NONBLOCK
- * FD_CLOEXEC
-* Routes wont be using regexp (reqular expression lang)
-* Define a HTTP redirection
-* MIME
+* What's MIME?
 
-HTTP redirection is a mechanism used by web servers to instruct a client (like a web browser) to request a different URL than the one originally requested. This is typically done by sending a 3xx HTTP status code (such as 301 for permanent redirection, 302 for temporary redirection, or 307/308 for other variations) along with a "Location" header that specifies the new URL. The client then automatically makes a new request to that URL.
+* Turn dir listing on/off
+* Default file to answer if the requested file is a dir
+*
+
+* Enable route to accept uploadeds and configure where they are saved (redirmap)
+* CGI chunked request, return vals (EOF) etc requirements
 
 
-* Methods class finnish
-* Router class finnish (calls for correct handler, redirections)
-* Delete implementation to CgiHandler
+* Spam blocker (.html)
+
+directory bool _listing & std::string _root to Location class. Needed for listing dirs.
