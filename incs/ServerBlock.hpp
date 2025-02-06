@@ -20,27 +20,26 @@
 
 class ServerBlock {
 private:
-    std::string     _serverName;
-    std::string     _port;         // str now, but maybe int?
-    size_t          _bodySize;
-
-    std::vector<Location>    _locations;
+    std::string             _serverName;
+    std::vector<int>        _ports; 
+    size_t                  _bodySize;
+    std::vector<Location>   _locations;
 
 public:
     ServerBlock();
     ~ServerBlock();
 
     // Getters and Setters
-    void        setServerName(std::string str);
-    void        setPort(std::string str);
-    void        setBodySize(size_t size);
-    void        setErrorPages(const std::map<int, std::string> &errorPages);
-    void        setLocation(const Location& loc);
+    void                    setServerName(std::string str);
+    void                    setPorts(int port);
+    void                    setBodySize(size_t size);
+    void                    setErrorPages(const std::map<int, std::string> &errorPages);
+    void                    setLocation(const Location& loc);
 
-    std::string getServerName() const;
-    std::string getPort() const;
-    size_t      getBodySize() const;
-    std::vector<Location>& getLocations();
+    std::string             getServerName() const;
+    std::vector<int>        getPorts();
+    size_t                  getBodySize() const;
+    std::vector<Location>&  getLocations();
 
     // void display() const;
 };

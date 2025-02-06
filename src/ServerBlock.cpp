@@ -28,44 +28,31 @@ void ServerBlock::setBodySize(std::string str) { _bodySize = str; } */
 // Destructor
 ServerBlock::~ServerBlock() {}
 
-/* // Copy Constructor
-ServerBlock::ServerBlock(const ServerBlock &other) {
-    *this = other;
-}
-
-// Copy Assignment Operator
-ServerBlock& ServerBlock::operator=(const ServerBlock &other) {
-    if (this != &other) {
-        this->value = other.value;
-    }
-    return *this;
-} */
-
-// Getters and Setters
+// Getters
 std::string ServerBlock::getServerName() const {
     return _serverName;
 }
 
-void ServerBlock::setServerName(std::string str) {
-    if (!str.empty() && str.back() == ';') {
-    str.pop_back();
-    }
-    _serverName = str;
-}
-
-std::string ServerBlock::getPort() const {
-    return _port;
-}
-
-void ServerBlock::setPort(std::string str) {
-    if (!str.empty() && str.back() == ';') {
-    str.pop_back();
-    }
-    _port = str;
+std::vector<int> ServerBlock::getPorts() {
+    return _ports;
 }
 
 size_t ServerBlock::getBodySize() const {
     return _bodySize;
+}
+
+std::vector<Location>& ServerBlock::getLocations(){
+    return _locations;
+}
+
+
+//Setters
+void ServerBlock::setServerName(std::string str) {
+    _serverName = str;
+}
+
+void ServerBlock::setPorts(int port) {
+    _ports.push_back(port); 
 }
 
 void ServerBlock::setBodySize(size_t size) {
@@ -75,12 +62,6 @@ void ServerBlock::setBodySize(size_t size) {
 void ServerBlock::setLocation(const Location& loc){
      _locations.push_back(loc);
 }
-
- std::vector<Location>& ServerBlock::getLocations(){
-    return _locations;
- }
-
-
 
 void ServerBlock::setErrorPages(const std::map<int, std::string> &errorPages) {
     ErrorHandler& errorHandler = ErrorHandler::getInstance();  // Get Singleton instance
