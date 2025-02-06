@@ -26,6 +26,10 @@
 #define METHODS         "allow_methods"
 #define LOCATION        "location"
 
+//ERRORS 
+#define CONF_ERROR    "error: configuration file: "
+
+
 class ConfParser {
 private:
     std::string              _fileName;
@@ -38,10 +42,10 @@ private:
     // static const std::string ERROR_PAGE;
 
 public:
+    //Constructor & Destructor
     ConfParser(std::string filename);
     ~ConfParser();
-    // ConfParser(const ConfParser &other);
-    // ConfParser& operator=(const ConfParser &other);
+
     std::map<int, std::string> _errorPages;
 
     //validate file basics before opening
@@ -61,6 +65,14 @@ public:
     void        keyWordFinder(std::string line, int serverIndex, size_t i);
     size_t      convertBodySize(std::string& word);
     bool        parseLocation(int serverIndex, int i);
+    bool        parsePort(std::string port, int si);
+    bool        parseServerName(std::string name, int si);
+    bool        parseLine(std::string &line);
+    bool        validPath(std::string path, int si);
+    void        whiteSpaceTrim(std::string &str);
+    bool        wordCheck(std::string& word);
+
+
 
     std::vector<ServerBlock> getServers() const {
         return _servers;
