@@ -61,6 +61,15 @@ bool ConfParser::fileExtension(){
 
 // Parsing the file
 
+
+bool ConfParser::checkServerBlock(const std::string &line) {
+    if(line != SERVER) {
+        return false;
+    }
+    return true;
+}
+
+
 bool ConfParser::parseFile(){
     std::ifstream file;
 
@@ -78,10 +87,13 @@ bool ConfParser::parseFile(){
         if (line.find_first_not_of(" \t") == std::string::npos) {
             continue ;
         }
-        if (checkServerBlock(line, block)){
+        if (checkServerBlock(line)) {
+            block ++; 
             _serverBlocks ++;
+            _fileLines.push_back(line);
+            continue ;
         }
-        if (!line.empty() && !parseLine(line)) {
+        if (!line.empty() && !parseLine(line, block)) {
             file.close();
             return false; 
         }
@@ -103,9 +115,15 @@ bool ConfParser::parseFile(){
     return true;
 }
 
-bool ConfParser::parseLine(std::string &line){
+bool ConfParser::parseLine(std::string &line, int &block){
     whiteSpaceTrim(line);
-    char last = line.back(); 
+    char last = line.back();
+    if (last == '{') {
+        block ++; 
+    }
+    if (last == '}') {
+        block --; 
+    }
     if (last != '{' && last != '}' && last != ';') {
         std::cerr << CONF_ERROR << "wrong last char of the line" << std::endl;
         return false; 
@@ -117,8 +135,7 @@ bool ConfParser::parseLine(std::string &line){
         std::cerr << CONF_ERROR << "';' can be only end of line" << std::endl;
         return false; 
     }
-    if (line.find('{') != std::string::npos && line.find("server") == std::string::npos && 
-        line.find("location") == std::string::npos) {
+    if (line.find('{') != std::string::npos && line.find("location") == std::string::npos) {
         std::cerr << CONF_ERROR << "undefined '{'" << std::endl;
         return false;
     }
@@ -126,7 +143,6 @@ bool ConfParser::parseLine(std::string &line){
         std::cerr << CONF_ERROR  << "undefined '}'" << std::endl;  
         return false; 
     }
-
     return true; 
 }
 
@@ -140,20 +156,6 @@ std::string ConfParser::removeComments(const std::string &line){
     return line;
 }
 
-bool ConfParser::checkServerBlock(const std::string &line, int &block) {
-    if(block == 0 && line.find(SERVER) != std::string::npos) {
-        block ++;
-        return true;
-    }
-    if(line.find("{") != std::string::npos) {
-        block ++;
-    }
-    if(line.find("}") != std::string::npos) {
-        block --;
-    }
-    return false;
-}
-
 bool ConfParser::BracketsClosed(int block){
     if (block > 0) {
          std::cerr << "Unclosed curly brackets in configuration File" << std::endl;
@@ -162,17 +164,37 @@ bool ConfParser::BracketsClosed(int block){
     return true;
 }
 
+int ConfParser::bracketDepth(std::string line){
+    if (line.find('{') == std::string::npos){
+        return 1; 
+    }
+    if (line.find('}') == std::string::npos){
+        return -1; 
+    }
+    return (0); 
+}
+
 bool ConfParser::parseData() {
 
-    int block = 0;
     int serverIndex = -1;
+    int block = 0;
 
     for (size_t i = 0; i < _fileLines.size(); ++i) {
-        if (checkServerBlock(_fileLines[i], block)) {
-            serverIndex ++;
-            _servers.push_back(ServerBlock());
+        if (_fileLines[i] == "}"){
+            block --; 
+            continue ;
         }
-        if (block > 0) {
+        if (checkServerBlock(_fileLines[i])) {
+            _servers.push_back(ServerBlock());
+            block ++;
+            serverIndex ++; 
+        }
+        else if (_fileLines[i].find(LOCATION) != std::string::npos) {
+            if (!parseLocation(serverIndex, i)) {
+                return false;
+            }
+            block --;
+        } else {
             keyWordFinder(_fileLines[i], serverIndex, i);
         }
     }
@@ -180,31 +202,26 @@ bool ConfParser::parseData() {
 }
 
 void ConfParser::keyWordFinder(std::string line, int serverIndex, size_t i) {
+    (void)i;
     std::istringstream ss(line);
     std::string word;
     while (ss >> word) {
-        if (word == SERVER_NAME) {
-            if (ss >> word) {
-                if (!parseServerName(word, serverIndex)) {
-                    std::exit(EXIT_FAILURE);
-                }
-                _servers[serverIndex].setServerName(word);
-            }
-        } else if (word == PORT) {
-            if (ss >> word) {
-                if (!parsePort(word, serverIndex)) {
-                    std::exit(EXIT_FAILURE);
-                }
-            }
-        } else if (word == BODY_SIZE) {
-            if (ss >> word) {
-                _servers[serverIndex].setBodySize(convertBodySize(word));
-            }
-        } else if (word == LOCATION) {
-            if (!parseLocation(serverIndex, i)) {
+        std::string temp = word; 
+        if (temp == SERVER_NAME && ss >> word){
+            if (!parseServerName(word, serverIndex)) {
                 std::exit(EXIT_FAILURE);
             }
-        } else if (word == ERROR_PAGE) {
+        } else if (temp == PORT && ss >> word) {
+            if (!parsePort(word, serverIndex)) {
+                std::exit(EXIT_FAILURE);
+            }
+        } else if (temp == BODY_SIZE && ss >> word) {
+                _servers[serverIndex].setBodySize(convertBodySize(word));
+        }else if (temp == ROOT && ss >> word) {
+            _servers[serverIndex].setRoot(word);
+        }else if (temp == AUTOI && ss >> word) {
+            _servers[serverIndex].setAutoIndex(true);
+        } else if (temp == ERROR_PAGE) {
             int statusCode;
             std::string pagePath;
             if (ss >> statusCode >> pagePath) {
@@ -219,6 +236,8 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex, size_t i) {
                     std::cerr << CONF_ERROR << "Failed to open error page file: " << pagePath << std::endl;
                 }
             }
+        } else {
+            std::cerr << "unknown" << temp <<std::endl;
         }
     }
 }
@@ -237,7 +256,6 @@ bool ConfParser::validPath(std::string path, int si) {
             }
         }
     }
-
     return true;
 }
 
@@ -288,11 +306,11 @@ bool ConfParser::parseServerName(std::string name, int si) {
     return true;
 }
 
-bool ConfParser::parseLocation(int si, int index) {
+bool ConfParser::parseLocation(int si, size_t &i) {
        
     Location loc;
 
-    for (size_t i = index; i < _fileLines.size(); ++i) {
+    for (; i < _fileLines.size(); ++i) {
         if (_fileLines[i].find('}') != std::string::npos){
             break ;
         }
@@ -305,6 +323,10 @@ bool ConfParser::parseLocation(int si, int index) {
                         return false; 
                     }
                     loc.setPath(word);
+                    if (ss >> word && word != "{"){
+                        std::cerr << CONF_ERROR << "extra path detected" << std::endl;
+                        return false; 
+                    }
                 }
             }
             if (word == METHODS) {
@@ -313,6 +335,16 @@ bool ConfParser::parseLocation(int si, int index) {
                         std::cerr << CONF_ERROR << "Invalid method: " << word << std::endl;
                         return false; 
                     }
+                }
+            }
+            if (word == ROOT) {
+                if (ss >> word) {
+                    loc.setRoot(word); 
+                }
+            }
+            if (word == ROOT) {
+                if (ss >> word) {
+                    loc.setAutoIndex(true); 
                 }
             }
         }
@@ -372,16 +404,19 @@ void ConfParser::display() {
     std::cout << "\nServer(s): " << std::endl;
     for (size_t i = 0; i < _servers.size(); ++i) {
         std::cout << "server_name:   " << _servers[i].getServerName() << std::endl;
+        std::cout << "root:          " << _servers[i].getRoot() << std::endl; 
         std::cout << "listen:        ";
         for (size_t p = 0; p < _servers[i].getPorts().size(); p ++){
             std::cout << _servers[i].getPorts()[p] << " ";
         } 
         std::cout << std::endl; 
         std::cout << "max_body_size: " << _servers[i].getBodySize() << std::endl;
+        std::cout << "autoindex:     " << _servers[i].getAutoIndex() << std::endl;
         std::cout << "location(s)    " << std::endl;
         for (size_t j = 0; j < _servers[i].getLocations().size(); ++j) {
             std::cout << "path:          " << _servers[i].getLocations()[j].getPath() << std::endl;
-
+            std::cout << "root:          " << _servers[i].getLocations()[j].getRoot() << std::endl;
+            std::cout << "autoindex:     " << _servers[i].getLocations()[j].getAutoIndex() << std::endl;
             // Print allowed methods
             std::cout << "Methods:       ";
             for (size_t k = 0; k < _servers[i].getLocations()[j].getAllowedMethods().size(); ++k) {

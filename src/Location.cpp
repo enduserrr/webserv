@@ -13,33 +13,41 @@
 #include "Location.hpp"
 
 // Constructor
-Location::Location(){}
+Location::Location() : _autoIndex(false) {}
 
 // Destructor
 Location::~Location() {}
 
-// // Copy Constructor
-// Location::Location(const Location &other) {
-//     *this = other;
-// }
 
-// // Copy Assignment Operator
-// Location& Location::operator=(const Location &other) {
-//     if (this != &other) {
-//         this->value = other.value;
-//     }
-//     return *this;
-// }
+//getters
+std::string Location::getPath() const {
+    // std::cout << "getpath: "<< _path << std::endl;
+    return _path;
+}
 
-// // Getters and Setters
-// int Location::getValue() const {
-//     return value;
-// }
+std::string Location::getRoot() const {
+    return _root;
+}
 
-bool Location::setPath(const std::string& path) {
-    // std::cout << "setpath: "<< path << std::endl;
+bool Location::getAutoIndex() {
+    return _autoIndex;
+}
+
+std::vector<std::string> Location::getAllowedMethods() const {
+    return _allowedMethods;
+}
+
+//setters
+void Location::setPath(const std::string& path) {
     _path = path;
-    return true;
+}
+
+void Location::setRoot(std::string root) {
+    _root = root;
+}
+
+void Location::setAutoIndex(bool b) {
+    _autoIndex = b;
 }
 
 bool Location::addAllowedMethod(const std::string& method){
@@ -48,20 +56,3 @@ bool Location::addAllowedMethod(const std::string& method){
     _allowedMethods.push_back(method);
     return true;
 }
-
-std::string Location::getPath() const {
-    // std::cout << "getpath: "<< _path << std::endl;
-    return _path;
-}
-
-std::vector<std::string> Location::getAllowedMethods() const {
-    return _allowedMethods;
-}
-
-
-
-
-// // Member function
-// void Location::display() const {
-//     std::cout << "Value: " << value << std::endl;
-// }

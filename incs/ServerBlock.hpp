@@ -21,7 +21,9 @@
 class ServerBlock {
 private:
     std::string             _serverName;
-    std::vector<int>        _ports; 
+    std::string             _root; 
+    std::vector<int>        _ports;
+    bool                    _autoIndex;  //1 true - 0 false
     size_t                  _bodySize;
     std::vector<Location>   _locations;
 
@@ -29,17 +31,22 @@ public:
     ServerBlock();
     ~ServerBlock();
 
-    // Getters and Setters
+    // Getters
+    std::string             getServerName() const;
+    std::string             getRoot() const;
+    std::vector<int>        getPorts();
+    bool                    getAutoIndex();
+    size_t                  getBodySize() const;
+    std::vector<Location>&  getLocations();
+
+    // Setters
     void                    setServerName(std::string str);
+    void                    setRoot(std::string root);
     void                    setPorts(int port);
+    void                    setAutoIndex(bool b);
     void                    setBodySize(size_t size);
     void                    setErrorPages(const std::map<int, std::string> &errorPages);
     void                    setLocation(const Location& loc);
-
-    std::string             getServerName() const;
-    std::vector<int>        getPorts();
-    size_t                  getBodySize() const;
-    std::vector<Location>&  getLocations();
 
     // void display() const;
 };
