@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/04 11:11:31 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/05 12:29:04 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -102,6 +102,7 @@ std::string CgiHandler::executeCgi(const std::string &cgiExecutable,
     }
     /* Call UploadHandler ff method is POST and there is a body (i.e. an upload) */
     if (req.getMethod() == "POST" && !req.getBody().empty()) {
+        // return Methods::mPost(req);
         UploadHandler uploadHandler;
         /* Return path instead of full http response (build the http response including the path) */
         std::string uploadedFilePath = uploadHandler.uploadReturnPath(req);

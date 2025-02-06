@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:43:41 by eleppala          #+#    #+#             */
-/*   Updated: 2025/01/28 18:43:43 by eleppala         ###   ########.fr       */
+/*   Updated: 2025/02/06 09:00:52 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "Location.hpp"
 
@@ -37,20 +37,20 @@ Location::~Location() {}
 // }
 
 bool Location::setPath(const std::string& path) {
-    // std::cout << "setpath: "<< path << std::endl; 
+    // std::cout << "setpath: "<< path << std::endl;
     _path = path;
     return true;
 }
 
 bool Location::addAllowedMethod(const std::string& method){
     if (method != "GET" && method != "POST" && method != "DELETE")
-        return false;  
+        return false;
     _allowedMethods.push_back(method);
-    return true; 
+    return true;
 }
 
 std::string Location::getPath() const {
-    // std::cout << "getpath: "<< _path << std::endl; 
+    // std::cout << "getpath: "<< _path << std::endl;
     return _path;
 }
 

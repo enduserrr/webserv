@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/04 11:36:04 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/05 11:05:18 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -20,6 +20,7 @@
 #include "UploadHandler.hpp"
 #include "HttpRequest.hpp"
 #include "HttpParser.hpp"
+#include "Router.hpp"
 #include "Webserver.hpp"
 #include <vector>
 #include <poll.h>// Pollfd

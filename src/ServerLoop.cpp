@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/04 11:27:49 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/05 12:25:21 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -84,19 +84,6 @@ void    ServerLoop::acceptNewConnection(int serverSocket) {
     std::cout << "New client connected: " << inet_ntoa(clientAddr.sin_addr) << std::endl;
 }
 
-// std::string ServerLoop::routeRequest(HttpParser &parser) {
-//     std::string uri = parser.getUri();
-//     /* For example, if the URI starts with "/cgi-bin/" or has a CGI file extension */
-//     if (uri.find("/cgi-bin/") == 0 ||
-//         (uri.size() >= 4 && uri.substr(uri.size()-4) == ".php")) {
-//         CgiHandler cgiHandler;
-//         return cgiHandler.processRequest(parser);
-//     } else {
-//         StaticHandler staticHandler;
-//         return staticHandler.processRequest(parser);
-//     }
-// }
-
 std::string ServerLoop::routeRequest(HttpRequest &req) {
     std::string uri = req.getUri();
     /* For example, if the URI starts with "/cgi-bin/" or has a CGI file extension */
@@ -134,14 +121,15 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     std::string request(buffer, bytesRead);
     std::cout << "Received request: " << request << std::endl;
     HttpParser parser;
-    if (!parser.parseRequest(request, 100)) {//Change to take _bodySize from ServerBlock?
+    if (!parser.parseRequest(request, ServerBlock().getBodySize())) {
         std::string errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
                                     + ErrorHandler::getInstance().getErrorPage(400);
         sendResponse(clientSocket, errorResponse);
         return ;
     }
     HttpRequest req = parser.getPendingRequest();
-    std::string response = routeRequest(req);
+    // std::string response = routeRequest(req);
+    std::string response = Router().routeRequest(req);
     sendResponse(clientSocket, response);
     parser.removeRequest();
 }

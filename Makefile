@@ -5,7 +5,8 @@ SRC		= $(SRC_DIR)/main.cpp $(SRC_DIR)/ConfParser.cpp \
 		  $(SRC_DIR)/ServerLoop.cpp $(SRC_DIR)/HttpParser.cpp \
 		  $(SRC_DIR)/ErrorHandler.cpp $(SRC_DIR)/StaticHandler.cpp \
 		  $(SRC_DIR)/CgiHandler.cpp $(SRC_DIR)/UploadHandler.cpp \
-		  $(SRC_DIR)/HttpRequest.cpp
+		  $(SRC_DIR)/HttpRequest.cpp $(SRC_DIR)/Router.cpp \
+		  $(SRC_DIR)/Methods.cpp
 OBJ_DIR	= .obj
 OBJ		= $(addprefix $(OBJ_DIR)/, $(notdir $(SRC:.cpp=.o)))
 CC		= c++

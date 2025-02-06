@@ -1,28 +1,33 @@
 /******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   StaticHandler.hpp                                  :+:      :+:    :+:   */
+/*   Methods.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/01 11:40:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/05 12:13:32 by asalo            ###   ########.fr       */
+/*   Created: 2025/02/05 11:35:44 by asalo             #+#    #+#             */
+/*   Updated: 2025/02/05 12:24:53 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#ifndef STATICHANDLER_HPP
-#define STATICHANDLER_HPP
+#ifndef METHODS_HPP
+# define METHODS_HPP
 
 #include "HttpRequest.hpp"
-#include "Methods.hpp"
+#include "UploadHandler.hpp"
+#include "ErrorHandler.hpp"
 #include <string>
 
-class StaticHandler {
-    public:
-        StaticHandler();
-        ~StaticHandler();
+class Methods {
+    private:
 
-        std::string processRequest(HttpRequest &req);
+    public:
+        Methods();
+        ~Methods();
+
+        static std::string mGet(HttpRequest &req);
+        static std::string mPost(HttpRequest &req);
+        static std::string mDelete(HttpRequest &req);
 };
 
 #endif

@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "*.embeddedhtml": "html",
-        "map": "cpp",
-        "algorithm": "cpp",
-        "new": "cpp",
-        "iosfwd": "cpp"
-    }
-}

@@ -1,7 +1,14 @@
 # WEBSERV
-* Allowed to use fcntl() with the following flags: (Any other flag is forbidden.)
- *F_SETFL
- *O_NONBLOCK
- * FD_CLOEXEC
-* Routes wont be using regexp
-* Define a HTTP redirection
+* What's MIME?
+
+* Turn dir listing on/off
+* Default file to answer if the requested file is a dir
+*
+
+* Enable route to accept uploadeds and configure where they are saved (redirmap)
+* CGI chunked request, return vals (EOF) etc requirements
+
+
+* Spam blocker (.html)
+
+directory bool _listing & std::string _root to Location class. Needed for listing dirs.
