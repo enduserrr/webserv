@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:16 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/05 11:04:22 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/10 11:19:50 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -40,13 +40,13 @@ std::string Router::routeRequest(HttpRequest &req) {
         return response.str();
     }
 
-    // Now route the request based on the URI pattern.
+    // Route request based on the URI pattern.
     // If the URI starts with "/cgi-bin/" or ends with ".php", delegate to the CGI handler.
     if (uri.find("/cgi-bin/") == 0 || (uri.size() >= 4 && uri.substr(uri.size()-4) == ".php")) {
         CgiHandler cgiHandler;
         return cgiHandler.processRequest(req);
     } else {
-        // Otherwise, treat it as a request for a static resource.
+        // Else, treat it as a request for a static resource.
         StaticHandler staticHandler;
         return staticHandler.processRequest(req);
     }
