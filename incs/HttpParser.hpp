@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:10 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/05 18:44:32 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/08 10:07:19 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -37,7 +37,8 @@ private:
     std::string                         _httpVersion;
     std::map <std::string, std::string> _headers;       //key + value
     std::string                         _body;
-    // bool                                _dir;
+    bool                                _autoIndex;
+    std::string                         _root;
 
 public:
     HttpParser();
@@ -80,10 +81,20 @@ public:
         return _uri;
     }
 
-    // bool getDirPermission() {
-        // return _dir;
-    // }
+    bool indexAllowed() {
+        return _autoIndex;
+    }
 
+    std::string getRoot() {
+        return _root;
+    }
+
+    void setAutoIndex(bool b) {
+        _autoIndex = b;
+    }
+    void setRoot(std::string root) {
+    _root = root;
+    }
 };
 
 #endif

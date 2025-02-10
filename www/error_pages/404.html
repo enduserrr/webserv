@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Index Page</title>
+  <title>404 Not Found</title>
   <style>
     body {
       background-color: #f9f9f9; /* Slightly off-white background */
@@ -15,9 +15,9 @@
       justify-content: center;
       min-height: 100vh;
     }
-    /* Text container centered on page with right-aligned text */
+    /* Container centered on page with left-aligned text */
     .container {
-      width: 80%;
+      width: 100%;
       max-width: 800px;
       text-align: left;
     }
@@ -32,20 +32,20 @@
       margin-bottom: 40px;
       line-height: 1.5;
     }
-    /* Centered button at the bottom */
+    /* Left-aligned button at the bottom */
     .button-container {
       text-align: left;
     }
     .button-container a {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: transparent; /* No fill */
-        border: 2px solid #333;  /* Outline with dark grey, adjust thickness and color as needed */
-        color: #333;             /* Text color matching the border */
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: transparent; /* No fill */
+      border: 2px solid #333;  /* Outline with dark grey */
+      color: #333;             /* Text color matching the border */
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
     }
     .button-container a:hover {
       background-color: #e3d5d5;
@@ -54,16 +54,12 @@
 </head>
 <body>
   <div class="container">
-    <h1>HOME</h1>
-    <h2></h2>
-    <p>
-        This is the home page. Stay as long as you need to!
-        <br><br>You could also try the button below...
-    </p>
+    <h1>ERROR 404</h1>
+    <h2>Oops! Bad Request.</h2>
+    <p>Your request cannot be processed.</p>
     <div class="button-container">
-      <a href="/uploads/" role="button">PRESS</a>
+        <a href="/index.html" role="button">Home</a>
     </div>
   </div>
 </body>
 </html>
-

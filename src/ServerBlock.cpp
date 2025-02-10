@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:44:02 by eleppala          #+#    #+#             */
-/*   Updated: 2025/01/28 18:44:05 by eleppala         ###   ########.fr       */
+/*   Updated: 2025/02/10 08:56:25 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "ServerBlock.hpp"
 #include <iostream>
@@ -35,7 +35,7 @@ std::string ServerBlock::getRoot() const {
     return _root;
 }
 
-std::vector<int> ServerBlock::getPorts() {
+std::vector<int> ServerBlock::getPorts() const {
     return _ports;
 }
 
@@ -62,7 +62,7 @@ void ServerBlock::setRoot(std::string root) {
 }
 
 void ServerBlock::setPorts(int port) {
-    _ports.push_back(port); 
+    _ports.push_back(port);
 }
 
 void ServerBlock::setAutoIndex(bool b) {
@@ -70,7 +70,7 @@ void ServerBlock::setAutoIndex(bool b) {
 }
 
 void ServerBlock::setBodySize(size_t size) {
-    _bodySize = size; 
+    _bodySize = size;
 }
 
 void ServerBlock::setLocation(const Location& loc){

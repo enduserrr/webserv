@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/04 11:37:13 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/07 09:39:30 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -52,7 +52,7 @@ bool HttpParser::readFullRequest(std::istream& input) {
     return false;
 }
 
-bool HttpParser::parseRequest(std::string& req, size_t max) {
+bool HttpParser::parseRequest(std::string &req, size_t max) {
 
     //debug
     // std::cout << req << std::endl;

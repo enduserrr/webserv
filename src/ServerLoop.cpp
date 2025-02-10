@@ -6,12 +6,14 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/05 12:25:21 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/10 10:20:08 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "../incs/ServerLoop.hpp"
 #include "../incs/StaticHandler.hpp"
+#include "../incs/Router.hpp"
+#include "../incs/ServerBlock.hpp"
 #include <algorithm>
 #include <iostream>
 #include <cstring> //memset
@@ -29,66 +31,57 @@ ServerLoop::~ServerLoop() {
 
 bool    ServerLoop::hasTimedOut() {
     time_t currentTime = time(nullptr);
-    return (currentTime - _startUpTime) >= 10;  // 10-second timeout
+    return (currentTime - _startUpTime) >= 300;  // Timeout after 5 minutes
 }
 
 void ServerLoop::setupServerSockets() {
     for (std::vector<ServerBlock>::const_iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
-        int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-        if (serverSocket < 0) {
-            
-            //----- PORTS CHANGED: -> std::vector<int>        _ports; -----
+        const std::vector<int>& ports = it->getPorts();  // Get the vector of ports
 
-            // ErrorHandler::getInstance().logError("Failed to create socket for port " + it->getPort());
-            
-            continue;
-        }
-        int opt = 1;  // Set socket options below
-        if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-            
-            //----- PORTS CHANGED: -> std::vector<int>        _ports; -----
-            
-            // ErrorHandler::getInstance().logError("Failed to set socket options for port " + it->getPort());
-            // close(serverSocket);
-            
-            continue;
-        }
-        struct sockaddr_in serverAddr;  // Bind socket
-        memset(&serverAddr, 0, sizeof(serverAddr));
-        serverAddr.sin_family = AF_INET;
-        serverAddr.sin_addr.s_addr = INADDR_ANY;
-        
-        //----- PORTS CHANGED: -> std::vector<int>        _ports; -----
-        // serverAddr.sin_port = htons(std::stoi(it->getPort()));
-        
-        
-        if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-            
-            //----- PORTS CHANGED: -> std::vector<int>        _ports; -----
-            
-            // ErrorHandler::getInstance().logError("Failed to bind socket for port " + it->getPort() +
-            //                                      ErrorHandler::getInstance().getErrorPage(404));
-            
-            close(serverSocket);
-            continue;
-        }
-        if (listen(serverSocket, SOMAXCONN) < 0) {
-            
-            //----- PORTS CHANGED: -> std::vector<int>        _ports; -----
+        for (std::vector<int>::const_iterator portIt = ports.begin(); portIt != ports.end(); ++portIt) {
+            int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+            if (serverSocket < 0) {
+                ErrorHandler::getInstance().logError("Failed to create socket for port " + std::to_string(*portIt));
+                continue;
+            }
 
-            // ErrorHandler::getInstance().logError("Failed to listen on port " + it->getPort());
-            
-            close(serverSocket);
-            continue;
-        }
-        struct pollfd pfd;  // Add to pollfd
-        pfd.fd = serverSocket;
-        pfd.events = POLLIN;
-        _pollFds.push_back(pfd);
-        
-        //----- PORTS CHANGED: -> std::vector<int>        _ports; -----
+            int opt = 1;  // Set socket options
+            if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+                ErrorHandler::getInstance().logError("Failed to set socket options for port " + std::to_string(*portIt));
+                close(serverSocket);
+                continue;
+            }
 
-        // std::cout << "Server started on port: " << it->getPort() << std::endl;
+            struct sockaddr_in serverAddr;  // Bind socket
+            memset(&serverAddr, 0, sizeof(serverAddr));
+            serverAddr.sin_family = AF_INET;
+            // Bind to 127.0.0.1, should be changed later once parsing is updated
+            if (inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr) <= 0) {
+                ErrorHandler::getInstance().logError("Invalid address for binding to port " + std::to_string(*portIt));
+                close(serverSocket);
+                continue;
+            }
+            serverAddr.sin_port = htons(*portIt);  // Convert int to network byte order
+
+            if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
+                ErrorHandler::getInstance().logError("Failed to bind socket for port " + std::to_string(*portIt));
+                close(serverSocket);
+                continue;
+            }
+
+            if (listen(serverSocket, SOMAXCONN) < 0) {
+                ErrorHandler::getInstance().logError("Failed to listen on port " + std::to_string(*portIt));
+                close(serverSocket);
+                continue;
+            }
+
+            struct pollfd pfd;  // Add to pollfd
+            pfd.fd = serverSocket;
+            pfd.events = POLLIN;
+            _pollFds.push_back(pfd);
+
+            std::cout << "Server started on port: " << *portIt << std::endl;
+        }
     }
 }
 
@@ -107,25 +100,13 @@ void    ServerLoop::acceptNewConnection(int serverSocket) {
     std::cout << "New client connected: " << inet_ntoa(clientAddr.sin_addr) << std::endl;
 }
 
-std::string ServerLoop::routeRequest(HttpRequest &req) {
-    std::string uri = req.getUri();
-    /* For example, if the URI starts with "/cgi-bin/" or has a CGI file extension */
-    if (uri.find("/cgi-bin/") == 0 ||
-        (uri.size() >= 4 && uri.substr(uri.size()-4) == ".php")) {
-        CgiHandler cgiHandler;
-        return cgiHandler.processRequest(req);
-    } else {
-        StaticHandler staticHandler;
-        return staticHandler.processRequest(req);
-    }
-}
-
 void ServerLoop::handleClientRequest(int clientSocket) {
+    std::cout << "REQUEST RECEIVED!" << std::endl;
     char buffer[1024];
     memset(buffer, 0, sizeof(buffer));
     ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
 
-    /* Client disconnected */
+    // Client disconnected
     if (bytesRead == 0) {
         std::cout << "Client closed the connection." << std::endl;
         close(clientSocket);
@@ -133,7 +114,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
             _pollFds.end());
         return ;
-    } else if (bytesRead < 0) {/* Error occurred */
+    } else if (bytesRead < 0) {//Error occurred
         ErrorHandler::getInstance().logError("Error receiving data from client.");
         close(clientSocket);
         _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
@@ -151,7 +132,8 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         return ;
     }
     HttpRequest req = parser.getPendingRequest();
-    // std::string response = routeRequest(req);
+    req.setAutoIndex(ServerBlock().getAutoIndex());
+    req.setRoot(ServerBlock().getRoot());
     std::string response = Router().routeRequest(req);
     sendResponse(clientSocket, response);
     parser.removeRequest();

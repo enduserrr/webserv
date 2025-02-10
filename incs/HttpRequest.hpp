@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:23:00 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/04 11:00:56 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/07 18:32:09 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -27,6 +27,9 @@ private:
     std::map <std::string, std::string> _headers;       //key + value
     std::string                         _body;
 
+    bool                                _autoIndex;
+    std::string                         _root;
+
 public:
     HttpRequest();
     ~HttpRequest();
@@ -46,6 +49,21 @@ public:
     std::map <std::string, std::string> getUriQuery();
     std::map <std::string, std::string> getHeaders();
     std::string getBody();
+
+    bool getAutoIndex() {
+        return _autoIndex;
+    }
+
+    std::string getRoot() {
+        return _root;
+    }
+
+    void setAutoIndex(bool b) {
+        _autoIndex = b;
+    }
+    void setRoot(std::string root) {
+    _root = root;
+    }
 
 };
 

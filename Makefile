@@ -1,4 +1,4 @@
-NAME	= webserv
+NAME	= webservu
 SRC_DIR = src
 SRC		= $(SRC_DIR)/main.cpp $(SRC_DIR)/ConfParser.cpp \
 		  $(SRC_DIR)/ServerBlock.cpp $(SRC_DIR)/Location.cpp \
@@ -6,7 +6,7 @@ SRC		= $(SRC_DIR)/main.cpp $(SRC_DIR)/ConfParser.cpp \
 		  $(SRC_DIR)/ErrorHandler.cpp $(SRC_DIR)/StaticHandler.cpp \
 		  $(SRC_DIR)/CgiHandler.cpp $(SRC_DIR)/UploadHandler.cpp \
 		  $(SRC_DIR)/HttpRequest.cpp $(SRC_DIR)/Router.cpp \
-		  $(SRC_DIR)/Methods.cpp
+		  $(SRC_DIR)/Methods.cpp $(SRC_DIR)/Mime.cpp
 OBJ_DIR	= .obj
 OBJ		= $(addprefix $(OBJ_DIR)/, $(notdir $(SRC:.cpp=.o)))
 CC		= c++
@@ -37,6 +37,6 @@ re: fclean all
 
 run: re
 	clear
-	./$(NAME) config/config3.conf
+	./$(NAME) config/config0.conf
 
 .PHONY: all clean fclean re run

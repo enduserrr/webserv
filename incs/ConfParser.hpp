@@ -1,22 +1,23 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ConfParser.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:22 by eleppala          #+#    #+#             */
-/*   Updated: 2025/01/28 18:45:24 by eleppala         ###   ########.fr       */
+/*   Updated: 2025/02/08 10:42:03 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef CONFPARSER_HPP
 #define CONFPARSER_HPP
 
-#include "Webserver.hpp"
 #include "ServerBlock.hpp"
-#include <vector>
-#include <sstream>
+#include "Libs.hpp"
+
+#define FILE_SIZE_MAX 1000000000
+#define FILE_SIZE_MIN 0
 
 #define SERVER          "server {"
 #define SERVER_NAME     "server_name"
@@ -28,7 +29,7 @@
 #define ROOT            "root"
 #define AUTOI           "autoindex"
 
-//ERRORS 
+//ERRORS
 #define CONF_ERROR    "error: configuration file: "
 
 
@@ -41,7 +42,6 @@ private:
     std::vector<std::string> _fileLines;
     std::vector<std::string> _fileData;         //for info that needs to store
     std::vector<ServerBlock> _servers;
-    // static const std::string ERROR_PAGE;
 
 public:
     //Constructor & Destructor
@@ -61,7 +61,7 @@ public:
     std::string removeComments(const std::string &line);
     bool        checkServerBlock(const std::string &line);
     bool        BracketsClosed(int block);
-    int         bracketDepth(std::string line); 
+    int         bracketDepth(std::string line);
 
     //parse data
     bool        parseData();

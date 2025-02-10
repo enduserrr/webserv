@@ -1,37 +1,29 @@
 /******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Webserver.hpp                                      :+:      :+:    :+:   */
+/*   Mime.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/21 09:06:03 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/08 10:42:24 by asalo            ###   ########.fr       */
+/*   Created: 2025/02/08 09:53:12 by asalo             #+#    #+#             */
+/*   Updated: 2025/02/08 10:39:14 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#ifndef WEBSERVER_HPP
-# define WEBSERVER_HPP
+#ifndef MIME_HPP
+# define MIME_HPP
 
 #include "Libs.hpp"
 
-#include "ConfParser.hpp"
-#include "Location.hpp"
-#include "ServerBlock.hpp"
-#include "ErrorHandler.hpp"
+class Mime {
+    private:
+        std::map<std::string, std::string> _types;
 
-#include "ServerLoop.hpp"
-#include "HttpParser.hpp"
-#include "HttpRequest.hpp"
+    public:
+        Mime();
+        ~Mime();
 
-#include "Router.hpp"
-#include "Methods.hpp"
-#include "StaticHandler.hpp"
-#include "CgiHandler.hpp"
-#include "UploadHandler.hpp"
-#include "Mime.hpp"
-
-//DEBUG
-#define DEBUG 1
+        std::string getMimeType(const std::string &extension) const;
+};
 
 #endif

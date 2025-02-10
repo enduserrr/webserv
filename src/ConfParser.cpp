@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ConfParser.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:43:21 by eleppala          #+#    #+#             */
-/*   Updated: 2025/01/28 18:43:23 by eleppala         ###   ########.fr       */
+/*   Updated: 2025/02/10 09:00:11 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "ConfParser.hpp"
 
@@ -88,14 +88,14 @@ bool ConfParser::parseFile(){
             continue ;
         }
         if (checkServerBlock(line)) {
-            block ++; 
+            block ++;
             _serverBlocks ++;
             _fileLines.push_back(line);
             continue ;
         }
         if (!line.empty() && !parseLine(line, block)) {
             file.close();
-            return false; 
+            return false;
         }
         if (!line.empty() && line.find_first_not_of(" \t") != std::string::npos) {
             _fileLines.push_back(line);
@@ -104,7 +104,7 @@ bool ConfParser::parseFile(){
     file.close();
     if (_serverBlocks == 0){
         std::cerr << CONF_ERROR << "no server blocks detected" << std::endl;
-        return false; 
+        return false;
     }
     if (!BracketsClosed(block)){
         return false;
@@ -119,31 +119,31 @@ bool ConfParser::parseLine(std::string &line, int &block){
     whiteSpaceTrim(line);
     char last = line.back();
     if (last == '{') {
-        block ++; 
+        block ++;
     }
     if (last == '}') {
-        block --; 
+        block --;
     }
     if (last != '{' && last != '}' && last != ';') {
         std::cerr << CONF_ERROR << "wrong last char of the line" << std::endl;
-        return false; 
+        return false;
     }
     if (last == ';'){
         line.pop_back();
     }
     if (line.find(';') != std::string::npos) {
         std::cerr << CONF_ERROR << "';' can be only end of line" << std::endl;
-        return false; 
+        return false;
     }
     if (line.find('{') != std::string::npos && line.find("location") == std::string::npos) {
         std::cerr << CONF_ERROR << "undefined '{'" << std::endl;
         return false;
     }
     if (line.find('}') != std::string::npos && line.find_first_not_of('}') != std::string::npos){
-        std::cerr << CONF_ERROR  << "undefined '}'" << std::endl;  
-        return false; 
+        std::cerr << CONF_ERROR  << "undefined '}'" << std::endl;
+        return false;
     }
-    return true; 
+    return true;
 }
 
 
@@ -166,12 +166,12 @@ bool ConfParser::BracketsClosed(int block){
 
 int ConfParser::bracketDepth(std::string line){
     if (line.find('{') == std::string::npos){
-        return 1; 
+        return 1;
     }
     if (line.find('}') == std::string::npos){
-        return -1; 
+        return -1;
     }
-    return (0); 
+    return (0);
 }
 
 bool ConfParser::parseData() {
@@ -181,13 +181,13 @@ bool ConfParser::parseData() {
 
     for (size_t i = 0; i < _fileLines.size(); ++i) {
         if (_fileLines[i] == "}"){
-            block --; 
+            block --;
             continue ;
         }
         if (checkServerBlock(_fileLines[i])) {
             _servers.push_back(ServerBlock());
             block ++;
-            serverIndex ++; 
+            serverIndex ++;
         }
         else if (_fileLines[i].find(LOCATION) != std::string::npos) {
             if (!parseLocation(serverIndex, i)) {
@@ -206,7 +206,7 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex, size_t i) {
     std::istringstream ss(line);
     std::string word;
     while (ss >> word) {
-        std::string temp = word; 
+        std::string temp = word;
         if (temp == SERVER_NAME && ss >> word){
             if (!parseServerName(word, serverIndex)) {
                 std::exit(EXIT_FAILURE);
@@ -245,14 +245,14 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex, size_t i) {
 bool ConfParser::validPath(std::string path, int si) {
     whiteSpaceTrim(path);
     if (path.empty() || path[0] != '/') {
-        std::cerr << CONF_ERROR << "Path should start with '/'" << std::endl;  
-        return false; 
+        std::cerr << CONF_ERROR << "Path should start with '/'" << std::endl;
+        return false;
     }
     if (!_servers[si].getLocations().empty()) {
         for (size_t i = 0; i < _servers[si].getLocations().size(); i ++){
             if (_servers[si].getLocations()[i].getPath() == path) {
                 std::cerr << CONF_ERROR << "This server already has this location: " << path << std::endl;
-                return false; 
+                return false;
             }
         }
     }
@@ -269,11 +269,11 @@ bool ConfParser::parsePort(std::string port, int si){
     } catch (const std::exception &e) {
         // fix later to for better errorhandling
         std::cerr << CONF_ERROR << "port has to be number" << std::endl;
-        return false; 
+        return false;
     }
     if (num < 1 || num > 65535) {
-        std::cerr << CONF_ERROR  << "port has to be in range of 1 - 65535" << std::endl; 
-        return false; 
+        std::cerr << CONF_ERROR  << "port has to be in range of 1 - 65535" << std::endl;
+        return false;
     }
     for (size_t i = 0; i < _servers[si].getPorts().size(); i ++){
         if (num == _servers[si].getPorts()[i]) {
@@ -282,7 +282,7 @@ bool ConfParser::parsePort(std::string port, int si){
         }
     }
     _servers[si].setPorts(num);
-    return true; 
+    return true;
 }
 
 bool ConfParser::wordCheck(std::string &word){
@@ -300,14 +300,14 @@ bool ConfParser::wordCheck(std::string &word){
 
 bool ConfParser::parseServerName(std::string name, int si) {
     if (!wordCheck(name)){
-        return false; 
-    } 
+        return false;
+    }
     _servers[si].setServerName(name);
     return true;
 }
 
 bool ConfParser::parseLocation(int si, size_t &i) {
-       
+
     Location loc;
 
     for (; i < _fileLines.size(); ++i) {
@@ -320,12 +320,12 @@ bool ConfParser::parseLocation(int si, size_t &i) {
             if (word == LOCATION) {
                 if (ss >> word){
                     if (!validPath(word, si)) {
-                        return false; 
+                        return false;
                     }
                     loc.setPath(word);
                     if (ss >> word && word != "{"){
                         std::cerr << CONF_ERROR << "extra path detected" << std::endl;
-                        return false; 
+                        return false;
                     }
                 }
             }
@@ -333,24 +333,24 @@ bool ConfParser::parseLocation(int si, size_t &i) {
                 while (ss >> word) {
                     if (!loc.addAllowedMethod(word)) {
                         std::cerr << CONF_ERROR << "Invalid method: " << word << std::endl;
-                        return false; 
+                        return false;
                     }
                 }
             }
             if (word == ROOT) {
                 if (ss >> word) {
-                    loc.setRoot(word); 
+                    loc.setRoot(word);
                 }
             }
-            if (word == ROOT) {
+            if (word == AUTOI) {
                 if (ss >> word) {
-                    loc.setAutoIndex(true); 
+                    loc.setAutoIndex(true);
                 }
             }
         }
     }
     _servers[si].setLocation(loc);
-    return true; 
+    return true;
 }
 
 size_t ConfParser::convertBodySize(std::string& word) {
@@ -365,16 +365,16 @@ size_t ConfParser::convertBodySize(std::string& word) {
     } catch (const std::exception &e) {
         // fix later to for better errorhandling
         std::cerr << CONF_ERROR << "bodysize has to be number" << std::endl;
-        std::exit(EXIT_FAILURE); 
+        std::exit(EXIT_FAILURE);
     }
     if(unit == 'k') {
-        num = num * 1000; 
+        num = num * 1000;
     }
     if(unit == 'm') {
-        num = num * 1000000; 
+        num = num * 1000000;
     }
     if(unit == 'g') {
-        num = num * 1000000000; 
+        num = num * 1000000000;
     }
     return num;
 }
@@ -389,40 +389,38 @@ void ConfParser::whiteSpaceTrim(std::string &str) {
     }
 }
 
-
-
 // Debug
-void ConfParser::display() {
-    std::cout << "\n\nParser information\n" << std::endl;
-    std::cout << "File name: " <<_fileName << std::endl;
-    std::cout << "File size: "<<_fileSize << std::endl;
-    std::cout << "Server blocks: "<<_serverBlocks << std::endl;
-    // std::cout << "\nParsed file now: " << std::endl;
-    // for (size_t i = 0; i < _fileLines.size(); ++i) {
-    //     std::cout << _fileLines[i] << std::endl;
-    // }
-    std::cout << "\nServer(s): " << std::endl;
-    for (size_t i = 0; i < _servers.size(); ++i) {
-        std::cout << "server_name:   " << _servers[i].getServerName() << std::endl;
-        std::cout << "root:          " << _servers[i].getRoot() << std::endl; 
-        std::cout << "listen:        ";
-        for (size_t p = 0; p < _servers[i].getPorts().size(); p ++){
-            std::cout << _servers[i].getPorts()[p] << " ";
-        } 
-        std::cout << std::endl; 
-        std::cout << "max_body_size: " << _servers[i].getBodySize() << std::endl;
-        std::cout << "autoindex:     " << _servers[i].getAutoIndex() << std::endl;
-        std::cout << "location(s)    " << std::endl;
-        for (size_t j = 0; j < _servers[i].getLocations().size(); ++j) {
-            std::cout << "path:          " << _servers[i].getLocations()[j].getPath() << std::endl;
-            std::cout << "root:          " << _servers[i].getLocations()[j].getRoot() << std::endl;
-            std::cout << "autoindex:     " << _servers[i].getLocations()[j].getAutoIndex() << std::endl;
-            // Print allowed methods
-            std::cout << "Methods:       ";
-            for (size_t k = 0; k < _servers[i].getLocations()[j].getAllowedMethods().size(); ++k) {
-                std::cout << _servers[i].getLocations()[j].getAllowedMethods()[k] << " ";
-            }
-        std::cout << "\n" << std::endl;
-        }
-    }
-}
+// void ConfParser::display() {
+//     std::cout << "\n\nParser information\n" << std::endl;
+//     std::cout << "File name: " <<_fileName << std::endl;
+//     std::cout << "File size: "<<_fileSize << std::endl;
+//     std::cout << "Server blocks: "<<_serverBlocks << std::endl;
+//     // std::cout << "\nParsed file now: " << std::endl;
+//     // for (size_t i = 0; i < _fileLines.size(); ++i) {
+//     //     std::cout << _fileLines[i] << std::endl;
+//     // }
+//     std::cout << "\nServer(s): " << std::endl;
+//     for (size_t i = 0; i < _servers.size(); ++i) {
+//         std::cout << "server_name:   " << _servers[i].getServerName() << std::endl;
+//         std::cout << "root:          " << _servers[i].getRoot() << std::endl;
+//         std::cout << "listen:        ";
+//         for (size_t p = 0; p < _servers[i].getPorts().size(); p ++){
+//             std::cout << _servers[i].getPorts()[p] << " ";
+//         }
+//         std::cout << std::endl;
+//         std::cout << "max_body_size: " << _servers[i].getBodySize() << std::endl;
+//         std::cout << "autoindex:     " << _servers[i].getAutoIndex() << std::endl;
+//         std::cout << "location(s)    " << std::endl;
+//         for (size_t j = 0; j < _servers[i].getLocations().size(); ++j) {
+//             std::cout << "path:          " << _servers[i].getLocations()[j].getPath() << std::endl;
+//             std::cout << "root:          " << _servers[i].getLocations()[j].getRoot() << std::endl;
+//             std::cout << "autoindex:     " << _servers[i].getLocations()[j].getAutoIndex() << std::endl;
+//             // Print allowed methods
+//             std::cout << "Methods:       ";
+//             for (size_t k = 0; k < _servers[i].getLocations()[j].getAllowedMethods().size(); ++k) {
+//                 std::cout << _servers[i].getLocations()[j].getAllowedMethods()[k] << " ";
+//             }
+//         std::cout << "\n" << std::endl;
+//         }
+//     }
+// }

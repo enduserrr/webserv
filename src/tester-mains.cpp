@@ -1,26 +1,64 @@
 /******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   tester-mains.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 11:30:12 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/10 09:49:13 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/10 09:07:40 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "Webserver.hpp"
 #include "Libs.hpp"
 
-int main(int ac, char **av) {
-    if (ac != 2) {
+/**
+ * @brief Test: something.
+ */
+/* int main(int argc, char **argv) {
+    if (argc != 2) {
         std::cout << "Usage: ./webserv <configfile.conf>" << std::endl;
         return 1;
     }
-    const char* configFile = av[1];
+    std::cout << "\nOpening program..\n\n" << std::endl;
+    ConfParser configParse(argv[1]);
+    if (!configParse.fileValidation()) {
+        std::cout << "File validation failed, shutting down.." << std::endl;
+        return 1;
+    }
+    if (!configParse.parseFile()) {
+        std::cout << "File parsing failed, shutting down.." << std::endl;
+        return 1;
+    }
+    if (DEBUG == 1)
+        configParse.display();
 
-    // Start the server in a separate thread (simulate client/server interaction)
+    std::vector<ServerBlock> serverBlocks = configParse.getServers();
+    // TRANSFER CUSTOM ERROR PAGES FROM CONF PARSER TO ERRORHANDLER
+    // ErrorHandler::getInstance().logError("Loading custom error pages...");
+    // for (std::vector<ServerBlock>::iterator it = serverBlocks.begin(); it != serverBlocks.end(); ++it) {
+    //     it->setErrorPages(configParse._errorPages);
+    // }
+
+    ServerLoop serverLoop(serverBlocks);
+    serverLoop.startServer();
+
+    return 0;
+} */
+
+
+
+/**
+ * @brief   Tests: Everything.
+ */
+/* int main(int argc, char **argv) {
+    if (argc != 2) {
+        std::cout << "Usage: ./webserv <configfile.conf>" << std::endl;
+        return 1;
+    }
+    const char* configFile = argv[1];
+
     std::thread serverThread([configFile]() {
         std::cout << "\n[Server] Opening program...\n" << std::endl;
         ConfParser configParse(configFile);
@@ -41,18 +79,9 @@ int main(int ac, char **av) {
         serverLoop.startServer();
     });
 
-    // Sleep to ensure the server is up
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    /**
-     * @brief   A lambda is an anonymous function object that hold short function without having to
-     *          declare whole separate function for it.
-     *
-     *          Below the lambda is simulating a client request without having to define
-     *          a separate named function for it.
-     */
-    std::function<void(const std::string&, const std::string&)> simulateClientRequest =
-    [](const std::string &requestDescription, const std::string &requestData) {
+    auto simulateClientRequest = [](const std::string &requestDescription, const std::string &requestData) {
         std::cout << "\n[Client] " << requestDescription << std::endl;
         int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
         if (clientSocket < 0) {
@@ -88,19 +117,37 @@ int main(int ac, char **av) {
         close(clientSocket);
     };
 
-/*     // Static 'GET' request for /index.html
+    // // Simulate a static resource request (for /index.html)
+    // std::string staticRequest = "GET /index.html HTTP/1.1\r\n"
+    //                             "Host: localhost\r\n"
+    //                             "\r\n";
+    // simulateClientRequest("Requesting static resource (/www/index.html)", staticRequest);
+
+    // // Simulate a CGI request (for /cgi-bin/test.php)
+    // std::string cgiRequest = "GET /cgi-bin/test.php HTTP/1.1\r\n"
+    //                          "Host: localhost\r\n"
+    //                          "\r\n";
+    // simulateClientRequest("Requesting CGI resource (/cgi-bin/test.php)", cgiRequest);
+
+    // // Sleep and join the server thread.
+    // std::this_thread::sleep_for(std::chrono::seconds(2));
+    // serverThread.join();
+    // return 0;
+
+    // Simulate a static GET request for /index.html.
     std::string staticGetRequest = "GET /index.html HTTP/1.1\r\n"
                                    "Host: localhost\r\n"
                                    "\r\n";
     simulateClientRequest("Requesting static resource (/index.html)", staticGetRequest);
 
-    // CGI 'GET' request for /cgi-bin/test.php
+    // Simulate a CGI GET request for /cgi-bin/test.php.
     std::string cgiGetRequest = "GET /cgi-bin/test.php HTTP/1.1\r\n"
                                 "Host: localhost\r\n"
                                 "\r\n";
     simulateClientRequest("Requesting CGI resource (/cgi-bin/test.php)", cgiGetRequest);
 
-    // Static 'POST' request (file upload) for /index.html
+    // Simulate a static POST request (file upload) for /index.html.
+    // Here, we assume that a POST to /index.html is routed to StaticHandler, which will invoke UploadHandler.
     std::string staticPostRequest = "POST /index.html HTTP/1.1\r\n"
                                     "Host: localhost\r\n"
                                     "Content-Length: 27\r\n"
@@ -108,23 +155,15 @@ int main(int ac, char **av) {
                                     "This is a test static upload";
     simulateClientRequest("Static POST request (upload to /index.html)", staticPostRequest);
 
-    // CGI 'POST' request for /cgi-bin/test.php
+    // Simulate a CGI POST request for /cgi-bin/test.php.
     std::string cgiPostRequest = "POST /cgi-bin/test.php HTTP/1.1\r\n"
                                  "Host: localhost\r\n"
                                  "Content-Length: 25\r\n"
                                  "\r\n"
                                  "This is a test CGI upload";
-    simulateClientRequest("CGI POST request", cgiPostRequest); */
-
-    // 'GET' request for the /uploads/ (directory)
-    std::string directoryRequest = "GET /uploads/ HTTP/1.1\r\n"
-                                   "Host: localhost\r\n"
-                                   "\r\n";
-    simulateClientRequest("Requesting directory listing for /uploads/", directoryRequest);
-
-    // Sleep and join threads (why sleep first?)
+    simulateClientRequest("CGI POST request", cgiPostRequest);
+    // Sleep and join the server thread.
     std::this_thread::sleep_for(std::chrono::seconds(2));
     serverThread.join();
     return 0;
-}
-
+} */
