@@ -15,14 +15,15 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 class Location {
 private:
     std::string                 _path;
     std::vector<std::string>    _allowedMethods;
-    // bool                        _dirListing; // gpt oli sita mielta etta 
-    bool                        _autoIndex;     // virallinen termi ois autoindex 
+    bool                        _autoIndex;
     std::string                 _root;
+    std::map<int, std::string>  _errorPages;
 
 public:
     Location();
@@ -30,15 +31,17 @@ public:
 
     //getters
     std::string                 getPath() const;
-    std::string                 getRoot() const;
-    bool                        getAutoIndex(); 
+    std::string&                getRoot();
+    bool&                       getAutoIndex(); 
     std::vector<std::string>    getAllowedMethods() const;
+    std::map<int, std::string>& getErrorPages();
 
     //setters
     void                        setPath(const std::string& path);
     void                        setRoot(std::string root);
     void                        setAutoIndex(bool b);
-    bool                        addAllowedMethod(const std::string& method);
+    void                        addAllowedMethod(const std::string& method);
+    void                        setErrorPage(int &code, std::string &path);
 
 };
 

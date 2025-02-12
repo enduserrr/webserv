@@ -35,7 +35,7 @@ bool    ServerLoop::hasTimedOut() {
 }
 
 void ServerLoop::setupServerSockets() {
-    for (std::vector<ServerBlock>::const_iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
+    for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
         const std::vector<int>& ports = it->getPorts();  // Get the vector of ports
 
         for (std::vector<int>::const_iterator portIt = ports.begin(); portIt != ports.end(); ++portIt) {

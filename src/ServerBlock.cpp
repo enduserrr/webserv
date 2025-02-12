@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
+/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:44:02 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/10 08:56:25 by asalo            ###   ########.fr       */
+/*   Updated: 2025/01/28 18:44:05 by eleppala         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "ServerBlock.hpp"
 #include <iostream>
@@ -31,15 +31,15 @@ std::string ServerBlock::getServerName() const {
     return _serverName;
 }
 
-std::string ServerBlock::getRoot() const {
+std::string& ServerBlock::getRoot() {
     return _root;
 }
 
-std::vector<int> ServerBlock::getPorts() const {
+std::vector<int> ServerBlock::getPorts(){
     return _ports;
 }
 
-bool ServerBlock::getAutoIndex() {
+bool& ServerBlock::getAutoIndex() {
     return _autoIndex;
 }
 
@@ -47,10 +47,13 @@ size_t ServerBlock::getBodySize() const {
     return _bodySize;
 }
 
-std::vector<Location>& ServerBlock::getLocations(){
+std::vector<Location>& ServerBlock::getLocations() {
     return _locations;
 }
 
+std::map<int, std::string>&  ServerBlock::getErrorPages() {
+    return _errorPages;
+}
 
 //Setters
 void ServerBlock::setServerName(std::string str) {
@@ -62,24 +65,30 @@ void ServerBlock::setRoot(std::string root) {
 }
 
 void ServerBlock::setPorts(int port) {
-    _ports.push_back(port);
+    _ports.push_back(port); 
 }
 
 void ServerBlock::setAutoIndex(bool b) {
     _autoIndex = b;
 }
 
-void ServerBlock::setBodySize(size_t size) {
-    _bodySize = size;
+void ServerBlock::setBodySize(int size, char unit) {
+    if(unit == 'k' || unit == 'K') {
+        size = size * 1000; 
+    }
+    if(unit == 'm' || unit == 'M') {
+        size = size * 1000000; 
+    }
+    if(unit == 'g'|| unit == 'G') {
+        size = size * 1000000000; 
+    }
+    _bodySize = size; 
 }
 
 void ServerBlock::setLocation(const Location& loc){
      _locations.push_back(loc);
 }
 
-void ServerBlock::setErrorPages(const std::map<int, std::string> &errorPages) {
-    ErrorHandler& errorHandler = ErrorHandler::getInstance();  // Get Singleton instance
-    for (std::map<int, std::string>::const_iterator it = errorPages.begin(); it != errorPages.end(); ++it) {
-        errorHandler.setCustomErrorPage(it->first, it->second);
-    }
+void ServerBlock::setErrorPage(int &code, std::string &path) {
+    _errorPages[code] = path;
 }
