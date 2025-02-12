@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/10 10:20:08 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/12 12:13:45 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -114,7 +114,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
             _pollFds.end());
         return ;
-    } else if (bytesRead < 0) {//Error occurred
+    } else if (bytesRead < 0) { // Error occurred
         ErrorHandler::getInstance().logError("Error receiving data from client.");
         close(clientSocket);
         _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
@@ -122,18 +122,31 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             _pollFds.end());
         return ;
     }
+
     std::string request(buffer, bytesRead);
     std::cout << "Received request: " << request << std::endl;
+
+    // Select the relevant ServerBlock (for simplicity, we use the first one)
+    ServerBlock &block = _serverBlocks[0];
+
     HttpParser parser;
-    if (!parser.parseRequest(request, ServerBlock().getBodySize())) {
+    if (!parser.parseRequest(block, request, block.getBodySize())) {
         std::string errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
                                     + ErrorHandler::getInstance().getErrorPage(400);
         sendResponse(clientSocket, errorResponse);
         return ;
     }
+
+    // Use the ServerBlock to complete the creation of the HttpRequest
+    if (!parser.createRequest(block)) { // createRequest applies autoIndex and root settings
+        std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+                                    + ErrorHandler::getInstance().getErrorPage(500);
+        sendResponse(clientSocket, errorResponse);
+        return ;
+    }
+
     HttpRequest req = parser.getPendingRequest();
-    req.setAutoIndex(ServerBlock().getAutoIndex());
-    req.setRoot(ServerBlock().getRoot());
+    // std::cout << RB << "ROOT: " << req.getRoot() << "\nAUTO-INDEX: " << req.getAutoIndex() << RES << std::endl;
     std::string response = Router().routeRequest(req);
     sendResponse(clientSocket, response);
     parser.removeRequest();
@@ -147,6 +160,7 @@ void    ServerLoop::sendResponse(int clientSocket, const std::string &response) 
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
     }
 }
+
 
 void    ServerLoop::startServer() {
     setupServerSockets();

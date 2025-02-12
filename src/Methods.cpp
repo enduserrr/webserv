@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/10 11:16:45 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/12 12:16:18 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -15,6 +15,8 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h> //Stat
+#define RB     "\033[1;91m"
+#define RES    "\033[0m"
 
 Methods::Methods() {}
 
@@ -73,17 +75,19 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
     return templateHtml;
 }
 
+/*Gets stuck here and does not return the directory listing.*/
 std::string Methods::mGet(HttpRequest &req) {
     std::string uri = req.getUri();
-    std::string basePath = "www";
+    // std::string basePath = "www";
+    std::string basePath = req.getRoot();
     std::string filePath = basePath + uri;
 
+    std::cout << RB << "ROOT: " << req.getRoot() << "\nAUTO-INDEX: " << req.getAutoIndex() << RES << std::endl;
     struct stat st;
     bool isDirectory = false;
     if (stat(filePath.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
         isDirectory = true;
     }
-
     // If the URI ends with '/', it's a directory request.
     if (!uri.empty() && uri.back() == '/') {
         if (isDirectory && req.getAutoIndex()) {

@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/07 09:39:30 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/12 12:12:29 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -20,43 +20,39 @@ HttpParser::HttpParser() {}
 /* Destructor */
 HttpParser::~HttpParser() {}
 
-bool HttpParser::readFullRequest(std::istream& input) {
-    char buffer[1024];
-    std::string request = _pendingData;
-    _pendingData.clear();
+// bool HttpParser::readFullRequest(std::istream& input) {
+//     char buffer[1024];
+//     std::string request = _pendingData;
+//     _pendingData.clear();
 
-    while (input.read(buffer, sizeof(buffer)) || input.gcount() > 0) {
-        request.append(buffer, input.gcount());
-        std::cout << std::endl;
-        size_t headerEnd = request.find("\r\n\r\n");
-        if (headerEnd == std::string::npos) {
-            return false;
-        }
-        if (headerEnd != std::string::npos) {
-            size_t contentLengthPos = request.find("Content-Length:");
-            if (contentLengthPos == std::string::npos) {
-                _pendingData = request.substr(headerEnd + 4);
-                request = request.substr(0, headerEnd + 4);
-                return true;
-            }
+//     while (input.read(buffer, sizeof(buffer)) || input.gcount() > 0) {
+//         request.append(buffer, input.gcount());
+//         std::cout << std::endl;
+//         size_t headerEnd = request.find("\r\n\r\n");
+//         if (headerEnd == std::string::npos) {
+//             return false;
+//         }
+//         if (headerEnd != std::string::npos) {
+//             size_t contentLengthPos = request.find("Content-Length:");
+//             if (contentLengthPos == std::string::npos) {
+//                 _pendingData = request.substr(headerEnd + 4);
+//                 request = request.substr(0, headerEnd + 4);
+//                 return true;
+//             }
 
-            size_t bodyStart = headerEnd + 4;
-            int contentLength = std::stoi(request.substr(contentLengthPos + 15));
-            if (request.size() >= bodyStart + contentLength) {
-                _pendingData = request.substr(bodyStart + contentLength);
-                request = request.substr(0, bodyStart + contentLength);
-                return parseRequest(request, 100);
-            }
-        }
-    }
-    return false;
-}
+//             size_t bodyStart = headerEnd + 4;
+//             int contentLength = std::stoi(request.substr(contentLengthPos + 15));
+//             if (request.size() >= bodyStart + contentLength) {
+//                 _pendingData = request.substr(bodyStart + contentLength);
+//                 request = request.substr(0, bodyStart + contentLength);
+//                 return parseRequest(request, 100);
+//             }
+//         }
+//     }
+//     return false;
+// }
 
-bool HttpParser::parseRequest(std::string &req, size_t max) {
-
-    //debug
-    // std::cout << req << std::endl;
-
+bool HttpParser::parseRequest(ServerBlock &block, std::string &req, size_t max) {
     std::istringstream ss(req);
     std::string line;
     _maxBodySize = max;
@@ -75,7 +71,7 @@ bool HttpParser::parseRequest(std::string &req, size_t max) {
     if (!parseBody(line)) {
         return false;
     }
-    createRequest();
+    createRequest(block);
     return true;
 }
 
@@ -234,17 +230,49 @@ void HttpParser::whiteSpaceTrim(std::string &str) {
     }
 }
 
-bool HttpParser::createRequest(){
+// bool HttpParser::createRequest(){
+//     HttpRequest req;
+//     req.setBodySize(_maxBodySize);
+//     req.setMethod(_method);
+//     req.setUri(_uri);
+//     req.setHttpVersion(_httpVersion);
+//     req.setUriQuery(_uriQuery);
+//     req.setHeaders(_headers); //key + value
+//     req.setBody(_body);
+//     _requests.push_back(req);
+
+//     return true;
+// }
+
+bool HttpParser::createRequest(ServerBlock &block) {
     HttpRequest req;
     req.setBodySize(_maxBodySize);
     req.setMethod(_method);
     req.setUri(_uri);
     req.setHttpVersion(_httpVersion);
     req.setUriQuery(_uriQuery);
-    req.setHeaders(_headers); //key + value
+    req.setHeaders(_headers);
     req.setBody(_body);
-    _requests.push_back(req);
 
+    // Determine the configuration based on the block's locations.
+    bool matched = false;
+    std::vector<Location>& locations = block.getLocations();
+    for (size_t i = 0; i < locations.size(); i++) {
+        // If the request URI starts with the location's path, use that location's settings.
+        if (_uri.find(locations[i].getPath()) == 0) {
+            req.setAutoIndex(locations[i].getAutoIndex());
+            req.setRoot(locations[i].getRoot());
+            matched = true;
+            // std::cout << RB << req.getRoot() << "\n" << req.getAutoIndex() << std::endl;
+            break;
+        }
+    }
+    // No match, use ServerBlock's global settings.
+    if (!matched) {
+        req.setAutoIndex(block.getAutoIndex());
+        req.setRoot(block.getRoot());
+    }
+    _requests.push_back(req);
     return true;
 }
 

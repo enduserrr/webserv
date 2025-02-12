@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:10 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/08 10:07:19 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/12 11:06:55 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -18,6 +18,7 @@
 #include <vector>
 #include "Webserver.hpp"
 #include "HttpRequest.hpp"
+#include "ServerBlock.hpp"
 
 
 // Socket will give rawchunks of data,
@@ -45,14 +46,16 @@ public:
     ~HttpParser();
 
 
-    bool readFullRequest(std::istream& input);
-    bool parseRequest(std::string& req, size_t max);
+    // bool readFullRequest(std::istream& input);
+    bool parseRequest(ServerBlock &block, std::string& req, size_t max);
     bool parseStartLine(std::string& line);
 
     bool setMethod(std::string& method);
     bool parseUriQuery(std::string query);
     bool parseUri(std::string& uri);
     bool isValidUri(std::string& uri);
+
+    bool createRequest(ServerBlock &block);
 
     bool parseHeaders(std::string& line);
     bool parseBody(std::string& line);
@@ -61,7 +64,7 @@ public:
     void removeRequest();
 
     /* Creates new request to HttpRequests vector after parsing */
-    bool createRequest();
+    // bool createRequest();
     std::vector<HttpRequest> &getRequests();
     HttpRequest &getPendingRequest();
 
