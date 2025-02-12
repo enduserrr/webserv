@@ -25,16 +25,20 @@ std::string Location::getPath() const {
     return _path;
 }
 
-std::string Location::getRoot() const {
+std::string& Location::getRoot() {
     return _root;
 }
 
-bool Location::getAutoIndex() {
+bool& Location::getAutoIndex() {
     return _autoIndex;
 }
 
 std::vector<std::string> Location::getAllowedMethods() const {
     return _allowedMethods;
+}
+
+std::map<int, std::string>&  Location::getErrorPages() {
+    return _errorPages;
 }
 
 //setters
@@ -50,9 +54,10 @@ void Location::setAutoIndex(bool b) {
     _autoIndex = b;
 }
 
-bool Location::addAllowedMethod(const std::string& method){
-    if (method != "GET" && method != "POST" && method != "DELETE")
-        return false;
+void Location::addAllowedMethod(const std::string& method){
     _allowedMethods.push_back(method);
-    return true;
+}
+
+void Location::setErrorPage(int &code, std::string &path) {
+    _errorPages[code] = path;
 }
