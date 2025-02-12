@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/07 09:39:30 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/11 12:20:48 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -243,6 +243,8 @@ bool HttpParser::createRequest(){
     req.setUriQuery(_uriQuery);
     req.setHeaders(_headers); //key + value
     req.setBody(_body);
+    req.setAutoIndex(_autoIndex);
+    req.setRoot(_root);
     _requests.push_back(req);
 
     return true;

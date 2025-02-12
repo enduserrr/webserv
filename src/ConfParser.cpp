@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:43:21 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/10 09:00:11 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/11 12:36:00 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -221,6 +221,7 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex, size_t i) {
             _servers[serverIndex].setRoot(word);
         }else if (temp == AUTOI && ss >> word) {
             _servers[serverIndex].setAutoIndex(true);
+            // ServerBlock().setAutoIndex(true);
         } else if (temp == ERROR_PAGE) {
             int statusCode;
             std::string pagePath;

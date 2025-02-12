@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/10 10:20:08 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/11 12:23:47 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -125,6 +125,8 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     std::string request(buffer, bytesRead);
     std::cout << "Received request: " << request << std::endl;
     HttpParser parser;
+    parser.setAutoIndex(ServerBlock().getAutoIndex());
+    parser.setRoot(ServerBlock().getRoot());
     if (!parser.parseRequest(request, ServerBlock().getBodySize())) {
         std::string errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
                                     + ErrorHandler::getInstance().getErrorPage(400);
@@ -132,8 +134,8 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         return ;
     }
     HttpRequest req = parser.getPendingRequest();
-    req.setAutoIndex(ServerBlock().getAutoIndex());
-    req.setRoot(ServerBlock().getRoot());
+    // req.setAutoIndex(ServerBlock().getAutoIndex());
+    // req.setRoot(ServerBlock().getRoot());
     std::string response = Router().routeRequest(req);
     sendResponse(clientSocket, response);
     parser.removeRequest();
