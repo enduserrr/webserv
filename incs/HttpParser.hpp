@@ -46,19 +46,20 @@ public:
     ~HttpParser();
 
 
-    // bool readFullRequest(std::istream& input);
+    bool readFullRequest(const std::string &chunk);
     bool parseRequest(ServerBlock &block, std::string& req, size_t max);
-    bool parseStartLine(std::string& line);
+    void parseStartLine(std::string &line, HttpRequest &req);
 
-    bool setMethod(std::string& method);
-    bool parseUriQuery(std::string query);
-    bool parseUri(std::string& uri);
-    bool isValidUri(std::string& uri);
+    void parseMethod(std::istringstream &ss, HttpRequest &req);
+    void parseUriQuery(const std::string &query, HttpRequest &req);
+    void parseUri(std::istringstream &ss, HttpRequest &req);
+    void isValidUri(std::string& uri);
+    void parseVersion(std::istringstream &ss, HttpRequest &req);
 
-    bool createRequest(ServerBlock &block);
+    bool createRequest(ServerBlock &block, HttpRequest &req);
 
-    bool parseHeaders(std::string& line);
-    bool parseBody(std::string& line);
+    void parseHeader(std::string &line, HttpRequest &req);
+    void parseBody(std::string &body, HttpRequest &req);
     void whiteSpaceTrim(std::string& str);
     void display() const;
     void removeRequest();

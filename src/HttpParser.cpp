@@ -53,171 +53,133 @@ HttpParser::~HttpParser() {}
 // }
 
 bool HttpParser::parseRequest(ServerBlock &block, std::string &req, size_t max) {
+    (void)block;
+    
     std::istringstream ss(req);
     std::string line;
     _maxBodySize = max;
+    HttpRequest request; 
     std::getline(ss, line);
-    if (!parseStartLine(line)) {
-        return false;
-    }
-    std::string headers;
-    while (getline(ss, line, '\r') && ss.get() == '\n' && !line.empty()) {
-        headers += line + "\n";
-    }
-    if (!parseHeaders(headers)) {
-        return false;
-    }
-    std::getline(ss, line);
-    if (!parseBody(line)) {
-        return false;
-    }
-    createRequest(block);
+    try {
+        parseStartLine(line, request);
+        while (getline(ss, line, '\r') && ss.get() == '\n' && !line.empty()){
+            parseHeader(line, request);
+        }
+        std::string body; 
+        body.assign(std::istreambuf_iterator<char>(ss), std::istreambuf_iterator<char>());     
+        parseBody(body, request);
+        createRequest(block, request);
+    } catch (...) {
+        return false; 
+    } 
     return true;
+}
+
+void HttpParser::parseVersion(std::istringstream &ss, HttpRequest &req){
+    std::string word;
+    if (!(ss >> word))
+        throw std::runtime_error("Silent");
+    if (word != "HTTP/1.1")
+        throw std::runtime_error("Silent");
+    req.setHttpVersion(word);
 }
 
 //STARTLINE SYNTAX: [method] [URI] [HTTP_VERSION]
-bool HttpParser::parseStartLine(std::string& line) {
+void HttpParser::parseStartLine(std::string &line, HttpRequest &req) {
     std::istringstream ss(line);
+    parseMethod(ss, req); 
+    parseUri(ss, req);
+    parseVersion(ss, req);
+}
+
+void HttpParser::parseMethod(std::istringstream &ss, HttpRequest &req) {
     std::string word;
-
-    ss >> word;
-    if (!setMethod(word)) {
-        return false;
-    }
-    ss >> word;
-    if (!parseUri(word)) {
-        return false;
-    }
-    ss >> word;
-    if (word != "HTTP/1.1") {
-        std::cout << "Wrong HTTP version"<< std::endl;
-        return false;
-    }
-    _httpVersion = word;
-    return true;
+    if (!(ss >> word))
+        throw std::runtime_error("Silent");
+    if (word != "GET" && word != "POST" && word != "DELETE")
+        throw std::runtime_error("Silent");
+    req.setMethod(word);
 }
 
-bool HttpParser::setMethod(std::string& method) {
-
-    // for now just test if method get post or delete
-    // later get allowed methods from config file location{allowed methods:}
-
-    if (method != "GET" && method != "POST" && method != "DELETE") {
-        std::cout << method << "No allowed method detected!"<< std::endl;
-        return false;
+//valid syntax: /dir/subdir?query=string  -- /dir/subdir?color=red&size=large
+void HttpParser::parseUri(std::istringstream &ss, HttpRequest &req) {
+    std::string word;
+    std::string temp; 
+    if (!(ss >> word))
+        throw std::runtime_error("Silent"); 
+    for (size_t i = 0; i < word.length(); i++) {
+        if(word[i] == '?')
+            parseUriQuery(word.substr(i + 1), req);
+        temp += word[i];
     }
-    _method = method;
-    return true;
+    isValidUri(temp);
+    req.setUri(temp); 
 }
 
-//valid syntax:
-// /dir/subdir?query=string
-// /dir/subdir?color=red&size=large
-bool HttpParser::parseUri(std::string& uri){
-    bool prev = false;
-    for (size_t i = 0; i < uri.length(); i++) {
-        if (uri[i] == '/') {
-            if (prev) continue;
-            prev = true;
-        } else {
-            prev = false;
-        }
-        if(uri[i] == '?') {
-            if (!parseUriQuery(uri.substr(i + 1))) {
-                return false;
-            }
-            break ;
-        }
-        _uri += uri[i];
-    }
-    if (!isValidUri(_uri)){
-        std::cerr << "uri is not valid" << std::endl;
-        return false;
-    }
-    return true;
-}
-
-bool HttpParser::parseUriQuery(std::string query) {
-    if (query.empty()){
-        return true;
-    }
+void HttpParser::parseUriQuery(const std::string &query, HttpRequest &req) {
+    if (query.empty())
+        throw std::runtime_error("Silent"); 
     std::stringstream ss(query);
     std::string token;
     while (std::getline(ss, token, '&')) {
-        if (token.empty()) {
-            std::cerr << "false query" << std::endl;
-            return false;
-        }
+        if (token.empty())
+            throw std::runtime_error("Silent");
         size_t pos = token.find('=');
         if (pos != std::string::npos) {
             std::string key = token.substr(0, pos);
             std::string value = token.substr(pos + 1);
-            if (key.empty()) {
-                return false;
-            }
-            _uriQuery[key] = value;
+            if (key.empty()) 
+                throw std::runtime_error("Silent");
+            req.setUriQuery(key, value);
         } else {
-            _uriQuery[token] = "true";
+            req.setUriQuery(token, "true");
         }
     }
-    return true;
 }
 
-bool HttpParser::isValidUri(std::string& uri) {
-
-    //should take locations from config file and see if matches for
-    //uri form reguest.
-
-    if (uri.empty() || uri[0] != '/') {
-        std::cout << "URI should start with '/'"<< std::endl;
-        return false;
-    }
+void HttpParser::isValidUri(std::string& uri) {
+    if (uri.empty() || uri[0] != '/')
+        throw std::runtime_error("Silent"); 
     std::string invalidChars = "<>{}|\\^`\" ";
     for (size_t i = 0; i < uri.length(); i++) {
-        if (invalidChars.find(uri[i]) != std::string::npos) {
-            std::cout << "Invalid character in URI: " << uri[i] << std::endl;
-            return false;
-        }
+        if (invalidChars.find(uri[i]) != std::string::npos) 
+            throw std::runtime_error("Silent");
     }
-    return true;
 }
 
 
-bool HttpParser::parseHeaders(std::string& lines) {
-    std::istringstream ss(lines);
-    std::string line;
-    while(std::getline(ss, line)){
-        // std::cout << "parse: " << line << std::endl;
-        size_t deli = line.find(':');
-        if (deli == std::string::npos) {
-            std::cerr << "headers: key + value pair not detected" << std::endl;
-            return false;
-        }
-        std::string key = line.substr(0, deli);
-        std::string value = line.substr(deli + 1);
-        whiteSpaceTrim(key);
-        whiteSpaceTrim(value);
-        if (key.empty() || value.empty()) {
-            std::cerr << "headers: key or value cannot be empty" << std::endl;
-            return false;
-        }
-        _headers[key] = value;
-    }
-    return true;
+void HttpParser::parseHeader(std::string &line, HttpRequest &req) {
+    std::istringstream ss(line);
+    std::string key;
+    std::string value; 
+    if (!(ss >> key >> value)) 
+        throw std::runtime_error("Silent");
+    key.pop_back(); 
+    // std::cout << key << value << std::endl;
+    req.addNewHeader(key, value); 
 }
 
-bool HttpParser::parseBody(std::string& line) {
-    //need more information of what body can be, to make relevant parsing.. :-)
-    //for now it is just one line body..
+void HttpParser::parseBody(std::string &body, HttpRequest &req) {
+    
+    
+    // std::string contentType = req.getHeader("Content-Type");
+    // if (contentType == "application/x-www-form-urlencoded"){
+    //     //key value pairs
+    // }
+    // else if (contentType == "text/plain"){
+    //     //parse to a string
+    // }  
+    // else if (contentType == "application/json"){
+    //     //store string
+    // }
+    // else if (contentType.find("multipart/form-data") == 0){
 
-    //needs atleast clientbodysize from ServerBlock
+    // }
+    // else if (contentType == "application/octet-stream") {
+    //     //store binary data
+    // }
 
-    if (line.size() > _maxBodySize) {
-        std::cerr << "Too big body (" << line.size() << ")" << std::endl;
-        return false;
-    }
-    _body = line;
-    return true;
+    req.setBody(body);
 }
 
 void HttpParser::whiteSpaceTrim(std::string &str) {
@@ -244,16 +206,7 @@ void HttpParser::whiteSpaceTrim(std::string &str) {
 //     return true;
 // }
 
-bool HttpParser::createRequest(ServerBlock &block) {
-    HttpRequest req;
-    req.setBodySize(_maxBodySize);
-    req.setMethod(_method);
-    req.setUri(_uri);
-    req.setHttpVersion(_httpVersion);
-    req.setUriQuery(_uriQuery);
-    req.setHeaders(_headers);
-    req.setBody(_body);
-
+bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     // Determine the configuration based on the block's locations.
     bool matched = false;
     std::vector<Location>& locations = block.getLocations();

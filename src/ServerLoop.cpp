@@ -137,13 +137,14 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         return ;
     }
 
-    // Use the ServerBlock to complete the creation of the HttpRequest
-    if (!parser.createRequest(block)) { // createRequest applies autoIndex and root settings
-        std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                                    + ErrorHandler::getInstance().getErrorPage(500);
-        sendResponse(clientSocket, errorResponse);
-        return ;
-    }
+    // ET EHKA TARVII TATA? 
+    // Use the ServerBlock to complete the creation of the HttpRequest 
+    // if (!parser.createRequest(block)) { // createRequest applies autoIndex and root settings
+    //     std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+    //                                 + ErrorHandler::getInstance().getErrorPage(500);
+    //     sendResponse(clientSocket, errorResponse);
+    //     return ;
+    // }
 
     HttpRequest req = parser.getPendingRequest();
     // std::cout << RB << "ROOT: " << req.getRoot() << "\nAUTO-INDEX: " << req.getAutoIndex() << RES << std::endl;
@@ -198,3 +199,28 @@ void ServerLoop::closeServer() {
     _clientData.clear();
     std::cout << "Server closed and resources cleaned." << std::endl;
 }
+
+
+// void ServerLoop::test(){
+//     std::string chunk =
+//     "POST /upload HTTP/1.1\r\n"
+//     "Host: example.com\r\n"
+//     "Content-Type: application/x-www-form-urlencoded\r\n"
+//     "Content-Length: 16\r\n"
+//     "\r\n";
+
+//     HttpParser par;
+//     par.parseRequest(_serverBlocks[0], chunk, 100); 
+//     HttpRequest req;
+//     req = par.getPendingRequest();
+
+//     std::cout<< req.getBodySize() << std::endl;
+//     std::cout<< req.getMethod() << std::endl;
+//     std::cout<< req.getUri() << std::endl;
+//     std::cout<< req.getHttpVersion() << std::endl;
+//     // std::cout<< req.getUriQuery() << std::endl;
+//     // std::cout<< req.getHeaders() << std::endl;
+//     std::cout<< req.getBody() << std::endl;
+
+
+// }
