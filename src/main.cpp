@@ -35,8 +35,8 @@ int main(int ac, char **av) {
     //     it->setErrorPages(configParse._errorPages);
     // }
     ServerLoop serverLoop(serverBlocks);
-    serverLoop.startServer();
-
+    serverLoop.startServer(); 
+    // serverLoop.test(); 
     return 0;
 }
 

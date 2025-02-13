@@ -57,6 +57,8 @@ class ServerLoop {
         void closeServer();
         bool hasTimedOut();  // Check if the server has timed out
 
+        void test();
+
 };
 
 #endif

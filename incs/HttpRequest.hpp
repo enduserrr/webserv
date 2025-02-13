@@ -34,21 +34,22 @@ public:
     HttpRequest();
     ~HttpRequest();
 
-    void setBodySize(int value);
-    void setMethod(std::string& method);
-    void setUri(std::string& uri);
-    void setHttpVersion(std::string& version);
-    void setUriQuery(std::map <std::string, std::string> _uriQuery);
-    void setHeaders(std::map <std::string, std::string> _headers);
-    void setBody(std::string& headers);
+    void                                setBodySize(int value);
+    void                                setMethod(std::string& method);
+    void                                setUri(std::string& uri);
+    void                                setHttpVersion(std::string& version);
+    void                                setUriQuery(const std::string &key, const std::string &value);
+    void                                addNewHeader(std::string &key, std::string &value);
+    void                                setBody(std::string& headers);
 
-    int             getBodySize();
-    std::string     getMethod();
-    std::string     getUri();
-    std::string     getHttpVersion();
+    int                                 getBodySize();
+    std::string                         getMethod();
+    std::string                         getUri();
+    std::string                         getHttpVersion();
     std::map <std::string, std::string> getUriQuery();
     std::map <std::string, std::string> getHeaders();
-    std::string getBody();
+    std::string&                        getHeader(const std::string &key);
+    std::string                         getBody();
 
     bool getAutoIndex() {
         return _autoIndex;

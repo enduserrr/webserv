@@ -31,11 +31,11 @@ void HttpRequest::setHttpVersion(std::string& version){
     _httpVersion = version;
 }
 
-void HttpRequest::setUriQuery(std::map <std::string, std::string> uriQuery){
-    _uriQuery = uriQuery;
+void HttpRequest::setUriQuery(const std::string &key, const std::string &value){
+    _uriQuery[key] = value;
 }
-void HttpRequest::setHeaders(std::map <std::string, std::string> headers){
-    _headers = headers;
+void HttpRequest::addNewHeader(std::string &key, std::string &value){
+    _headers[key] = value;
 }
 void HttpRequest::setBody(std::string& body){
     _body = body;
@@ -59,6 +59,10 @@ std::string HttpRequest::getHttpVersion() {
 
 std::map <std::string, std::string> HttpRequest::getUriQuery() {
     return _uriQuery;
+}
+
+std::string& HttpRequest::getHeader(const std::string &key) {
+    return _headers[key];
 }
 
 std::map <std::string, std::string> HttpRequest::getHeaders() {
