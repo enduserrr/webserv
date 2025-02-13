@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/05 11:05:18 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/13 12:39:12 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -22,6 +22,7 @@
 #include "HttpParser.hpp"
 #include "Router.hpp"
 #include "Webserver.hpp"
+#include "ClientSession.hpp"
 #include <vector>
 #include <poll.h>// Pollfd
 #include <map>// For storing client data
@@ -35,17 +36,21 @@
 
 class ServerLoop {
     private:
-        std::vector<ServerBlock> _serverBlocks; // Config data
-        std::vector<struct pollfd> _pollFds; // Fd's for polling
-        std::map<int, std::string> _clientData; // Store client data (like requests)
-        time_t _startUpTime; // Server starting timestamp
-        // HttpParser _httpParser;
+        std::map<int, ClientSession> _clients;
+
+        std::vector<ServerBlock>    _serverBlocks; // Config data
+        std::vector<struct pollfd>  _pollFds; // Fd's for polling
+        std::map<int, std::string>  _clientData; // Store client data (like requests)
+        time_t                      _startUpTime;
+        bool                        _run;
+
+        // void    handleClientRequest(int clientSocket);
+        void    removeClient(int clientSocket);
 
         void setupServerSockets();
         void acceptNewConnection(int serverSocket);
         void handleClientRequest(int clientSocket);
         void sendResponse(int clientSocket, const std::string &response);
-        // std::string routeRequest(HttpParser &parser);
         std::string routeRequest(HttpRequest &req);
 
     public:
@@ -53,12 +58,13 @@ class ServerLoop {
         ServerLoop(const std::vector<ServerBlock> &serverBlocks);
         ~ServerLoop();
 
-        void startServer();
-        void closeServer();
-        bool hasTimedOut();  // Check if the server has timed out
-
+        void    startServer();
+        void    closeServer();
+        bool    hasTimedOut();
+        void    stop() {
+            _run = false;
+        }
         void test();
-
 };
 
 #endif

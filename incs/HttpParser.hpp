@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:10 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/12 11:06:55 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/13 12:31:47 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -46,7 +46,8 @@ public:
     ~HttpParser();
 
 
-    bool readFullRequest(const std::string &chunk);
+    // bool readFullRequest(std::istream& input);
+    bool    readFullRequest(std::istream &input, ServerBlock &block);
     bool parseRequest(ServerBlock &block, std::string& req, size_t max);
     void parseStartLine(std::string &line, HttpRequest &req);
 

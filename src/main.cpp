@@ -6,12 +6,22 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 11:30:12 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/12 12:03:21 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/13 12:49:45 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "Webserver.hpp"
 #include "Libs.hpp"
+#include <csignal>
+#include <iostream>
+
+ServerLoop* g_serverLoop = nullptr;
+
+void signalHandler(int signum) {
+    std::cout << "\nSignal (" << signum << ") received, stopping server..." << std::endl;
+    if (g_serverLoop)
+        g_serverLoop->stop();
+}
 
 int main(int ac, char **av) {
     if (ac != 2) {
@@ -30,13 +40,14 @@ int main(int ac, char **av) {
         return 1;
     }
     std::vector<ServerBlock> serverBlocks = configParse.getServers();
-    // ErrorHandler::getInstance().logError("Adding custom error pages...");
-    // for (std::vector<ServerBlock>::iterator it = serverBlocks.begin(); it != serverBlocks.end(); ++it) {
-    //     it->setErrorPages(configParse._errorPages);
-    // }
     ServerLoop serverLoop(serverBlocks);
-    serverLoop.startServer(); 
-    // serverLoop.test(); 
+    g_serverLoop = &serverLoop;
+
+    // Register signal handlers for graceful shutdown.
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
+
+    serverLoop.startServer();
     return 0;
 }
 

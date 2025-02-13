@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/12 12:48:20 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/13 12:04:56 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -17,6 +17,7 @@
 #include <sys/stat.h> //Stat
 #define RB     "\033[1;91m"
 #define RES    "\033[0m"
+#define GC     "\033[3;90m"
 
 Methods::Methods() {}
 
@@ -35,11 +36,10 @@ static void replaceAll(std::string &str, const std::string &from, const std::str
 }
 
 std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
-    // Load the listing.html template from www/template
+    // listing.html template from www/template
     std::ifstream templateFile("www/templates/listing.html");
-
     if (!templateFile) {
-        // Fallback: generate a simple HTML page if the template isn't available.
+        // Else, make a simple HTML page
         std::cout << "FALLBACK FILE" << std::endl;
         std::ostringstream fallback;
         fallback << "<html><head><title>Index of " << uri << "</title></head><body>"
@@ -83,7 +83,6 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
     }
     closedir(dir);
     std::string itemsHtml = itemsStream.str();
-
     // Replace placeholders in the template.
     std::string title = "Index of " + uri;
     replaceAll(templateHtml, "{{title}}", title);
@@ -98,15 +97,13 @@ std::string Methods::mGet(HttpRequest &req) {
     std::string basePath = req.getRoot();
     std::string filePath = basePath + uri;
 
-    std::cout << RB << "ROOT: " << req.getRoot() << "\nAUTO-INDEX: " << req.getAutoIndex() << RES << std::endl;
+    std::cout << GC << "ROOT: " << req.getRoot() << "\nAUTO-INDEX: " << req.getAutoIndex() << RES << std::endl;
     struct stat st;
     bool isDirectory = false;
     if (stat(filePath.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
         isDirectory = true;
     }
-
-    // If the URI ends with '/', it's a directory request.
-    if (!uri.empty() && uri.back() == '/') {
+    if (!uri.empty() && uri.back() == '/') {// If the URI ends with '/', it's a directory request.
         if (isDirectory && req.getAutoIndex()) {
             // Generate directory listing using the template.
             std::string listing = generateDirectoryListing(filePath, uri);
@@ -124,34 +121,28 @@ std::string Methods::mGet(HttpRequest &req) {
                 return response;
             }
         } else {
-            // Autoindex is off; assume an index file should be served.
-            filePath += "index.html";
+            filePath += "index.html";// Autoindex is off; assume an index file should be served.
         }
     }
-
-    // Check if the file exists.
-    if (stat(filePath.c_str(), &st) != 0) {
+    if (stat(filePath.c_str(), &st) != 0) {// Check if the file exists.
         std::string response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n";
         std::cerr << "Unable to fetch the requested resource." << std::endl;
         response += ErrorHandler::getInstance().getErrorPage(404);
         return response;
     }
 
-    // Open the file for reading in binary mode.
-    std::ifstream file(filePath.c_str(), std::ios::in | std::ios::binary);
+    std::ifstream file(filePath.c_str(), std::ios::in | std::ios::binary);// Open the file for reading in binary mode.
     if (!file) {
         std::string response = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n";
         response += ErrorHandler::getInstance().getErrorPage(500);
         return response;
     }
 
-    // Read the file content.
     std::ostringstream ss;
-    ss << file.rdbuf();
+    ss << file.rdbuf();// Read the file content.
     std::string fileContent = ss.str();
 
-    // Build the HTTP response.
-    std::ostringstream responseStream;
+    std::ostringstream responseStream;// Build the HTTP response.
     responseStream << "HTTP/1.1 200 OK\r\n"
                    << "Content-Length: " << fileContent.size() << "\r\n"
                    << "Content-Type: text/html\r\n"

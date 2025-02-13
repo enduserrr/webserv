@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/12 12:13:45 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/13 12:50:10 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -20,10 +20,14 @@
 #include <unistd.h> //close()
 #include <arpa/inet.h> //socket operations
 
-ServerLoop::ServerLoop() {}
+ServerLoop::ServerLoop() {
+    _run = true;
+}
 
 ServerLoop::ServerLoop(const std::vector<ServerBlock> &serverBlocks)
-    : _serverBlocks(serverBlocks) {}
+    : _serverBlocks(serverBlocks) {
+        _run = true;
+}
 
 ServerLoop::~ServerLoop() {
     closeServer();
@@ -101,57 +105,85 @@ void    ServerLoop::acceptNewConnection(int serverSocket) {
 }
 
 void ServerLoop::handleClientRequest(int clientSocket) {
-    std::cout << "REQUEST RECEIVED!" << std::endl;
     char buffer[1024];
-    memset(buffer, 0, sizeof(buffer));
     ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
 
-    // Client disconnected
-    if (bytesRead == 0) {
-        std::cout << "Client closed the connection." << std::endl;
-        close(clientSocket);
-        _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
-            [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
-            _pollFds.end());
-        return ;
-    } else if (bytesRead < 0) { // Error occurred
-        ErrorHandler::getInstance().logError("Error receiving data from client.");
-        close(clientSocket);
-        _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
-            [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
-            _pollFds.end());
-        return ;
+    if (bytesRead <= 0) { // Handle disconnection or error
+        std::cout << "Client disconnected: " << clientSocket << std::endl;
+        removeClient(clientSocket);
+        return;
     }
 
-    std::string request(buffer, bytesRead);
-    std::cout << "Received request: " << request << std::endl;
+    std::string data(buffer, bytesRead);
 
-    // Select the relevant ServerBlock (for simplicity, we use the first one)
+    // Find or create the ClientSession
+    if (_clients.find(clientSocket) == _clients.end()) {
+        _clients[clientSocket] = ClientSession(clientSocket);
+    }
+    ClientSession &client = _clients[clientSocket];
+
+    // Append data to session buffer
+    client.buffer += data;
+
+    // Select the relevant ServerBlock (for simplicity, using the first one)
+    // Add logic to select & use different ServerBlocks
     ServerBlock &block = _serverBlocks[0];
 
     HttpParser parser;
-    if (!parser.parseRequest(block, request, block.getBodySize())) {
-        std::string errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
-                                    + ErrorHandler::getInstance().getErrorPage(400);
-        sendResponse(clientSocket, errorResponse);
-        return ;
+    // Meaby put send response to Router class instead?
+    std::istringstream input(client.buffer);
+    if (parser.readFullRequest(input, block)) {
+        client.request = parser.getPendingRequest(); // Store parsed request
+        std::string response = Router().routeRequest(client.request, clientSocket);
+        sendResponse(clientSocket, response);
+        client.buffer.clear();
     }
-
-    // ET EHKA TARVII TATA? 
-    // Use the ServerBlock to complete the creation of the HttpRequest 
-    // if (!parser.createRequest(block)) { // createRequest applies autoIndex and root settings
-    //     std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-    //                                 + ErrorHandler::getInstance().getErrorPage(500);
-    //     sendResponse(clientSocket, errorResponse);
-    //     return ;
-    // }
-
-    HttpRequest req = parser.getPendingRequest();
-    // std::cout << RB << "ROOT: " << req.getRoot() << "\nAUTO-INDEX: " << req.getAutoIndex() << RES << std::endl;
-    std::string response = Router().routeRequest(req);
-    sendResponse(clientSocket, response);
-    parser.removeRequest();
 }
+
+
+/*// void ServerLoop::handleClientRequest(int clientSocket) {
+//     std::cout << "REQUEST RECEIVED!" << std::endl;
+//     HttpParser parser;
+//     std::string fullRequestData;
+
+//     while (true) {
+//         char buffer[1024];
+//         memset(buffer, 0, sizeof(buffer));
+//         ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+
+//         if (bytesRead == 0) { // Client disconnected
+//             std::cout << "Client closed the connection." << std::endl;
+//             close(clientSocket);
+//             _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
+//                 [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
+//                 _pollFds.end());
+//             return;
+//         } else if (bytesRead < 0) { // Error occurred
+//             ErrorHandler::getInstance().logError("Error receiving data from client.");
+//             close(clientSocket);
+//             _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
+//                 [clientSocket](const struct pollfd &pfd) { return pfd.fd == clientSocket; }),
+//                 _pollFds.end());
+//             return;
+//         }
+
+//         fullRequestData.append(buffer, bytesRead);
+//         std::istringstream iss(fullRequestData);
+
+//         // Select the relevant ServerBlock (for simplicity, we use the first one)
+//         ServerBlock &block = _serverBlocks[0];
+//         if (parser.readFullRequest(iss, block))
+//             break;
+//         // Otherwise, continue accumulating data.
+//     }
+
+//     HttpRequest req = parser.getPendingRequest();
+//     // std::cout << RB << "ROOT: " << req.getRoot() << "\nAUTO-INDEX: " << req.getAutoIndex() << RES << std::endl;
+//     std::string response = Router().routeRequest(req);
+//     sendResponse(clientSocket, response);
+//     parser.removeRequest();
+// }*/
+
 
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
@@ -167,7 +199,7 @@ void    ServerLoop::startServer() {
     setupServerSockets();
 
     _startUpTime = time(nullptr); // Set start up time
-    while (true) {
+    while (_run) {
         if (hasTimedOut()) {// Check for timeout (exit after 10 sec)
             std::cout << "No activity for 10 seconds. Exiting server." << std::endl;
             closeServer();
@@ -210,7 +242,7 @@ void ServerLoop::closeServer() {
 //     "\r\n";
 
 //     HttpParser par;
-//     par.parseRequest(_serverBlocks[0], chunk, 100); 
+//     par.parseRequest(_serverBlocks[0], chunk, 100);
 //     HttpRequest req;
 //     req = par.getPendingRequest();
 
@@ -224,3 +256,11 @@ void ServerLoop::closeServer() {
 
 
 // }
+
+void ServerLoop::removeClient(int clientSocket) {
+    if (_clients.find(clientSocket) != _clients.end()) {
+        _clients[clientSocket].closeConnection();
+        _clients.erase(clientSocket);
+    }
+}
+
