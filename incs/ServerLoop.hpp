@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/13 12:39:12 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/15 13:07:09 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -38,6 +38,10 @@ class ServerLoop {
     private:
         std::map<int, ClientSession> _clients;
 
+        std::vector<int>            _serverSockets;
+        std::vector<int>            _boundPorts;
+        std::map<int, ServerBlock>  _portToBlock; // Maps port -> ServerBlock (first assigned block)
+
         std::vector<ServerBlock>    _serverBlocks; // Config data
         std::vector<struct pollfd>  _pollFds; // Fd's for polling
         std::map<int, std::string>  _clientData; // Store client data (like requests)
@@ -46,7 +50,7 @@ class ServerLoop {
 
         // void    handleClientRequest(int clientSocket);
         void    removeClient(int clientSocket);
-
+        void    closeConnection(int clientFd);
         void setupServerSockets();
         void acceptNewConnection(int serverSocket);
         void handleClientRequest(int clientSocket);
