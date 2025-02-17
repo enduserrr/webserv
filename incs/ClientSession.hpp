@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 12:18:51 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/15 12:55:05 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/17 11:34:23 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -32,7 +32,7 @@ class ClientSession {
         ClientSession(int clientFd);
         ~ClientSession();
 
-    void closeConnection();
+    void removeClient();
 };
 
 #endif

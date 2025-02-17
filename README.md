@@ -3,9 +3,9 @@
 ## To do:
 
 ### Multiple Clients & Blocks
-* Modify startServer & handleClientRequest to correctly check for client connections on sockets
-* Add logic to select & use different ServerBlocks
-* Should multiple ServerBlocks be able to listen same ports?
+* startServer & handleClientRequest to correctly check for client connections on sockets | OK!
+* Add logic to support multiple ServerBlocks | OK!
+* Multiple ServerBlocks able to listen same ports? - NO | OK!
 
 ### Exiting, Cleaning & Signals
 * Signal handling finetuning (cleaning etc, shouldn't log an error after ctr-c?)
@@ -14,12 +14,16 @@
 * Http page for uploading and deleting uploaded content
 * Login Http page that leads to uploading page
 
-### Serving the Right Client
-* Addind fd tag to HttpParser so requests can be tagged with correct client fd to return the results to
+### Serving the Client
+* Moving the responsing and correct client fd to Router?
 
 ### Perserverance
 * DDOS safety
+* Any jamming
 
 ### Client Permissions & Handling POST and DEL Requests
 * POST & DELETE finetuning (should create upload folder to the directory the request was sent for)
 * MIME types
+
+### Reporting & Errors
+* Log levels info/warning/error to enable accurate reporting

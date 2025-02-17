@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/15 13:07:09 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/17 11:39:16 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -44,18 +44,15 @@ class ServerLoop {
 
         std::vector<ServerBlock>    _serverBlocks; // Config data
         std::vector<struct pollfd>  _pollFds; // Fd's for polling
-        std::map<int, std::string>  _clientData; // Store client data (like requests)
+        // std::map<int, std::string>  _clientData; // Store client data (like requests)
         time_t                      _startUpTime;
         bool                        _run;
 
-        // void    handleClientRequest(int clientSocket);
-        void    removeClient(int clientSocket);
-        void    closeConnection(int clientFd);
-        void setupServerSockets();
-        void acceptNewConnection(int serverSocket);
-        void handleClientRequest(int clientSocket);
-        void sendResponse(int clientSocket, const std::string &response);
-        std::string routeRequest(HttpRequest &req);
+        void    removeClient(int clientFd);
+        void    setupServerSockets();
+        void    acceptNewConnection(int serverSocket);
+        void    handleClientRequest(int clientSocket);
+        void    sendResponse(int clientSocket, const std::string &response);
 
     public:
         ServerLoop();
@@ -68,7 +65,7 @@ class ServerLoop {
         void    stop() {
             _run = false;
         }
-        void test();
+        // void test();
 };
 
 #endif
