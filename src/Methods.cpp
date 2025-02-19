@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/13 12:04:56 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/19 11:31:04 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -36,10 +36,8 @@ static void replaceAll(std::string &str, const std::string &from, const std::str
 }
 
 std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
-    // listing.html template from www/template
-    std::ifstream templateFile("www/templates/listing.html");
-    if (!templateFile) {
-        // Else, make a simple HTML page
+    std::ifstream templateFile("www/templates/listing.html"); // listing.html template from www/template
+    if (!templateFile) { // Else, make a simple HTML page
         std::cout << "FALLBACK FILE" << std::endl;
         std::ostringstream fallback;
         fallback << "<html><head><title>Index of " << uri << "</title></head><body>"
@@ -65,8 +63,7 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
     tmplStream << templateFile.rdbuf();
     std::string templateHtml = tmplStream.str();
 
-    // Generate the list items from the directory contents.
-    std::ostringstream itemsStream;
+    std::ostringstream itemsStream; // Generate the list items from the directory contents.
     DIR *dir = opendir(directoryPath.c_str());
     if (!dir) {
         return "";
@@ -83,9 +80,9 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
     }
     closedir(dir);
     std::string itemsHtml = itemsStream.str();
-    // Replace placeholders in the template.
+
     std::string title = "Index of " + uri;
-    replaceAll(templateHtml, "{{title}}", title);
+    replaceAll(templateHtml, "{{title}}", title); // Replace placeholders in the template with dir listings
     replaceAll(templateHtml, "{{items}}", itemsHtml);
 
     return templateHtml;

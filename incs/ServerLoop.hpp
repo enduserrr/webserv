@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/17 11:39:16 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/19 11:08:37 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -44,9 +44,9 @@ class ServerLoop {
 
         std::vector<ServerBlock>    _serverBlocks; // Config data
         std::vector<struct pollfd>  _pollFds; // Fd's for polling
-        // std::map<int, std::string>  _clientData; // Store client data (like requests)
         time_t                      _startUpTime;
         bool                        _run;
+        // int                         _clientCount;
 
         void    removeClient(int clientFd);
         void    setupServerSockets();

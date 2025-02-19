@@ -6,17 +6,17 @@
   <style>
     /* Set background, font, and text colors */
     body {
-      background-color: #f9f9f9; /* Slightly off-white */
+      background-color: #f9f9f9; /* Slightly off-white background */
       font-family: Helvetica, sans-serif;
-      color: #333; /* Dark grey */
+      color: #333; /* Dark grey font */
       margin: 0;
       padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      min-height: 50vh;
     }
-    /* Centered container with right-aligned text */
+    /* Text container centered on page with right-aligned text */
     .container {
       width: 80%;
       max-width: 800px;
@@ -33,34 +33,23 @@
       margin-bottom: 40px;
       line-height: 1.5;
     }
-    form {
-      margin-bottom: 40px;
-    }
-    /* Styling for input elements and the select dropdown */
-    input[type="number"], select {
-      font-size: 16px;
-      padding: 8px;
-      margin: 5px;
-      width: 100px;
-    }
-    /* Outline-only button styling */
+    /* Centered button at the bottom */
     .button-container {
       text-align: left;
-      margin-top: 20px;
     }
-    .button-container input[type="submit"] {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: transparent; /* no fill */
-      border: 2px solid #333;
-      color: #333;
-      text-decoration: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
+    .button-container a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: transparent; /* No fill */
+        border: 2px solid #333;  /* Outline with dark grey, adjust thickness and color as needed */
+        color: #333;             /* Text color matching the border */
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
     }
-    .button-container input[type="submit"]:hover {
-      background-color: #f0f0f0;
+    .button-container a:hover {
+      background-color: #e3d5d5;
     }
   </style>
 </head>

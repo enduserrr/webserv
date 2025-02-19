@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/17 11:43:26 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/19 12:13:30 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -96,49 +96,48 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     int clientFd = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
     if (clientFd < 0) {
         ErrorHandler::getInstance().logError("Failed to accept client connection.");
-        return;
+        return ;
     }
-    // Retrieve the local (server) port for the accepted connection.
-    struct sockaddr_in localAddr;
+
+    struct sockaddr_in localAddr; // Retrieve the local (server) port for the accepted connection.
     socklen_t localLen = sizeof(localAddr);
     if (getsockname(clientFd, (struct sockaddr*)&localAddr, &localLen) < 0) {
         ErrorHandler::getInstance().logError("Failed to get local address for client connection.");
         close(clientFd);
-        return;
+        return ;
     }
     int localPort = ntohs(localAddr.sin_port);
-    // Find the correct ServerBlock for this port.
-    if (_portToBlock.find(localPort) == _portToBlock.end()) {
+    if (_portToBlock.find(localPort) == _portToBlock.end()) {// Find ServerBlock for this port
         std::cerr << "Warning: No ServerBlock found for port " << localPort << std::endl;
         close(clientFd);
-        return;
+        return ;
     }
-    // Create and store the client session with the correct ServerBlock.
-    ClientSession session(clientFd);
+
+    ClientSession session(clientFd);// Create and store the client session with the correct ServerBlock.
     session._block = _portToBlock[localPort];
     _clients[clientFd] = session;
-    // Add the new client to the poll vector.
-    struct pollfd pfd;
+
+    struct pollfd pfd;// Add the new client to the poll vector.
     pfd.fd = clientFd;
     pfd.events = POLLIN;
     _pollFds.push_back(pfd);
     std::cout << "New client connected on port " << localPort
               << " (fd: " << clientFd << ")" << std::endl;
+    // _clientCount++;
 }
 
 void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[1024];
     ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
 
-    if (bytesRead == 0) {
-        // Client closed connection
+    if (bytesRead == 0) { // Client closed connection
         std::cout << "Client disconnected: " << clientSocket << std::endl;
         close(clientSocket);
         _clients.erase(clientSocket);
-        return;
+        return ;
     } else if (bytesRead < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
-            return; // No data available yet, try again later
+            return ; // No data available yet, try again later
         } else if (errno == ENOTCONN) {
             std::cerr << "Client already disconnected: " << clientSocket << std::endl;
         } else {
@@ -147,29 +146,27 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         close(clientSocket);
         std::cout << "Removing socket: " << clientSocket << std::endl;
         _clients.erase(clientSocket);
-        return;
+        return ;
     }
-    // Store received data
-    std::string data(buffer, bytesRead);
-    // Ensure client session exists
-    if (_clients.find(clientSocket) == _clients.end()) {
+
+    std::string data(buffer, bytesRead); // Store received data
+    if (_clients.find(clientSocket) == _clients.end()) {// Ensure client session exists
         _clients[clientSocket] = ClientSession(clientSocket);
-        // Retrieve the port the client is connected to
-        struct sockaddr_in addr;
+        struct sockaddr_in addr;// Retrieve the port the client is connected to
         socklen_t addrLen = sizeof(addr);
         if (getsockname(clientSocket, (struct sockaddr*)&addr, &addrLen) == 0) {
             int port = ntohs(addr.sin_port);
-            // Assign the correct ServerBlock based on the port
-            if (_portToBlock.find(port) != _portToBlock.end()) {
+            if (_portToBlock.find(port) != _portToBlock.end()) { // Assign the correct ServerBlock based on the port
                 _clients[clientSocket]._block = _portToBlock[port];
             } else {
                 std::cerr << "Warning: No matching ServerBlock for port " << port << std::endl;
             }
         }
     }
+
     ClientSession &client = _clients[clientSocket];
     client.buffer += data;
-    ServerBlock &block = client._block;// Correct ServerBlock to the client
+    ServerBlock &block = client._block; // Correct ServerBlock to the client
     HttpParser parser;
     std::istringstream input(client.buffer);
     if (parser.readFullRequest(input, block)) {
@@ -192,6 +189,7 @@ void    ServerLoop::sendResponse(int clientSocket, const std::string &response) 
 void ServerLoop::startServer() {
     setupServerSockets();
     _startUpTime = time(nullptr); // Set start up time
+    // _clientCount = 0;
 
     while (_run) {
         if (hasTimedOut()) {
@@ -207,7 +205,6 @@ void ServerLoop::startServer() {
         for (size_t i = 0; i < _pollFds.size(); ++i) {
             if (_pollFds[i].revents & POLLIN) {
                 int fd = _pollFds[i].fd;
-
                 if (std::find(_serverSockets.begin(), _serverSockets.end(), fd) != _serverSockets.end()) {
                     acceptNewConnection(fd); // New client
                 } else {
@@ -235,7 +232,6 @@ void ServerLoop::closeServer() {
         close(it->fd);
     }
     _pollFds.clear();
-    // _clientData.clear();
     std::cout << "Server closed and resources cleaned." << std::endl;
 }
 

@@ -1,14 +1,12 @@
 # WEBSERV
 
 ## To do:
+- Request parsing to correctly parsing content-type header
+- Client count per ip address checker (could count ClientSessions per ip address)
+- Max request count in a timeframe and cool down period (ddos safety)
+- POST to check for accepted MIME types, logic where uploads folder is created to (server block) | OK!
+- Ensuring the server won't get stuck in to method handling | OK!
 
-### Multiple Clients & Blocks
-* startServer & handleClientRequest to correctly check for client connections on sockets | OK!
-* Add logic to support multiple ServerBlocks | OK!
-* Multiple ServerBlocks able to listen same ports? - NO | OK!
-
-### Exiting, Cleaning & Signals
-* Signal handling finetuning (cleaning etc, shouldn't log an error after ctr-c?)
 
 ### HTTP
 * Http page for uploading and deleting uploaded content
@@ -16,10 +14,6 @@
 
 ### Serving the Client
 * Moving the responsing and correct client fd to Router?
-
-### Perserverance
-* DDOS safety
-* Any jamming
 
 ### Client Permissions & Handling POST and DEL Requests
 * POST & DELETE finetuning (should create upload folder to the directory the request was sent for)

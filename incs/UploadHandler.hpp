@@ -12,7 +12,7 @@ class UploadHandler {
         UploadHandler();
         ~UploadHandler();
 
-        std::string upload(HttpRequest &req);
+        // std::string upload(HttpRequest &req);
         std::string uploadReturnPath(HttpRequest &req);
 };
 
