@@ -6,7 +6,7 @@ SRC		= $(SRC_DIR)/main.cpp $(SRC_DIR)/ConfParser.cpp \
 		  $(SRC_DIR)/ErrorHandler.cpp $(SRC_DIR)/StaticHandler.cpp \
 		  $(SRC_DIR)/CgiHandler.cpp $(SRC_DIR)/UploadHandler.cpp \
 		  $(SRC_DIR)/HttpRequest.cpp $(SRC_DIR)/Router.cpp \
-		  $(SRC_DIR)/Methods.cpp $(SRC_DIR)/Mime.cpp \
+		  $(SRC_DIR)/Methods.cpp $(SRC_DIR)/Types.cpp \
 		  $(SRC_DIR)/ClientSession.cpp
 OBJ_DIR	= .obj
 OBJ		= $(addprefix $(OBJ_DIR)/, $(notdir $(SRC:.cpp=.o)))

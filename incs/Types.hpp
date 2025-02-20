@@ -1,29 +1,34 @@
 /******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Mime.hpp                                           :+:      :+:    :+:   */
+/*   Types.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 09:53:12 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/08 10:39:14 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/20 10:50:44 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#ifndef MIME_HPP
-# define MIME_HPP
+#ifndef TYPES_HPP
+# define TYPES_HPP
 
 #include "Libs.hpp"
 
-class Mime {
+class Types {
     private:
-        std::map<std::string, std::string> _types;
+        std::map<std::string, std::string>  _mimeTypes;
+        std::vector<std::string>            _contentTypes; //Change to std::list
 
     public:
-        Mime();
-        ~Mime();
+        Types();
+        ~Types();
 
+        // bool validMime(const std::string &extencion);
         std::string getMimeType(const std::string &extension) const;
+        bool isValidMime(const std::string &extension) const;
+        bool isValidContent(const std::string &contentType) const;
+
 };
 
 #endif

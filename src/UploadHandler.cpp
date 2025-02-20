@@ -6,12 +6,12 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/19 13:03:36 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/20 11:14:19 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "../incs/UploadHandler.hpp"
-#include "../incs/Mime.hpp"
+#include "../incs/Types.hpp"
 #include <fstream>
 #include <sstream>
 #include <ctime>
@@ -25,90 +25,226 @@ UploadHandler::UploadHandler() {
 
 UploadHandler::~UploadHandler() {}
 
-// std::string UploadHandler::upload(HttpRequest &req) {
-//     /* Get raw data to be uploaded*/
+std::string extractFilenameFromMultipart(const std::string &body, const std::string &boundary) {
+    std::string filename;
+    std::string boundaryDelimiter = "--" + boundary;
+    size_t pos = body.find(boundaryDelimiter);
+
+    if (pos != std::string::npos) {
+        size_t filenamePos = body.find("filename=\"", pos);
+        if (filenamePos != std::string::npos) {
+            filenamePos += 10; // Move past "filename=\""
+            size_t endPos = body.find("\"", filenamePos);
+            if (endPos != std::string::npos) {
+                filename = body.substr(filenamePos, endPos - filenamePos);
+            }
+        }
+    }
+    return filename;
+}
+
+std::string extractFileContentFromMultipart(const std::string &body, const std::string &boundary) {
+    std::string boundaryDelimiter = "--" + boundary;
+    size_t start = body.find("\r\n\r\n"); // Find start of file content
+    if (start != std::string::npos) {
+        start += 4; // Move past header section
+        size_t end = body.find(boundaryDelimiter, start);
+        if (end != std::string::npos) {
+            return body.substr(start, end - start - 2); // Remove trailing CRLF
+        }
+    }
+    return "";
+}
+
+
+// std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
 //     std::string body = req.getBody();
 
-//     std::time_t now = std::time(nullptr);
-//     std::ostringstream filename;
-//     filename << "./uploads/upload_" << now << ".dat";
-
-//     std::ofstream ofs(filename.str().c_str(), std::ios::binary);
-//     if (!ofs) {
-//         return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-//                + ErrorHandler::getInstance().getErrorPage(500);
+//     // Get the content type from the request header
+//     std::string contentType = req.getHeader("Content-Type");
+//     if (contentType.empty()) {
+//         std::cout << "Content-Type header missing" << std::endl;
+//         return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
+//                + ErrorHandler::getInstance().getErrorPage(415);
 //     }
-//     ofs.write(body.c_str(), body.size());
-//     ofs.close();
 
-//     std::ostringstream responseStream;
-//     responseStream << "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
-//                    << "<html><body><h1>Upload Successful</h1>"
-//                    << "<p>Your file has been saved as " << filename.str() << ".</p>"
-//                    << "</body></html>";
+// std::vector<std::string> acceptedContentTypes = {
+//     "application/x-www-form-urlencoded",
+//     "multipart/form-data"
+// };
 
-//     return responseStream.str();
+// // Check if content type is accepted
+// bool isAccepted = false;
+// for (const auto &type : acceptedContentTypes) {
+//     if (contentType.find(type) == 0) {  // Use `find` for "multipart/form-data"
+//         isAccepted = true;
+//         break;
+//     }
+// }
+
+// if (!isAccepted) {
+//     std::cout << "Unsupported media type: " << contentType << std::endl;
+//     return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
+//            + ErrorHandler::getInstance().getErrorPage(415);
+// }
+
+//     // Accepted file extensions mapped to MIME types
+//     std::map<std::string, std::string> acceptedMimeTypes = {
+//         {".html", "text/html"},
+//         {".htm",  "text/html"},
+//         {".css",  "text/css"},
+//         {".ico",  "image/x-icon"},
+//         {".avi",  "video/x-msvideo"},
+//         {".bmp",  "image/bmp"},
+//         {".doc",  "application/msword"},
+//         {".gif",  "image/gif"},
+//         {".gz",   "application/x-gzip"},
+//         {".jpg",  "image/jpeg"},
+//         {".jpeg", "image/jpeg"},
+//         {".png",  "image/png"},
+//         {".txt",  "text/plain"},
+//         {".mp3",  "audio/mp3"},
+//         {".pdf",  "application/pdf"}
+//     };
+
+//     // If the request Content-Type isn't supported, return 415
+//     bool isFormEncoded = (contentType == "application/x-www-form-urlencoded");
+//     bool isMultipart = (contentType.find("multipart/form-data") == 0); // Handle multipart boundary
+//     if (!isFormEncoded && !isMultipart) {
+//         std::cout << "Unsupported media type: " << contentType << std::endl;
+//         return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
+//                + ErrorHandler::getInstance().getErrorPage(415);
+//     }
+
+//     std::string filePath;
+
+//     // Handle application/x-www-form-urlencoded (store as text file)
+//     if (isFormEncoded) {
+//         filePath = "./uploads/upload_" + std::to_string(std::time(nullptr)) + ".txt";
+//         std::ofstream ofs(filePath.c_str(), std::ios::binary);
+//         if (!ofs) {
+//             std::cout << "Failed to write uploaded content." << std::endl;
+//             return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+//                    + ErrorHandler::getInstance().getErrorPage(500);
+//         }
+//         ofs.write(body.c_str(), body.size());
+//         ofs.close();
+//         return filePath;
+//     }
+
+//     // Handle multipart/form-data (parse file upload)
+//     if (isMultipart) {
+//         std::string boundary = contentType.substr(contentType.find("boundary=") + 9);
+//         if (boundary.empty()) {
+//             std::cout << "Multipart boundary missing" << std::endl;
+//             return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
+//                    + ErrorHandler::getInstance().getErrorPage(400);
+//         }
+
+//         // Extract filename from multipart content
+//         std::string filename = extractFilenameFromMultipart(body, boundary);
+//         if (filename.empty()) {
+//             std::cout << "Filename extraction failed" << std::endl;
+//             return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
+//                    + ErrorHandler::getInstance().getErrorPage(400);
+//         }
+
+//         // Determine file extension and validate MIME type
+//         std::string extension = filename.substr(filename.find_last_of("."));
+//         if (acceptedMimeTypes.find(extension) == acceptedMimeTypes.end()) {
+//             std::cout << "Invalid file type: " << extension << std::endl;
+//             return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
+//                    + ErrorHandler::getInstance().getErrorPage(415);
+//         }
+
+//         // Save the extracted file
+//         filePath = "./uploads/" + filename;
+//         std::ofstream ofs(filePath.c_str(), std::ios::binary);
+//         if (!ofs) {
+//             std::cout << "Failed to write uploaded file" << std::endl;
+//             return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+//                    + ErrorHandler::getInstance().getErrorPage(500);
+//         }
+//         std::string fileContent = extractFileContentFromMultipart(body, boundary);
+//         ofs.write(fileContent.c_str(), fileContent.size());
+//         ofs.close();
+//     }
+
+//     return filePath;
 // }
 
 std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
+    Types types; // Instance of Types class for type validation
     std::string body = req.getBody();
-
-    // Get the content type from the request header --> DOESN'T WORK NOW => INCORRECT REQUEST PARSING
     std::string contentType = req.getHeader("Content-Type");
+
     if (contentType.empty()) {
-        std::cout << "Content-type header missing" << std::endl;
+        std::cout << "Content-Type header missing" << std::endl;
         return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
                + ErrorHandler::getInstance().getErrorPage(415);
     }
 
-    std::vector<std::pair<std::string, std::string>> acceptedTypes = { // Accepted mime types
-        {".html", "text/html"},
-        {".htm",  "text/html"},
-        {".css",  "text/css"},
-        {".ico",  "image/x-icon"},
-        {".avi",  "video/x-msvideo"},
-        {".bmp",  "image/bmp"},
-        {".doc",  "application/msword"},
-        {".gif",  "image/gif"},
-        {".gz",   "application/x-gzip"},
-        {".jpg",  "image/jpeg"},
-        {".jpeg", "image/jpeg"},
-        {".png",  "image/png"},
-        {".txt",  "text/plain"},
-        {".mp3",  "audio/mp3"},
-        {".pdf",  "application/pdf"}
-    };
+    // Check if the content type is accepted
+    if (!types.isValidContent(contentType)) {
+        std::cout << "Unsupported media type: " << contentType << std::endl;
+        return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
+               + ErrorHandler::getInstance().getErrorPage(415);
+    }
 
-    std::string extension;
-    for (const auto &pair : acceptedTypes) { // Find Content-Type
-        if (pair.second == contentType) {
-            extension = pair.first;
-            break;
+    std::string filePath;
+
+    // Handle application/x-www-form-urlencoded (store as text file)
+    if (contentType == "application/x-www-form-urlencoded") {
+        filePath = "./uploads/upload_" + std::to_string(std::time(nullptr)) + ".txt";
+        std::ofstream ofs(filePath.c_str(), std::ios::binary);
+        if (!ofs) {
+            std::cout << "Failed to write uploaded content." << std::endl;
+            return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+                   + ErrorHandler::getInstance().getErrorPage(500);
         }
+        ofs.write(body.c_str(), body.size());
+        ofs.close();
+        return filePath;
     }
 
-    // If no accepted MIME type match don't upload
-    if (extension.empty()) {
-        std::cout << "No matching media type." << std::endl;
-        return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
-               + ErrorHandler::getInstance().getErrorPage(415);
-    }
+    // Handle multipart/form-data (parse file upload)
+    if (contentType.find("multipart/form-data") == 0) {
+        std::string boundary = contentType.substr(contentType.find("boundary=") + 9);
+        if (boundary.empty()) {
+            std::cout << "Multipart boundary missing" << std::endl;
+            return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
+                   + ErrorHandler::getInstance().getErrorPage(400);
+        }
 
-    // Gen file name
-    std::time_t now = std::time(nullptr);
-    std::ostringstream filename;
-    filename << "./uploads/upload_" << now << extension;
-    std::string filePath = filename.str();
+        // Extract filename from multipart content
+        std::string filename = extractFilenameFromMultipart(body, boundary);
+        if (filename.empty()) {
+            std::cout << "Filename extraction failed" << std::endl;
+            return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
+                   + ErrorHandler::getInstance().getErrorPage(400);
+        }
 
-    // Try writing the uploaded content to the file
-    std::ofstream ofs(filePath.c_str(), std::ios::binary);
-    if (!ofs) {
-        std::cout << "Failed to write uploaded content." << std::endl;
-        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-               + ErrorHandler::getInstance().getErrorPage(500);
+        // Determine file extension and validate MIME type
+        std::string extension = filename.substr(filename.find_last_of("."));
+        if (!types.isValidMime(extension)) {
+            std::cout << "Invalid file type: " << extension << std::endl;
+            return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
+                   + ErrorHandler::getInstance().getErrorPage(415);
+        }
+
+        // Save the extracted file
+        filePath = "./uploads/" + filename;
+        std::ofstream ofs(filePath.c_str(), std::ios::binary);
+        if (!ofs) {
+            std::cout << "Failed to write uploaded file" << std::endl;
+            return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+                   + ErrorHandler::getInstance().getErrorPage(500);
+        }
+        std::string fileContent = extractFileContentFromMultipart(body, boundary);
+        ofs.write(fileContent.c_str(), fileContent.size());
+        ofs.close();
     }
-    ofs.write(body.c_str(), body.size());
-    ofs.close();
 
     return filePath;
 }
+

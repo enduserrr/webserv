@@ -21,3 +21,8 @@
 
 ### Reporting & Errors
 * Log levels info/warning/error to enable accurate reporting
+
+
+###
+- File up doesn't  work
+- File ups to take names
