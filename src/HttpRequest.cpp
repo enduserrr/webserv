@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:22:42 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/04 11:01:37 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/21 12:29:12 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -71,4 +71,12 @@ std::map <std::string, std::string> HttpRequest::getHeaders() {
 
 std::string HttpRequest::getBody() {
     return _body;
+}
+
+void HttpRequest::setFileName(std::string name) {
+    _fileName = name;
+}
+
+std::string HttpRequest::getFileName() {
+    return _fileName;
 }

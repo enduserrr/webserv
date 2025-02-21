@@ -26,3 +26,5 @@
 ###
 - File up doesn't  work
 - File ups to take names
+
+- Header parsed first before parsing body. Currently

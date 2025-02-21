@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/20 11:12:48 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/21 12:41:28 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -152,7 +152,6 @@ void HttpParser::isValidUri(std::string& uri) {
     }
 }
 
-
 void HttpParser::parseHeader(std::string &line, HttpRequest &req) {
     std::istringstream ss(line);
     std::string key;
@@ -164,73 +163,10 @@ void HttpParser::parseHeader(std::string &line, HttpRequest &req) {
     req.addNewHeader(key, value);
 }
 
-// void HttpParser::parseBody(std::string &body, HttpRequest &req) {
-//     // std::string contentType = req.getHeader("Content-Type");
-//     // if (contentType == "application/x-www-form-urlencoded"){
-//     //     //key value pairs
-//     // }
-//     // else if (contentType == "text/plain"){
-//     //     //parse to a string
-//     // }
-//     // else if (contentType == "application/json"){
-//     //     //store string
-//     // }
-//     // else if (contentType.find("multipart/form-data") == 0){
-
-//     // }
-//     // else if (contentType == "application/octet-stream") {
-//     //     //store binary data
-//     // }
-//     req.setBody(body);
-// }
-
-// void HttpParser::parseBody(std::string &body, HttpRequest &req) {
-//     std::string contentType = req.getHeader("Content-Type");
-
-//     if (contentType == "application/x-www-form-urlencoded") {
-//         // Parse key-value pairs (e.g., "key1=value1&key2=value2")
-//         req.setBody(body); // You may need a function to properly parse it
-//     }
-//     else if (contentType.find("multipart/form-data") == 0) {
-//         // File upload parsing (requires boundary extraction)
-//         req.setBody(body); // You'll need a function to parse the parts
-//     }
-//     else {
-//         static std::map<std::string, std::string> mimeTypes = {
-//             {".html", "text/html"}, {".htm", "text/html"},
-//             {".css", "text/css"}, {".ico", "image/x-icon"},
-//             {".avi", "video/x-msvideo"}, {".bmp", "image/bmp"},
-//             {".doc", "application/msword"}, {".gif", "image/gif"},
-//             {".gz", "application/x-gzip"}, {".jpg", "image/jpeg"},
-//             {".jpeg", "image/jpeg"}, {".png", "image/png"},
-//             {".txt", "text/plain"}, {".mp3", "audio/mp3"},
-//             {".pdf", "application/pdf"}
-//         };
-
-//         // Check if content type matches known types
-//         bool isValid = false;
-//         for (const auto &entry : mimeTypes) {
-//             if (contentType == entry.second) {
-//                 isValid = true;
-//                 break;
-//             }
-//         }
-//         std::string s = "";
-//         if (!isValid) {
-//             std::cerr << "Error: Unsupported Content-Type: " << contentType << std::endl;
-//             req.setBody(s); // Clear body on error
-//             return;
-//         }
-
-//         req.setBody(body); // Store raw body for valid types
-//     }
-// }
-
-#include "Types.hpp" // Ensure this header is included
-
-void HttpParser::parseBody(std::string &body, HttpRequest &req) {
+/* void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     Types types; // Use the centralized Types class
     std::string contentType = req.getHeader("Content-Type");
+    std::cout << RB << contentType << RES << std::endl;
     std::string non = "";
 
     if (contentType.empty()) {
@@ -254,8 +190,73 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
         std::cerr << "Error: Unsupported Content-Type: " << contentType << std::endl;
         req.setBody(non); // Clear body on error
     }
-}
+} */
 
+void HttpParser::parseBody(std::string &body, HttpRequest &req) {
+    Types types; // Use the centralized Types class
+    std::string contentType = req.getHeader("Content-Type");
+    std::cout << RB << contentType << RES << std::endl;
+    std::string emptyBody = "";
+
+    if (contentType.empty()) {
+        std::cerr << "Error: Missing Content-Type header" << std::endl;
+        req.setBody(emptyBody);
+        return;
+    }
+
+    if (contentType == "application/x-www-form-urlencoded") {
+        req.setBody(body);
+    }
+    else if (contentType.find("multipart/form-data") == 0) {
+        // Extract boundary
+        size_t boundaryPos = contentType.find("boundary=");
+        if (boundaryPos == std::string::npos) {
+            std::cerr << "Error: Missing boundary in Content-Type" << std::endl;
+            req.setBody(emptyBody);
+            return;
+        }
+
+        std::string boundary = "--" + contentType.substr(boundaryPos + 9);
+        size_t dispositionPos = body.find("Content-Disposition: form-data;");
+        if (dispositionPos == std::string::npos) {
+            std::cerr << "Error: Missing Content-Disposition header" << std::endl;
+            req.setBody(emptyBody);
+            return;
+        }
+
+        // Extract filename
+        size_t filenamePos = body.find("filename=\"", dispositionPos);
+        if (filenamePos != std::string::npos) {
+            filenamePos += 10; // Move past "filename=\""
+            size_t endPos = body.find("\"", filenamePos);
+            if (endPos != std::string::npos) {
+                std::string filename = body.substr(filenamePos, endPos - filenamePos);
+                req.setFileName(filename); // Store filename
+            }
+        }
+
+        // Extract file content
+        size_t contentStart = body.find("\r\n\r\n", dispositionPos);
+        if (contentStart != std::string::npos) {
+            contentStart += 4; // Move past header section
+            size_t contentEnd = body.find(boundary, contentStart);
+            if (contentEnd != std::string::npos) {
+                std::string value = body.substr(contentStart, contentEnd - contentStart - 2);
+                req.setBody(value);
+            } else {
+                std::string value = body.substr(contentStart);
+                req.setBody(value);
+            }
+        }
+    }
+    else if (types.isValidContent(contentType)) {
+        req.setBody(body);
+    }
+    else {
+        std::cerr << "Error: Unsupported Content-Type: " << contentType << std::endl;
+        req.setBody(emptyBody);
+    }
+}
 
 void HttpParser::whiteSpaceTrim(std::string &str) {
     size_t start = str.find_first_not_of(" \t\r\n");
@@ -287,7 +288,6 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     _requests.push_back(req);
     return true;
 }
-
 
 /* Return all requests */
 std::vector<HttpRequest>& HttpParser::getRequests() {

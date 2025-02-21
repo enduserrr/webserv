@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:23:00 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/07 18:32:09 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/21 12:29:26 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -26,6 +26,7 @@ private:
     std::map <std::string, std::string> _uriQuery;
     std::map <std::string, std::string> _headers;       //key + value
     std::string                         _body;
+    std::string                         _fileName;
 
     bool                                _autoIndex;
     std::string                         _root;
@@ -41,6 +42,7 @@ public:
     void                                setUriQuery(const std::string &key, const std::string &value);
     void                                addNewHeader(std::string &key, std::string &value);
     void                                setBody(std::string& headers);
+    void                                setFileName(std::string name);
 
     int                                 getBodySize();
     std::string                         getMethod();
@@ -50,6 +52,7 @@ public:
     std::map <std::string, std::string> getHeaders();
     std::string&                        getHeader(const std::string &key);
     std::string                         getBody();
+    std::string                         getFileName();
 
     bool getAutoIndex() {
         return _autoIndex;
