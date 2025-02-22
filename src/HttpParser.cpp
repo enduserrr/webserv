@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/21 12:41:28 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/22 10:54:49 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -209,11 +209,19 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     }
     else if (contentType.find("multipart/form-data") == 0) {
         // Extract boundary
+        // size_t boundaryPos = contentType.find("boundary=");
+        // if (boundaryPos == std::string::npos) {
+        //     std::cerr << "Error: Missing boundary in Content-Type" << std::endl;
+        //     req.setBody(emptyBody);
+        //     return;
+        // }
+
         size_t boundaryPos = contentType.find("boundary=");
-        if (boundaryPos == std::string::npos) {
-            std::cerr << "Error: Missing boundary in Content-Type" << std::endl;
-            req.setBody(emptyBody);
-            return;
+        if (boundaryPos != std::string::npos) {
+            std::string boundary = "--" + contentType.substr(boundaryPos + 9);
+            std::cout << "Extracted boundary: " << boundary << std::endl;
+        } else {
+            std::cerr << "Error: Missing boundary in Content-Type: " << contentType << std::endl;
         }
 
         std::string boundary = "--" + contentType.substr(boundaryPos + 9);

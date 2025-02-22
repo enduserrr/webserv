@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/21 12:40:52 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/22 13:10:27 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -25,23 +25,23 @@ UploadHandler::UploadHandler() {
 
 UploadHandler::~UploadHandler() {}
 
-// std::string extractFilenameFromMultipart(const std::string &body, const std::string &boundary) {
-//     std::string filename;
-//     std::string boundaryDelimiter = "--" + boundary;
-//     size_t pos = body.find(boundaryDelimiter);
+/* std::string extractFilenameFromMultipart(const std::string &body, const std::string &boundary) {
+    std::string filename;
+    std::string boundaryDelimiter = "--" + boundary;
+    size_t pos = body.find(boundaryDelimiter);
 
-//     if (pos != std::string::npos) {
-//         size_t filenamePos = body.find("filename=\"", pos);
-//         if (filenamePos != std::string::npos) {
-//             filenamePos += 10; // Move past "filename=\""
-//             size_t endPos = body.find("\"", filenamePos);
-//             if (endPos != std::string::npos) {
-//                 filename = body.substr(filenamePos, endPos - filenamePos);
-//             }
-//         }
-//     }
-//     return filename;
-// }
+    if (pos != std::string::npos) {
+        size_t filenamePos = body.find("filename=\"", pos);
+        if (filenamePos != std::string::npos) {
+            filenamePos += 10; // Move past "filename=\""
+            size_t endPos = body.find("\"", filenamePos);
+            if (endPos != std::string::npos) {
+                filename = body.substr(filenamePos, endPos - filenamePos);
+            }
+        }
+    }
+    return filename;
+} */
 
 std::string extractFileContentFromMultipart(const std::string &body, const std::string &boundary) {
     std::string boundaryDelimiter = "--" + boundary;
@@ -62,27 +62,21 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
     std::string contentType = req.getHeader("Content-Type");
 
     if (contentType.empty()) {
-        std::cout << "Content-Type header missing" << std::endl;
-        return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
-               + ErrorHandler::getInstance().getErrorPage(415);
+        return ErrorHandler::getInstance().getErrorPage(415);
     }
 
     if (!types.isValidContent(contentType)) {
-        std::cout << "Unsupported media type: " << contentType << std::endl;
-        return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
-               + ErrorHandler::getInstance().getErrorPage(415);
+        return ErrorHandler::getInstance().getErrorPage(415);
     }
 
     std::string filePath;
 
     // Handle application/x-www-form-urlencoded (store as text file)
     if (contentType == "application/x-www-form-urlencoded") {
-        filePath = "./uploads/upload_" + std::to_string(std::time(nullptr)) + ".txt";
+        filePath = "./www/uploads/upload_" + std::to_string(std::time(nullptr)) + ".txt";
         std::ofstream ofs(filePath.c_str(), std::ios::binary);
         if (!ofs) {
-            std::cout << "Failed to write uploaded content." << std::endl;
-            return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                   + ErrorHandler::getInstance().getErrorPage(500);
+            return ErrorHandler::getInstance().getErrorPage(500);
         }
         ofs.write(body.c_str(), body.size());
         ofs.close();
@@ -94,38 +88,33 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
         std::string boundary = contentType.substr(contentType.find("boundary=") + 9);
         if (boundary.empty()) {
             std::cout << "Multipart boundary missing" << std::endl;
-            return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
-                   + ErrorHandler::getInstance().getErrorPage(400);
+            return ErrorHandler::getInstance().getErrorPage(400);
         }
         // std::string filename = extractFilenameFromMultipart(body, boundary);
         std::string filename = req.getFileName();
         if (filename.empty()) {
             std::cout << "Filename extraction failed" << std::endl;
-            return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
-                   + ErrorHandler::getInstance().getErrorPage(400);
+            return ErrorHandler::getInstance().getErrorPage(400);
         }
 
         // Determine file type and check MIME type
         std::string extension = filename.substr(filename.find_last_of("."));
         if (!types.isValidMime(extension)) {
             std::cout << "Invalid file type: " << extension << std::endl;
-            return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
-                   + ErrorHandler::getInstance().getErrorPage(415);
+            return ErrorHandler::getInstance().getErrorPage(415);
         }
 
         // Save the extracted file
-        filePath = "./uploads/" + filename;
+        filePath = "./www/uploads/" + filename;
         std::ofstream ofs(filePath.c_str(), std::ios::binary);
         if (!ofs) {
             std::cout << "Failed to write uploaded file" << std::endl;
-            return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                   + ErrorHandler::getInstance().getErrorPage(500);
+            return ErrorHandler::getInstance().getErrorPage(500);
         }
         std::string fileContent = extractFileContentFromMultipart(body, boundary);
         ofs.write(fileContent.c_str(), fileContent.size());
         ofs.close();
     }
-
     return filePath;
 }
 

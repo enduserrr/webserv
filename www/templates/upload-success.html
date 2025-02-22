@@ -2,30 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>400</title>
+  <title>Upload Successful</title>
   <style>
     body {
-      background-color: #f9f9f9; /* Slightly off-white background */
+      background-color: #f9f9f9;
       font-family: Helvetica, sans-serif;
-      color: #333; /* Dark grey font */
+      color: #333;
       margin: 0;
-      padding: 20;
+      padding: 20px;
       display: flex;
       align-items: left;
       justify-content: center;
       min-height: 50vh;
     }
-    /* Container centered on page with left-aligned text */
     .container {
       width: 100%;
       max-width: 800px;
       text-align: left;
     }
     h1 {
-        margin-top: 20;
-        margin-bottom: 10px;
-        font-size: 60px;
-        font-weight: bolder;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 60px;
+      font-weight: bolder;
     }
     h2 {
       margin-bottom: 20px;
@@ -35,16 +34,20 @@
       margin-bottom: 40px;
       line-height: 1.5;
     }
-    /* Left-aligned button at the bottom */
+    .file-path {
+      font-weight: bold;
+      color: #007bff;
+      word-wrap: break-word;
+    }
     .button-container {
       text-align: left;
     }
     .button-container a {
       display: inline-block;
       padding: 10px 20px;
-      background-color: transparent; /* No fill */
-      border: 2px solid #333;  /* Outline with dark grey */
-      color: #333;             /* Text color matching the border */
+      background-color: transparent;
+      border: 2px solid #333;
+      color: #333;
       text-decoration: none;
       border-radius: 5px;
       font-size: 16px;
@@ -57,12 +60,13 @@
 </head>
 <body>
   <div class="container">
-    <h1>Upload Succesfull!</h1>
-    <h2>You can go now...</h2>
-  </br>
+    <h1>Upload Successful!</h1>
+    <h2>Your file has been uploaded.</h2>
+    <p>File path: <span class="file-path">{{file_path}}</span></p>
     <div class="button-container">
-        <a href="/index.html" role="button">Home</a>
+      <a href="/index.html" role="button">Home</a>
     </div>
   </div>
 </body>
 </html>
+
