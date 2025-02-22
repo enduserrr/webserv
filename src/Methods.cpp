@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/22 13:02:33 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/22 13:46:00 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -36,8 +36,8 @@ static void replaceAll(std::string &str, const std::string &from, const std::str
 }
 
 std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
-    std::ifstream templateFile("www/templates/listing.html"); // listing.html template from www/template
-    if (!templateFile) { // Else, make a simple HTML page
+    std::ifstream templateFile("/www/templates/folder.html"); // Use correct template path
+    if (!templateFile) { // Fallback in case the template is missing
         std::cout << "FALLBACK FILE" << std::endl;
         std::ostringstream fallback;
         fallback << "<html><head><title>Index of " << uri << "</title></head><body>"
@@ -59,34 +59,110 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
         return fallback.str();
     }
 
+    // Read template file into string
     std::ostringstream tmplStream;
     tmplStream << templateFile.rdbuf();
     std::string templateHtml = tmplStream.str();
 
-    std::ostringstream itemsStream; // Generate the list items from the directory contents.
+    std::ostringstream itemsStream; // Generate the list items from the directory contents
     DIR *dir = opendir(directoryPath.c_str());
     if (!dir) {
         return "";
     }
+
     struct dirent *entry;
     while ((entry = readdir(dir)) != nullptr) {
         std::string name = entry->d_name;
         if (name == "." || name == "..")
             continue;
-        itemsStream << "<li><a href=\"" << uri;
+
+        std::string filePath = uri;
         if (uri.back() != '/')
-            itemsStream << "/";
-        itemsStream << name << "\">" << name << "</a></li>\n";
+            filePath += "/";
+        filePath += name;
+
+        std::string fileItem = "<li>" + name;
+
+        // File preview button for supported formats
+        if (name.find(".jpg") != std::string::npos || name.find(".jpeg") != std::string::npos ||
+            name.find(".png") != std::string::npos || name.find(".gif") != std::string::npos) {
+            fileItem += " <button class='view-btn' onclick='previewFile(\"" + filePath + "\")'>View</button>";
+        } else if (name.find(".mp4") != std::string::npos || name.find(".webm") != std::string::npos ||
+                   name.find(".ogg") != std::string::npos) {
+            fileItem += " <button class='view-btn' onclick='previewFile(\"" + filePath + "\")'>Play</button>";
+        }
+
+        // Delete button
+        fileItem += " <a href='/delete?file=" + name + "' class='delete-btn'>Delete</a>";
+
+        fileItem += "</li>\n";
+        itemsStream << fileItem;
     }
     closedir(dir);
-    std::string itemsHtml = itemsStream.str();
 
-    std::string title = "Index of " + uri;
-    replaceAll(templateHtml, "{{title}}", title); // Replace placeholders in the template with dir listings
-    replaceAll(templateHtml, "{{items}}", itemsHtml);
+    std::string itemsHtml = itemsStream.str();
+    std::string title = "Uploads - " + uri;
+
+    // Replace placeholders in folder.html
+    replaceAll(templateHtml, "{{title}}", title);
+    replaceAll(templateHtml, "{{files}}", itemsHtml);
 
     return templateHtml;
 }
+
+
+// std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
+//     std::ifstream templateFile("www/uploads/folder.html"); // listing.html template from www/template
+//     if (!templateFile) { // Else, make a simple HTML page
+//         std::cout << "FALLBACK FILE" << std::endl;
+//         std::ostringstream fallback;
+//         fallback << "<html><head><title>Index of " << uri << "</title></head><body>"
+//                  << "<h1>Index of " << uri << "</h1><ul>";
+//         DIR *dir = opendir(directoryPath.c_str());
+//         if (!dir) return "";
+//         struct dirent *entry;
+//         while ((entry = readdir(dir)) != nullptr) {
+//             std::string name = entry->d_name;
+//             if (name == "." || name == "..")
+//                 continue;
+//             fallback << "<li><a href=\"" << uri;
+//             if (uri.back() != '/')
+//                 fallback << "/";
+//             fallback << name << "\">" << name << "</a></li>\n";
+//         }
+//         closedir(dir);
+//         fallback << "</ul></body></html>";
+//         return fallback.str();
+//     }
+
+//     std::ostringstream tmplStream;
+//     tmplStream << templateFile.rdbuf();
+//     std::string templateHtml = tmplStream.str();
+
+//     std::ostringstream itemsStream; // Generate the list items from the directory contents.
+//     DIR *dir = opendir(directoryPath.c_str());
+//     if (!dir) {
+//         return "";
+//     }
+//     struct dirent *entry;
+//     while ((entry = readdir(dir)) != nullptr) {
+//         std::string name = entry->d_name;
+//         if (name == "." || name == "..")
+//             continue;
+//         itemsStream << "<li><a href=\"" << uri;
+//         if (uri.back() != '/')
+//             itemsStream << "/";
+//         itemsStream << name << "\">" << name << "</a></li>\n";
+//     }
+//     closedir(dir);
+//     std::string itemsHtml = itemsStream.str();
+
+//     std::string title = "Index of " + uri;
+//     replaceAll(templateHtml, "{{title}}", title); // Replace placeholders in the template with dir listings
+//     replaceAll(templateHtml, "{{items}}", itemsHtml);
+
+//     return templateHtml;
+// }
 
 std::string Methods::mGet(HttpRequest &req) {
     std::string uri = req.getUri();

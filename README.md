@@ -10,3 +10,5 @@
 - Login Http page that leads to uploading page
 - Delete button for ups
 
+
+- Folder html page that requires login. Modifiable listings. Upload and delete options.
