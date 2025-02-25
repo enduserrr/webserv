@@ -159,7 +159,11 @@ void HttpParser::parseHeader(std::string &line, HttpRequest &req) {
     if (!(ss >> key >> value))
         throw std::runtime_error("Silent");
     key.pop_back();
-    std::cout << WB << key << " | " << value << RES << std::endl;
+    if (key == "Content-Length") {
+        size_t size = std::stoi(value);
+        if (size > _maxBodySize)
+            throw std::runtime_error("413 Payload Too Large"); 
+    }
     req.addNewHeader(key, value);
 }
 

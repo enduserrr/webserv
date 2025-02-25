@@ -18,6 +18,8 @@
 #include <vector>
 #include "Location.hpp"
 
+#define DEFAULT_BODY_SIZE 1048576  //1MB
+
 class ServerBlock {
 private:
     std::string                 _serverName;

@@ -13,70 +13,73 @@
 #include "HttpRequest.hpp"
 
 /* Constructor */
-HttpRequest::HttpRequest() {}
+HttpRequest::HttpRequest() : _maxBodySize(0) {}
 
 /* Destructor */
 HttpRequest::~HttpRequest() {}
 
-void HttpRequest::setBodySize(int size){
+void HttpRequest::setBodySize(size_t size) {
     _maxBodySize = size;
 }
-void HttpRequest::setMethod(std::string& method){
+void HttpRequest::setMethod(const std::string& method){
     _method = method;
 }
-void HttpRequest::setUri(std::string& uri){
+void HttpRequest::setUri(const std::string& uri){
     _uri = uri;
 }
-void HttpRequest::setHttpVersion(std::string& version){
+void HttpRequest::setHttpVersion(const std::string& version){
     _httpVersion = version;
 }
 
-void HttpRequest::setUriQuery(const std::string &key, const std::string &value){
+void HttpRequest::setUriQuery(const std::string &key, const std::string &value) {
     _uriQuery[key] = value;
 }
-void HttpRequest::addNewHeader(std::string &key, std::string &value){
+void HttpRequest::addNewHeader(const std::string &key, const std::string &value) {
     _headers[key] = value;
 }
-void HttpRequest::setBody(std::string& body){
+void HttpRequest::setBody(const std::string& body){
     _body = body;
 }
 
-int HttpRequest::getBodySize() {
+size_t HttpRequest::getBodySize() const {
     return _maxBodySize;
 }
 
-std::string HttpRequest::getMethod() {
+const std::string& HttpRequest::getMethod() const {
     return _method;
 }
 
-std::string HttpRequest::getUri() {
+std::string HttpRequest::getUri() const {
     return _uri;
 }
 
-std::string HttpRequest::getHttpVersion() {
+std::string HttpRequest::getHttpVersion() const {
     return _httpVersion;
 }
 
-std::map <std::string, std::string> HttpRequest::getUriQuery() {
+const std::map <std::string, std::string>& HttpRequest::getUriQuery() const {
     return _uriQuery;
 }
 
-std::string& HttpRequest::getHeader(const std::string &key) {
-    return _headers[key];
+std::string     HttpRequest::getHeader(const std::string &key) const {
+    std::map<std::string, std::string>::const_iterator it = _headers.find(key); 
+    if (it == _headers.end())
+        return "";
+    return it->second;
 }
 
-std::map <std::string, std::string> HttpRequest::getHeaders() {
+const std::map <std::string, std::string>& HttpRequest::getHeaders() const {
     return _headers;
 }
 
-std::string HttpRequest::getBody() {
+const std::string&  HttpRequest::getBody() const {
     return _body;
 }
 
-void HttpRequest::setFileName(std::string name) {
+void HttpRequest::setFileName(const std::string& name) {
     _fileName = name;
 }
 
-std::string HttpRequest::getFileName() {
+const std::string& HttpRequest::getFileName() const {
     return _fileName;
 }
