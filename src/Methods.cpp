@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/22 13:46:00 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/24 11:08:24 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -111,7 +111,7 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
 }
 
 
-// std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
+/* // std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
 //     std::ifstream templateFile("www/uploads/folder.html"); // listing.html template from www/template
 //     if (!templateFile) { // Else, make a simple HTML page
 //         std::cout << "FALLBACK FILE" << std::endl;
@@ -162,7 +162,7 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
 //     replaceAll(templateHtml, "{{items}}", itemsHtml);
 
 //     return templateHtml;
-// }
+// } */
 
 std::string Methods::mGet(HttpRequest &req) {
     std::string uri = req.getUri();
@@ -189,27 +189,18 @@ std::string Methods::mGet(HttpRequest &req) {
                                << listing;
                 return responseStream.str();
             } else {
-                std::string response = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n";
-                response += ErrorHandler::getInstance().getErrorPage(500);
-                return response;
+                return ErrorHandler::getInstance().getErrorPage(500);
             }
         } else {
             filePath += "index.html";// Autoindex is off => return the index page
         }
     }
-    if (stat(filePath.c_str(), &st) != 0) {// Check if the file exists.
-        std::string response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n";
-        std::cerr << "Unable to fetch the requested resource." << std::endl;
-        response += ErrorHandler::getInstance().getErrorPage(404);
-        return response;
-    }
+    if (stat(filePath.c_str(), &st) != 0)// Check if the file exists.
+        return ErrorHandler::getInstance().getErrorPage(404);
 
     std::ifstream file(filePath.c_str(), std::ios::in | std::ios::binary);// Open the file for reading in binary mode.
-    if (!file) {
-        std::string response = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n";
-        response += ErrorHandler::getInstance().getErrorPage(500);
-        return response;
-    }
+    if (!file)
+        return ErrorHandler::getInstance().getErrorPage(500);
 
     std::ostringstream ss;
     ss << file.rdbuf();// Read the file content.
@@ -224,27 +215,21 @@ std::string Methods::mGet(HttpRequest &req) {
     return responseStream.str();
 }
 
+
 std::string Methods::mPost(HttpRequest &req) {
-    if (req.getBody().empty()) {
-        std::string response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n";
-        response += ErrorHandler::getInstance().getErrorPage(404);
-        return response;
-    }
+    if (req.getBody().empty())
+        return ErrorHandler::getInstance().getErrorPage(404);
 
     UploadHandler uploadHandler;
     std::string uploadedFilePath = uploadHandler.uploadReturnPath(req);
 
-    if (uploadedFilePath.find("HTTP/1.1") == 0) {
-        return uploadedFilePath;
-    }
-
+    if (uploadedFilePath.find("HTTP/1.1") == 0)
+        // return uploadedFilePath;
+        ErrorHandler::getInstance().getErrorPage(500);
     // Read the upload-success.html template
     std::ifstream file("/home/asalo/Code/enduserrr/c++/webserv/www/templates/upload-success.html");
-    if (!file.is_open()) {
-        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-               "<html><body><h1>500 Internal Server Error</h1>"
-               "<p>Failed to load the success page template.</p></body></html>";
-    }
+    if (!file.is_open())
+        return ErrorHandler::getInstance().getErrorPage(500);
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string htmlContent = buffer.str();
@@ -258,31 +243,22 @@ std::string Methods::mPost(HttpRequest &req) {
 
 std::string Methods::mDelete(HttpRequest &req) {
     std::string uri = req.getUri();
-    std::string basePath = "www";
+    std::string basePath = "www";//change this
     std::string filePath = basePath + uri;
 
     // Allow deletion only if the file is in the /uploads directory
-    if (filePath.find("/uploads/") == std::string::npos) {
-        std::string response = "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html\r\n\r\n";
-        response += ErrorHandler::getInstance().getErrorPage(403);
-        return response;
-    }
+    if (filePath.find("/uploads/") == std::string::npos)
+        return ErrorHandler::getInstance().getErrorPage(403);
 
     // Check if the file exists
     struct stat st;
-    if (stat(filePath.c_str(), &st) != 0) {
-        std::string response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n";
-        std::cerr << "File to delete not found." << std::endl;
-        response += ErrorHandler::getInstance().getErrorPage(404);
-        return response;
-    }
+    if (stat(filePath.c_str(), &st) != 0)
+        return ErrorHandler::getInstance().getErrorPage(404);
 
     // Attempt delete
-    if (remove(filePath.c_str()) != 0) {
-        std::string response = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n";
-        response += ErrorHandler::getInstance().getErrorPage(500);
-        return response;
-    }
+    if (remove(filePath.c_str()) != 0)
+        return ErrorHandler::getInstance().getErrorPage(500);
+
     std::ostringstream deleteResponse;
     deleteResponse << "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
                     << "<html><body><h1>Delete Successful</h1>"

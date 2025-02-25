@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/22 10:54:49 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/24 11:05:05 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -208,14 +208,6 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
         req.setBody(body);
     }
     else if (contentType.find("multipart/form-data") == 0) {
-        // Extract boundary
-        // size_t boundaryPos = contentType.find("boundary=");
-        // if (boundaryPos == std::string::npos) {
-        //     std::cerr << "Error: Missing boundary in Content-Type" << std::endl;
-        //     req.setBody(emptyBody);
-        //     return;
-        // }
-
         size_t boundaryPos = contentType.find("boundary=");
         if (boundaryPos != std::string::npos) {
             std::string boundary = "--" + contentType.substr(boundaryPos + 9);
