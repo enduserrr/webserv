@@ -15,7 +15,7 @@
 
 
 // Constructor
-ServerBlock::ServerBlock() : _autoIndex(false) {}
+ServerBlock::ServerBlock() : _autoIndex(false), _bodySize(DEFAULT_BODY_SIZE) {}
 
 /* ServerBlock::ServerBlock(ErrorHandler *errorHandler) : _errorHandler(errorHandler) {}
 

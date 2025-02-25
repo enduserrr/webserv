@@ -35,24 +35,24 @@ public:
     HttpRequest();
     ~HttpRequest();
 
-    void                                setBodySize(int value);
-    void                                setMethod(std::string& method);
-    void                                setUri(std::string& uri);
-    void                                setHttpVersion(std::string& version);
-    void                                setUriQuery(const std::string &key, const std::string &value);
-    void                                addNewHeader(std::string &key, std::string &value);
-    void                                setBody(std::string& headers);
-    void                                setFileName(std::string name);
+    void                                setBodySize(size_t value);
+    void                                setMethod(const std::string& method);
+    void                                setUri(const std::string& uri);
+    void                                setHttpVersion(const std::string& version);
+    void                                setUriQuery(const std::string& key, const std::string& value);
+    void                                addNewHeader(const std::string& key, const std::string& value);
+    void                                setBody(const std::string& headers);
+    void                                setFileName(const std::string& name);
 
-    int                                 getBodySize();
-    std::string                         getMethod();
-    std::string                         getUri();
-    std::string                         getHttpVersion();
-    std::map <std::string, std::string> getUriQuery();
-    std::map <std::string, std::string> getHeaders();
-    std::string&                        getHeader(const std::string &key);
-    std::string                         getBody();
-    std::string                         getFileName();
+    size_t                                      getBodySize() const;
+    const std::string&                          getMethod() const;
+    std::string                                 getUri() const;
+    std::string                                 getHttpVersion() const;
+    std::string                                 getHeader(const std::string& key) const;
+    const std::string&                          getBody() const;
+    const std::string&                          getFileName() const;
+    const std::map <std::string, std::string>&  getUriQuery() const;
+    const std::map <std::string, std::string>&  getHeaders() const; 
 
     bool getAutoIndex() {
         return _autoIndex;
