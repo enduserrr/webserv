@@ -165,6 +165,17 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     }
 
     ClientSession &client = _clients[clientSocket];
+    
+    //ClientSession monitoroi ettei requesteja tuu liikaa. nyt setattu 10/sekunti. 
+    if (client.requestLimiter()) {
+        std::string response = "HTTP/1.1 429 Too Many Requests\r\n"
+                               "Content-Type: text/html\r\n\r\n"
+                               "<h1>429 Too Many Requests</h1>";
+        sendResponse(clientSocket, response);
+        return;
+    }
+
+
     client.buffer += data;
     ServerBlock &block = client._block; // Correct ServerBlock to the client
     HttpParser parser;
