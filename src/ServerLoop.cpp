@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/19 12:13:30 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/26 11:16:00 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -123,7 +123,6 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     _pollFds.push_back(pfd);
     std::cout << "New client connected on port " << localPort
               << " (fd: " << clientFd << ")" << std::endl;
-    // _clientCount++;
 }
 
 void ServerLoop::handleClientRequest(int clientSocket) {
@@ -165,36 +164,41 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     }
 
     ClientSession &client = _clients[clientSocket];
-    
-    //ClientSession monitoroi ettei requesteja tuu liikaa. nyt setattu 10/sekunti. 
+
     if (client.requestLimiter()) {
         std::string response = "HTTP/1.1 429 Too Many Requests\r\n"
                                "Content-Type: text/html\r\n\r\n"
-                               "<h1>429 Too Many Requests</h1>";
+                               "<h1>429 Too Many Requests</h1>"; //Add 429 error page
         sendResponse(clientSocket, response);
-        return;
+        return ;
     }
-
-
     client.buffer += data;
     ServerBlock &block = client._block; // Correct ServerBlock to the client
     HttpParser parser;
     std::istringstream input(client.buffer);
+    std::cout << RB << "Buffer: " << RES << client.buffer << std::endl;
     if (parser.readFullRequest(input, block)) {
         client.request = parser.getPendingRequest();
         std::string response = Router().routeRequest(client.request, clientSocket);
         sendResponse(clientSocket, response);
         client.buffer.clear();
+        std::cout << RB << "Buffer size after clearing: " << RES << client.buffer.size() << std::endl;
+        close(clientSocket); // Close socket after request processing completed.
+        _clients.erase(clientSocket);
+        return ;
     }
 }
 
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
+    std::cout << WB << "Trying ServerLoop::sendResponse..." << RES << std::endl;
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
         ErrorHandler::getInstance().logError("Failed to send response to client.");
         std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                                     + ErrorHandler::getInstance().getErrorPage(500);
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
     }
+    std::cout << WB << "ServerLoop::sendResponse OK!" << RES << std::endl;
+    return ;
 }
 
 void ServerLoop::startServer() {

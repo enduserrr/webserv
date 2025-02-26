@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:23:00 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/21 12:29:26 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/26 09:11:57 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -35,14 +35,14 @@ public:
     HttpRequest();
     ~HttpRequest();
 
-    void                                setBodySize(size_t value);
-    void                                setMethod(const std::string& method);
-    void                                setUri(const std::string& uri);
-    void                                setHttpVersion(const std::string& version);
-    void                                setUriQuery(const std::string& key, const std::string& value);
-    void                                addNewHeader(const std::string& key, const std::string& value);
-    void                                setBody(const std::string& headers);
-    void                                setFileName(const std::string& name);
+    void                                        setBodySize(size_t value);
+    void                                        setMethod(const std::string& method);
+    void                                        setUri(const std::string& uri);
+    void                                        setHttpVersion(const std::string& version);
+    void                                        setUriQuery(const std::string& key, const std::string& value);
+    void                                        addNewHeader(const std::string& key, const std::string& value);
+    void                                        setBody(const std::string& headers);
+    void                                        setFileName(const std::string& name);
 
     size_t                                      getBodySize() const;
     const std::string&                          getMethod() const;
@@ -52,7 +52,7 @@ public:
     const std::string&                          getBody() const;
     const std::string&                          getFileName() const;
     const std::map <std::string, std::string>&  getUriQuery() const;
-    const std::map <std::string, std::string>&  getHeaders() const; 
+    const std::map <std::string, std::string>&  getHeaders() const;
 
     bool getAutoIndex() {
         return _autoIndex;

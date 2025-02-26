@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:16 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/17 11:31:20 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/26 10:58:17 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -46,6 +46,7 @@ std::string Router::routeRequest(HttpRequest &req, int clientFd) {
     }
 }
 
+// Meaby remove this as it's a replica of ServerLoop member func
 void    Router::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
         ErrorHandler::getInstance().logError("Failed to send response to client.");
