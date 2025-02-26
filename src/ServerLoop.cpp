@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/26 11:16:00 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/26 19:19:23 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -96,7 +96,7 @@ bool ServerLoop::serverFull() {
         std::cerr << "clients: " << _clients.size()<< std::endl;
         return true;
      }
-    return false; 
+    return false;
 }
 
 void ServerLoop::acceptNewConnection(int serverSocket) {
@@ -176,10 +176,10 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     ClientSession &client = _clients[clientSocket];
 
     if (client.requestLimiter()) {
-        std::string response = "HTTP/1.1 429 Too Many Requests\r\n"
-                               "Content-Type: text/html\r\n\r\n"
-                               "<h1>429 Too Many Requests</h1>"; //Add 429 error page
-        sendResponse(clientSocket, response);
+        // std::string response = "HTTP/1.1 429 Too Many Requests\r\n"
+        //                        "Content-Type: text/html\r\n\r\n"
+        //                        "<h1>429 Too Many Requests</h1>";
+        sendResponse(clientSocket, ErrorHandler::getInstance().getErrorPage(429));
         return ;
     }
     client.buffer += data;
@@ -200,21 +200,18 @@ void ServerLoop::handleClientRequest(int clientSocket) {
 }
 
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
-    std::cout << WB << "Trying ServerLoop::sendResponse..." << RES << std::endl;
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
         ErrorHandler::getInstance().logError("Failed to send response to client.");
         std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                                     + ErrorHandler::getInstance().getErrorPage(500);
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
     }
-    std::cout << WB << "ServerLoop::sendResponse OK!" << RES << std::endl;
     return ;
 }
 
 void ServerLoop::startServer() {
     setupServerSockets();
     _startUpTime = time(nullptr); // Set start up time
-    // _clientCount = 0;
 
     while (_run) {
         if (hasTimedOut()) {

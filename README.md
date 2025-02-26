@@ -1,20 +1,24 @@
 # WEBSERV
 
-## To do:
-- Client count per ip address checker (could count ClientSessions per ip address) | OK!
-- Max request count in a timeframe and cool down period (ddos safety) | OK!
-- Log levels info/warning/error to enable accurate reporting
-
 ## AGENDA:
-* Faulty behaviour:
- * Works without a file
- * Works with empty string
- * Dup file names?
-* Refine:
- * DELETE to work only in the allowed folder
- * Error reporting: add INFO & WARNING log levels
-* mDELETE:
- * Add to take location from HttpRequest
- * Delete button in folder.html (Methods.cpp)
 
+* Error Management:
+ * Which file returns what (which are relevant to what client receives)
+
+* Error Pages & Log Levels:
+ * Info/Warning/Error levels
+ * Custom error pages? (& defaults)
+
+
+* Location Vars:
+ * Take location info from HttpRequest
+
+* mDELETE:
+ * DELETE to work only in the allowed folder
+ * Delete button in listing.html doesn't work (Methods.cpp)
+
+## FIXED:
+* Dup file names: Adds  "new_" infront of the filename if a file with the same name exists | OK!
+* Unified Error pages (.html) with corrected error messages. | OK!
+* Location info for methods from HttpRequest | OK!
 

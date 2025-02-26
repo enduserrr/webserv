@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/26 10:42:03 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/26 19:31:31 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -62,13 +62,13 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
     std::string contentType = req.getHeader("Content-Type");
 
     if (contentType.empty()) {
-        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+        return "HTTP/1.1 415 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                 + ErrorHandler::getInstance().getErrorPage(415);
         // return ErrorHandler::getInstance().getErrorPage(415);
     }
 
     if (!types.isValidContent(contentType)) {
-        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+        return "HTTP/1.1 415 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                 + ErrorHandler::getInstance().getErrorPage(415);
         // return ErrorHandler::getInstance().getErrorPage(415);
     }
@@ -93,16 +93,14 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
     if (contentType.find("multipart/form-data") == 0) {
         std::string boundary = contentType.substr(contentType.find("boundary=") + 9);
         if (boundary.empty()) {
-            std::cout << "Multipart boundary missing" << std::endl;
-            return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+            return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
                 + ErrorHandler::getInstance().getErrorPage(400);
             // return ErrorHandler::getInstance().getErrorPage(400);
         }
         // std::string filename = extractFilenameFromMultipart(body, boundary);
         std::string filename = req.getFileName();
         if (filename.empty()) {
-            std::cout << "Filename extraction failed" << std::endl;
-            return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+            return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
                 + ErrorHandler::getInstance().getErrorPage(400);
             // return ErrorHandler::getInstance().getErrorPage(400);
         }
@@ -110,20 +108,16 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
         // Determine file type and check MIME type
         std::string extension = filename.substr(filename.find_last_of("."));
         if (!types.isValidMime(extension)) {
-            std::cout << "Invalid file type: " << extension << std::endl;
-            return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+            return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
                 + ErrorHandler::getInstance().getErrorPage(415);
-            // return ErrorHandler::getInstance().getErrorPage(415);
         }
 
         // Save the extracted file
         filePath = "./www/uploads/" + filename;
         std::ofstream ofs(filePath.c_str(), std::ios::binary);
         if (!ofs) {
-            std::cout << "Failed to write uploaded file" << std::endl;
             return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                 + ErrorHandler::getInstance().getErrorPage(500);
-            return ErrorHandler::getInstance().getErrorPage(500);
         }
         std::string fileContent = extractFileContentFromMultipart(body, boundary);
         ofs.write(fileContent.c_str(), fileContent.size());

@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/26 11:22:07 by asalo            ###   ########.fr       */
+/*   Updated: 2025/02/26 20:05:30 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -36,7 +36,8 @@ static void replaceAll(std::string &str, const std::string &from, const std::str
 }
 
 std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
-    std::ifstream templateFile("/www/templates/folder.html"); // Use correct template path
+    std::cout << RB << "Trying to generate dir listing" << RES << std::endl;
+    std::ifstream templateFile("www/templates/listing.html"); // Use the listing template from www/templates
     if (!templateFile) { // Fallback in case the template is missing
         std::cout << "FALLBACK FILE" << std::endl;
         std::ostringstream fallback;
@@ -52,17 +53,19 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
             fallback << "<li><a href=\"" << uri;
             if (uri.back() != '/')
                 fallback << "/";
-            fallback << name << "\">" << name << "</a></li>\n";
+            fallback << name << "\">" << name << "</a>"
+                     << " <a href='/delete?file=" << name << "' class='delete-btn'>Delete</a></li>\n";
         }
         closedir(dir);
         fallback << "</ul></body></html>";
         return fallback.str();
     }
 
-    std::ostringstream tmplStream; // Read template file into string
+    std::ostringstream tmplStream;
     tmplStream << templateFile.rdbuf();
     std::string templateHtml = tmplStream.str();
-    std::ostringstream itemsStream; // Generate the list items from the directory contents
+
+    std::ostringstream itemsStream; // Generate the list items from the directory contents.
     DIR *dir = opendir(directoryPath.c_str());
     if (!dir) {
         return "";
@@ -72,36 +75,27 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
     while ((entry = readdir(dir)) != nullptr) {
         std::string name = entry->d_name;
         if (name == "." || name == "..")
-            continue;
+            continue ;
 
         std::string filePath = uri;
         if (uri.back() != '/')
             filePath += "/";
         filePath += name;
 
-        std::string fileItem = "<li>" + name;
-
-        // File preview button for supported formats
-        if (name.find(".jpg") != std::string::npos || name.find(".jpeg") != std::string::npos ||
-            name.find(".png") != std::string::npos || name.find(".gif") != std::string::npos) {
-            fileItem += " <button class='view-btn' onclick='previewFile(\"" + filePath + "\")'>View</button>";
-        } else if (name.find(".mp4") != std::string::npos || name.find(".webm") != std::string::npos ||
-                   name.find(".ogg") != std::string::npos) {
-            fileItem += " <button class='view-btn' onclick='previewFile(\"" + filePath + "\")'>Play</button>";
-        }
-
-        // Delete button ???
-        fileItem += " <a href='/delete?file=" + name + "' class='delete-btn'>Delete</a>";
-
-        fileItem += "</li>\n";
+        // Build the list item without preview buttons.
+        std::string fileItem = "<li>"
+                               + std::string("<a href=\"") + filePath + "\">" + name + "</a>"
+                               + " <a href='/delete?file=" + name + "' class='delete-btn'>Delete</a>"
+                               + "</li>\n";
         itemsStream << fileItem;
     }
-
     closedir(dir);
+
     std::string itemsHtml = itemsStream.str();
-    std::string title = "Uploads - " + uri;
-    replaceAll(templateHtml, "{{title}}", title);
-    replaceAll(templateHtml, "{{files}}", itemsHtml);
+    std::string title = "Index of " + uri;
+    replaceAll(templateHtml, "{{title}}", title); // Replace placeholder for title.
+    replaceAll(templateHtml, "{{items}}", itemsHtml); // Replace placeholder for list items.
+
     return templateHtml;
 }
 
@@ -111,7 +105,6 @@ std::string Methods::mGet(HttpRequest &req) {
     std::string basePath = req.getRoot();
     std::string filePath = basePath + uri;
 
-    std::cout << GC << "ROOT: " << req.getRoot() << "\nAUTO-INDEX: " << req.getAutoIndex() << RES << std::endl;
     struct stat st;
     bool isDirectory = false;
     if (stat(filePath.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
@@ -163,9 +156,7 @@ std::string Methods::mPost(HttpRequest &req) {
         // Load folder.html template to display error message at the top.
         std::ifstream file("www/templates/folder.html");
         if (!file.is_open())
-            return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                + ErrorHandler::getInstance().getErrorPage(500);
-            // return ErrorHandler::getInstance().getErrorPage(500);
+            return ErrorHandler::getInstance().getErrorPage(500);
         std::stringstream buffer;
         buffer << file.rdbuf();
         std::string htmlContent = buffer.str();
@@ -180,29 +171,49 @@ std::string Methods::mPost(HttpRequest &req) {
 
     UploadHandler uploadHandler;
     std::string uploadedFilePath = uploadHandler.uploadReturnPath(req);
+    if (uploadedFilePath.find("HTTP/1.1") == 0)
+        return uploadedFilePath;
 
-    if (uploadedFilePath.find("HTTP/1.1") == 0)// If uploadReturnPath returned an error response, return it err
-        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                + ErrorHandler::getInstance().getErrorPage(500);
-        // return ErrorHandler::getInstance().getErrorPage(500);
+    // If this is a file upload (i.e. a filename was set in HttpRequest), check for duplicate names.
+    if (!req.getFileName().empty()) {
+        // Assume uploads are stored in "./www/uploads/"
+        std::string uploadDir = "./www/uploads/";
+        // Extract the current file name from the uploaded file path
+        size_t pos = uploadedFilePath.find_last_of("/");
+        std::string fileName = (pos == std::string::npos) ? uploadedFilePath : uploadedFilePath.substr(pos + 1);
+        std::string fullPath = uploadDir + fileName;
+        std::ifstream checkFile(fullPath.c_str());
+        if (checkFile.good()) {
+            checkFile.close();
+            // Create a new file name with "copy_of_" prefix
+            std::string newFileName = "new_" + fileName;
+            std::string newFullPath = uploadDir + newFileName;
+            // Rename the file on disk
+            if (rename(uploadedFilePath.c_str(), newFullPath.c_str()) == 0) {
+                uploadedFilePath = newFullPath;
+            } else {
+                std::cerr << "Failed to rename file" << std::endl;
+                return ErrorHandler::getInstance().getErrorPage(500);
+            }
+        }
+    }
 
-    std::ifstream file("www/templates/upload-success.html");// Load the upload-success.html template
+    // Load the upload-success.html template.
+    std::ifstream file("www/templates/upload-success.html");
     if (!file.is_open())
-        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                + ErrorHandler::getInstance().getErrorPage(500);
-        // return ErrorHandler::getInstance().getErrorPage(500);
+        return ErrorHandler::getInstance().getErrorPage(500);
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string htmlContent = buffer.str();
     file.close();
 
+    // Replace the placeholder with the uploaded file path.
     replaceAll(htmlContent, "{{file_path}}", uploadedFilePath);
 
     std::ostringstream uploadResponse;
     uploadResponse << "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n" << htmlContent;
     return uploadResponse.str();
 }
-
 
 std::string Methods::mDelete(HttpRequest &req) {
     std::string uri = req.getUri();
@@ -226,3 +237,33 @@ std::string Methods::mDelete(HttpRequest &req) {
                     << "<p>The file has been deleted successfully.</p></body></html>";
     return deleteResponse.str();
 }
+
+// std::string Methods::mDelete(HttpRequest &req) {
+//     // Check if DELETE is allowed for this resource.
+//     // Assuming HttpRequest has a method getAllowedMethods() that returns a vector of allowed method strings.
+//     std::vector<std::string> allowedMethods = req.getAllowedMethods();
+//     if (std::find(allowedMethods.begin(), allowedMethods.end(), "DELETE") == allowedMethods.end()) {
+//         return ErrorHandler::getInstance().getErrorPage(405);
+//     }
+
+//     std::string uri = req.getUri();
+//     std::string basePath = "www"; // This can be modified based on config
+//     std::string filePath = basePath + uri;
+
+//     // Allow deletion only if the file is in the /uploads directory.
+//     if (filePath.find("/uploads/") == std::string::npos)
+//         return ErrorHandler::getInstance().getErrorPage(403);
+
+//     struct stat st;
+//     if (stat(filePath.c_str(), &st) != 0) // Check if the file exists.
+//         return ErrorHandler::getInstance().getErrorPage(404);
+
+//     if (remove(filePath.c_str()) != 0) // Try delete.
+//         return ErrorHandler::getInstance().getErrorPage(500);
+
+//     std::ostringstream deleteResponse;
+//     deleteResponse << "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
+//                    << "<html><body><h1>Delete Successful</h1>"
+//                    << "<p>The file has been deleted successfully.</p></body></html>";
+//     return deleteResponse.str();
+// }
