@@ -41,6 +41,16 @@ std::map<int, std::string>&  Location::getErrorPages() {
     return _errorPages;
 }
 
+std::pair<int, std::string>  Location::getRedirect() const {
+    return _redirect;
+
+    // HOWTOUSE: 
+    // std::pair<int, std::string> redir = location.getRedirect();
+    // int status = redir.first;
+    // std::string url = redir.second;
+
+}
+
 //setters
 void Location::setPath(const std::string& path) {
     _path = path;
@@ -60,4 +70,8 @@ void Location::addAllowedMethod(const std::string& method){
 
 void Location::setErrorPage(int &code, std::string &path) {
     _errorPages[code] = path;
+}
+
+void Location::setRedirect(int code, const std::string &url) {
+    _redirect = std::make_pair(code, url);
 }

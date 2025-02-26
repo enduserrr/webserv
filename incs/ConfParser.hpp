@@ -32,6 +32,8 @@
 #define LOCATION        "location"
 #define ROOT            "root"
 #define AUTOI           "autoindex"
+#define REDIR           "return"
+
 
 //ERRORS 
 #define ERR RED         "error: " RESET
@@ -92,7 +94,8 @@ public:
     void                    parsePort(std::istringstream &ss, int si);
     void                    parseBodySize(std::istringstream &ss, int si);
     void                    parseErrorPages(std::istringstream &ss, std::map<int, std::string> &error_pages);
-    
+    void                    parseRedirect(std::istringstream &ss, Location &loc);
+
     void                    whiteSpaceTrim(std::string &str);
     int                     convertToInt(std::string &word, const std::string &info);
     void                    hasForbiddenSymbols(std::string& word);

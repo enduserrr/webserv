@@ -253,8 +253,11 @@ void ConfParser::locationBlock(int si, size_t &i) {
         else if (key == ROOT)
             parseRoot(ss, loc.getRoot());
         else if (key == AUTOI) {
-            std::cout << RB << "location autoI" << RES << std::endl;
+            // std::cout << RB << "location autoI" << RES << std::endl;
             parseAutoIndex(ss, loc.getAutoIndex());
+        }
+        else if (key == REDIR){
+            parseRedirect(ss, loc); 
         }
         else if (key == ERR_PAGE)
             parseErrorPages(ss, loc.getErrorPages());
@@ -262,6 +265,18 @@ void ConfParser::locationBlock(int si, size_t &i) {
             throw std::runtime_error(ERR CONF "unexpected keyword in location");
     }
     _servers[si].setLocation(loc);
+}
+
+void ConfParser::parseRedirect(std::istringstream &ss, Location &loc){
+    int code; 
+    std::string url;
+    if (!(ss >> code) || !(ss >> url))
+        throw std::runtime_error(ERR CONF "unexpected location line");
+    if (code != 301 && code != 302)
+        throw std::runtime_error(ERR CONF "redirection code");
+    loc.setRedirect(code, url); 
+    if (ss >> url)
+        throw std::runtime_error(ERR CONF "unexpected location line");
 }
 
 void ConfParser::parseMethods(std::istringstream &ss, Location &loc) {
