@@ -21,6 +21,8 @@
 
 class ClientSession {
     private:
+        size_t _requestCount; 
+        time_t _lastRequestTime; 
 
     public:
         int fd;
@@ -33,6 +35,7 @@ class ClientSession {
         ~ClientSession();
 
     void removeClient();
+    bool requestLimiter(); 
 };
 
 #endif

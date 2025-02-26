@@ -22,11 +22,27 @@
 //         close(fd);
 // }
 
-ClientSession::ClientSession() : fd(-1) {}
+ClientSession::ClientSession() : _requestCount(0), _lastRequestTime(time(nullptr)), fd(-1) {}
 
 ClientSession::ClientSession(int clientFd) : fd(clientFd) {}
 
 ClientSession::~ClientSession() {}
+
+bool ClientSession::requestLimiter() {
+
+    time_t now = time(nullptr);  
+
+    if (now - _lastRequestTime >= 1) {
+        _lastRequestTime = now; 
+        _requestCount = 0; 
+    }
+    if (_requestCount >= 10) 
+        return true; 
+    _requestCount++;
+    std::cout << " counter++ : " <<_requestCount << std::endl;
+    return false; 
+}
+
 
 void ClientSession::removeClient() {
     if (fd != -1) {
