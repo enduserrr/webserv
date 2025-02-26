@@ -34,6 +34,8 @@
 #define RB     "\033[1;91m"
 #define RES    "\033[0m"
 
+#define MAX_CLIENTS 100
+
 class ServerLoop {
     private:
         std::map<int, ClientSession> _clients;
@@ -62,6 +64,7 @@ class ServerLoop {
         void    startServer();
         void    closeServer();
         bool    hasTimedOut();
+        bool    serverFull();
         void    stop() {
             _run = false;
         }

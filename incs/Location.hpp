@@ -24,6 +24,7 @@ private:
     bool                        _autoIndex;
     std::string                 _root;
     std::map<int, std::string>  _errorPages;
+    std::pair<int, std::string> _redirect; 
 
 public:
     Location();
@@ -35,13 +36,15 @@ public:
     bool&                       getAutoIndex(); 
     std::vector<std::string>    getAllowedMethods() const;
     std::map<int, std::string>& getErrorPages();
+    std::pair<int, std::string> getRedirect() const ;
 
     //setters
     void                        setPath(const std::string& path);
     void                        setRoot(std::string root);
     void                        setAutoIndex(bool b);
     void                        addAllowedMethod(const std::string& method);
-    void                        setErrorPage(int &code, std::string &path);
+    void                        setErrorPage(int &code, std::string& path);
+    void                        setRedirect(int code, const std::string& url); 
 
 };
 

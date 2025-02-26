@@ -24,7 +24,7 @@
 
 ClientSession::ClientSession() : _requestCount(0), _lastRequestTime(time(nullptr)), fd(-1) {}
 
-ClientSession::ClientSession(int clientFd) : fd(clientFd) {}
+ClientSession::ClientSession(int clientFd) : _requestCount(0), _lastRequestTime(time(nullptr)), fd(clientFd) {}
 
 ClientSession::~ClientSession() {}
 

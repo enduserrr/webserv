@@ -90,7 +90,18 @@ void ServerLoop::setupServerSockets() {
     }
 }
 
+bool ServerLoop::serverFull() {
+     if (_clients.size() >= MAX_CLIENTS) {
+        std::cerr << "Server is full! Rejecting new client." << std::endl;
+        std::cerr << "clients: " << _clients.size()<< std::endl;
+        return true;
+     }
+    return false; 
+}
+
 void ServerLoop::acceptNewConnection(int serverSocket) {
+    if (serverFull())
+        return ;
     struct sockaddr_in clientAddr;
     socklen_t addrLen = sizeof(clientAddr);
     int clientFd = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
@@ -98,7 +109,6 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
         ErrorHandler::getInstance().logError("Failed to accept client connection.");
         return ;
     }
-
     struct sockaddr_in localAddr; // Retrieve the local (server) port for the accepted connection.
     socklen_t localLen = sizeof(localAddr);
     if (getsockname(clientFd, (struct sockaddr*)&localAddr, &localLen) < 0) {
