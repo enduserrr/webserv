@@ -141,13 +141,13 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
  */
 void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096]; // For each recv
-    std::string requestBuffer; // For accumulating request data if multipart
+    std::cout << "\n\nBUFFF at start: " <<_clients[clientSocket].buffer << std::endl;   
     ssize_t bytesRead;
-
+    HttpParser parser;
 
     while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
-        requestBuffer.append(buffer, bytesRead); // Read until headers received or no more data
-        if (requestBuffer.find("\r\n\r\n") != std::string::npos) {
+        _clients[clientSocket].buffer.append(buffer, bytesRead);
+        if (parser.isFullRequest(_clients[clientSocket].buffer)) {
             break ;
         }
     }
@@ -161,7 +161,6 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         removeClient(clientSocket);
         return ;
     }
-
     if (_clients.find(clientSocket) == _clients.end()) {// Check if client session exists
         _clients[clientSocket] = ClientSession(clientSocket);
         struct sockaddr_in addr;
@@ -181,37 +180,31 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         sendResponse(clientSocket, ErrorHandler::getInstance().getErrorPage(429));
         return;
     }
+    // std::istringstream headerStream(client.buffer); // Create a temporary stream to parse headers
+    // std::string line;
+    // std::string contentType;
 
-    client.buffer += requestBuffer; // Received data to client's buffer
-    std::istringstream headerStream(client.buffer); // Create a temporary stream to parse headers
-    std::string line;
-    std::string contentType;
-
-    std::getline(headerStream, line); // Read the request line
-    while (std::getline(headerStream, line) && line != "\r") {// Read headers until an empty line
-        if (line.find("Content-Type:") == 0) {
-            contentType = line.substr(strlen("Content-Type:"));
-            contentType.erase(0, contentType.find_first_not_of(" \t"));
-        }
-    }
+    // std::getline(headerStream, line); // Read the request line
+    // while (std::getline(headerStream, line) && line != "\r") {// Read headers until an empty line
+    //     if (line.find("Content-Type:") == 0) {
+    //         contentType = line.substr(strlen("Content-Type:"));
+    //         contentType.erase(0, contentType.find_first_not_of(" \t"));
+    //     }
+    // }
     /*  After getting multipart upload check it's size before forwarding
         If multipart request received only partly it should return to not block */
     // --- Multi part check ---
-    if (!contentType.empty() && contentType.find("multipart/form-data") == 0) {
-        handleMultipartUpload(client);
-        return ;
-    }
+    // if (!contentType.empty() && contentType.find("multipart/form-data") == 0) {
+    //     handleMultipartUpload(client);
+    //     return ;
+    // }
     ServerBlock &block = client._block;
-    HttpParser parser;
-    std::istringstream input(client.buffer);
-    if (parser.readFullRequest(input, block)) {
+    if (parser.parseRequest(block)) {
         client.request = parser.getPendingRequest();
         std::string response = Router().routeRequest(client.request, clientSocket);
         sendResponse(clientSocket, response);
-        client.buffer.clear();
         removeClient(clientSocket);
-        return;
-    }
+    } 
 }
 
 /**
