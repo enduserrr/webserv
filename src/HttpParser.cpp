@@ -21,51 +21,34 @@ HttpParser::HttpParser() {}
 /* Destructor */
 HttpParser::~HttpParser() {}
 
-/**
- * @brief   Reads & parses complete single part request
- */
-bool HttpParser::readFullRequest(std::istream &input, ServerBlock &block) {
-    char buffer[1024];
-    std::string request = _pendingData;
-    _pendingData.clear();
-
-    while (input.read(buffer, sizeof(buffer)) || input.gcount() > 0) {
-        request.append(buffer, input.gcount());
-        size_t headerEnd = request.find("\r\n\r\n");
-        if (headerEnd == std::string::npos)
-            return false;  // Wait for more data
-        size_t contentLengthPos = request.find("Content-Length:");
-        if (contentLengthPos == std::string::npos) {// No body
-            _pendingData = request.substr(headerEnd + 4);
-            request = request.substr(0, headerEnd + 4);
-            return parseRequest(block, request, block.getBodySize());
-        }
-        size_t bodyStart = headerEnd + 4;
-        size_t contentLengthEnd = request.find("\r\n", contentLengthPos);
+bool HttpParser::isFullRequest(std::string &input) {
+    size_t headerEnd = input.find("\r\n\r\n");
+    if (headerEnd == std::string::npos)
+        return false;
+    size_t bodyStart = headerEnd + 4;
+    size_t contentLengthPos = input.find("Content-Length:");
+    if (contentLengthPos != std::string::npos) {
+        size_t contentLengthEnd = input.find("\r\n", contentLengthPos);
         if (contentLengthEnd == std::string::npos)
-            return false; // Wait for full headers
-        std::string contentLengthValue = request.substr(contentLengthPos + 15, contentLengthEnd - (contentLengthPos + 15));
-        int contentLength = 0;
-        try {
-            contentLength = std::stoi(contentLengthValue);
-        } catch (...) {
-            return false; // Inval Content-Length
-        }
-        if (request.size() >= bodyStart + contentLength) {
-            _pendingData = request.substr(bodyStart + contentLength);
-            request = request.substr(0, bodyStart + contentLength);
-            return parseRequest(block, request, block.getBodySize());
-        }
+            return false;
+        std::string contentLengthValue = input.substr(contentLengthPos + 15, contentLengthEnd - (contentLengthPos + 15));
+        int contentLength = std::stoi(contentLengthValue);
+        if (input.size() < bodyStart + contentLength)
+            return false;
     }
-    return false;
+    _fullRequest = input.substr(0, bodyStart + contentLengthPos);
+    std::cout << "\nONE FULL REQUEST:" << _fullRequest << std::endl; 
+    input = input.substr(bodyStart);
+    std::cout << "\n\nLEFT OVER:" << input << std::endl; 
+    return true;
 }
 
-bool HttpParser::parseRequest(ServerBlock &block, std::string &req, size_t max) {
+bool HttpParser::parseRequest(ServerBlock &block) {
     (void)block;
 
-    std::istringstream ss(req);
+    std::istringstream ss(_fullRequest);
     std::string line;
-    _maxBodySize = max;
+    _maxBodySize = block.getBodySize();
     HttpRequest request;
     std::getline(ss, line);
     try {
@@ -78,8 +61,10 @@ bool HttpParser::parseRequest(ServerBlock &block, std::string &req, size_t max) 
         parseBody(body, request);
         createRequest(block, request);
     } catch (...) {
+        std::cout <<"false"<<std::endl;
         return false;
     }
+    std::cout <<"true"<<std::endl;
     return true;
 }
 

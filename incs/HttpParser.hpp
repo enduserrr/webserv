@@ -28,6 +28,7 @@
 
 class HttpParser {
 private:
+    std::string                         _fullRequest; 
     std::string                         _pendingData;   //used for storing rest of the chunk
     std::vector<HttpRequest>            _requests;
 
@@ -46,9 +47,9 @@ public:
     ~HttpParser();
 
 
-    // bool readFullRequest(std::istream& input);
-    bool    readFullRequest(std::istream &input, ServerBlock &block);
-    bool parseRequest(ServerBlock &block, std::string& req, size_t max);
+    bool isFullRequest(std::string &input);
+    bool readFullRequest(std::istream &input, ServerBlock &block);
+    bool parseRequest(ServerBlock &block);
     void parseStartLine(std::string &line, HttpRequest &req);
 
     void parseMethod(std::istringstream &ss, HttpRequest &req);
