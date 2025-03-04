@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/19 11:08:37 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/02 17:26:33 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -55,6 +55,7 @@ class ServerLoop {
         void    acceptNewConnection(int serverSocket);
         void    handleClientRequest(int clientSocket);
         void    sendResponse(int clientSocket, const std::string &response);
+        void    handleMultipartUpload(ClientSession &client);
 
     public:
         ServerLoop();

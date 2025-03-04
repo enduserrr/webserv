@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:22:42 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/21 12:29:12 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/04 08:45:59 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -57,12 +57,12 @@ std::string HttpRequest::getHttpVersion() const {
     return _httpVersion;
 }
 
-const std::map <std::string, std::string>& HttpRequest::getUriQuery() const {
+const std::map <std::string, std::string> &HttpRequest::getUriQuery() const {
     return _uriQuery;
 }
 
 std::string     HttpRequest::getHeader(const std::string &key) const {
-    std::map<std::string, std::string>::const_iterator it = _headers.find(key); 
+    std::map<std::string, std::string>::const_iterator it = _headers.find(key);
     if (it == _headers.end())
         return "";
     return it->second;

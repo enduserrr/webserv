@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 11:30:12 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/19 13:00:10 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/01 17:02:04 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -24,6 +24,7 @@ void signalHandler(int signum) {
 }
 
 int main(int ac, char **av) {
+    signal(SIGPIPE, SIG_IGN);
     if (ac != 2) {
         std::cout << "Usage: ./webserv <configfile.conf>" << std::endl;
         return 1;

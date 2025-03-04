@@ -20,6 +20,9 @@
     }
     li {
       margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     a {
       text-decoration: none;
@@ -28,20 +31,34 @@
     a:hover {
       text-decoration: underline;
     }
-    /* Centered button at the bottom */
+    .delete {
+      padding: 5px 10px;
+      background-color: transparent;
+      border: 2px solid red;
+      color: red;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .delete:hover {
+      background-color: red;
+      color: white;
+    }
     .button-container {
       text-align: left;
+      margin-top: 20px;
     }
     .button-container a {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: transparent; /* No fill */
-        border: 2px solid #333;  /* Outline with dark grey, adjust thickness and color as needed */
-        color: #333;             /* Text color matching the border */
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: transparent;
+      border: 2px solid #333;
+      color: #333;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 10px;
     }
     .button-container a:hover {
       background-color: #e3d5d5;
@@ -56,5 +73,34 @@
   <div class="button-container">
     <a href="/index.html" role="button">HOME</a>
   </div>
+
+  <!-- JavaScript to intercept delete button clicks and send DELETE request -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const deleteButtons = document.querySelectorAll("button.delete");
+      deleteButtons.forEach(button => {
+        button.addEventListener("click", function(event) {
+          event.preventDefault();
+          const targetUrl = this.getAttribute("data-target");
+          const method = this.getAttribute("data-method") || "DELETE";
+          // Optionally, disable the button to prevent multiple clicks.
+          this.disabled = true;
+          fetch(targetUrl, { method: method })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              // Refresh the page or update the listing dynamically.
+              location.reload();
+            })
+            .catch(error => {
+              console.error("Error during deletion:", error);
+              this.disabled = false;
+            });
+        });
+      });
+    });
+  </script>
 </body>
 </html>
+

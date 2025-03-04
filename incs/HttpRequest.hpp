@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:23:00 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/26 09:11:57 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/01 16:52:06 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -68,6 +68,30 @@ public:
     void setRoot(std::string root) {
     _root = root;
     }
+    void display() const {
+    std::cout << "---- HttpRequest Display ----" << std::endl;
+    std::cout << "Method: " << _method << std::endl;
+    std::cout << "URI: " << _uri << std::endl;
+    std::cout << "HTTP Version: " << _httpVersion << std::endl;
+    std::cout << "Max Body Size: " << _maxBodySize << std::endl;
+    std::cout << "AutoIndex: " << (_autoIndex ? "true" : "false") << std::endl;
+    std::cout << "Root: " << _root << std::endl;
+    std::cout << "File Name: " << _fileName << std::endl;
+    std::cout << "Body: " << _body << std::endl;
+
+    std::cout << "Headers:" << std::endl;
+    for (const auto &header : _headers) {
+        std::cout << "  " << header.first << ": " << header.second << std::endl;
+    }
+
+    std::cout << "URI Query:" << std::endl;
+    for (const auto &query : _uriQuery) {
+        std::cout << "  " << query.first << ": " << query.second << std::endl;
+    }
+
+    std::cout << "-----------------------------" << std::endl;
+}
+
 
 };
 

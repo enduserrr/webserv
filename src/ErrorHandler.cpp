@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:21:14 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/19 12:29:31 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/01 15:43:34 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -26,33 +26,34 @@ std::string ErrorHandler::loadFileContent(const std::string &filePath) {
 }
 
 ErrorHandler::ErrorHandler() {
-    // Load error pages from the directory "www/error_pages"
-    std::string baseDir = "www/error_pages/";
+    std::string baseDir = "www/templates/error_pages/";
 
-    // Try to load each error page file.
     _errorPages[400] = loadFileContent(baseDir + "400.html");
-    _errorPages[404] = loadFileContent(baseDir + "404.html");
-    _errorPages[500] = loadFileContent(baseDir + "500.html");
     _errorPages[403] = loadFileContent(baseDir + "403.html");
+    _errorPages[404] = loadFileContent(baseDir + "404.html");
     _errorPages[408] = loadFileContent(baseDir + "408.html");
     _errorPages[415] = loadFileContent(baseDir + "415.html");
-
-    // Load a default error page.
+    _errorPages[413] = loadFileContent(baseDir + "413.html");
+    _errorPages[429] = loadFileContent(baseDir + "429.html");
+    _errorPages[500] = loadFileContent(baseDir + "500.html");
     _defaultErrorPage = loadFileContent(baseDir + "default.html");
 
-    // Optionally, if any file fails to load, you can assign a hard-coded fallback:
+    // Fallback option if any file fails to load
     if (_errorPages[400].empty())
         _errorPages[400] = "<html><body><h1>400 Bad Request</h1><p>Your request cannot be processed.</p></body></html>";
-    if (_errorPages[404].empty())
-        _errorPages[404] = "<html><body><h1>404 Not Found</h1><p>The requested resource was not found.</p></body></html>";
-    if (_errorPages[500].empty())
-        _errorPages[500] = "<html><body><h1>500 Internal Server Error</h1><p>An unexpected error occurred.</p></body></html>";
     if (_errorPages[403].empty())
         _errorPages[403] = "<html><body><h1>403 Forbidden</h1><p>You don't have permission to access this resource.</p></body></html>";
+    if (_errorPages[404].empty())
+        _errorPages[404] = "<html><body><h1>404 Not Found</h1><p>The requested resource was not found.</p></body></html>";
     if (_errorPages[408].empty())
         _errorPages[408] = "<html><body><h1>408 Request Timeout</h1><p>The server timed out waiting for the request.</p></body></html>";
+    if (_errorPages[429].empty())
+        _errorPages[429] = "<html><body><h1>429 Too Many Requests</h1><p>The server can't accept more requests at this time</p></body></html>";
+    if (_errorPages[500].empty())
+        _errorPages[500] = "<html><body><h1>500 Internal Server Error</h1><p>An unexpected error occurred.</p></body></html>";
+
     if (_defaultErrorPage.empty())
-        _defaultErrorPage = "<html><body><h1>Error</h1><p>An unknown error occurred.</p></body></html>";
+        _defaultErrorPage = "<html><body><h1>Error</h1><p>An error occurred.</p></body></html>";
 }
 
 ErrorHandler &ErrorHandler::getInstance() {
@@ -64,20 +65,17 @@ ErrorHandler::~ErrorHandler() {
     std::cout << "ErrorHandler Destructor." << std::endl;
 }
 
-// Log to the console
 void ErrorHandler::logError(const std::string &message) {
     std::cerr << "[ErrorHandler]: " << message << std::endl;
 }
 
-// Get the error page for a specific status code
 std::string ErrorHandler::getErrorPage(int code) {
     if (_errorPages.find(code) != _errorPages.end()) {
-        return _errorPages[code]; // Return custom error page if it exists
+        return _errorPages[code];
     }
-    return _defaultErrorPage; // Return default error page for unknown status codes
+    return _defaultErrorPage;
 }
 
-// Add a custom error page for a specific status code
 void ErrorHandler::setCustomErrorPage(int code, const std::string &pageContent) {
     _errorPages[code] = pageContent;
 }

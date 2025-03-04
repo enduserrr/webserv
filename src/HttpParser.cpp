@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/24 11:05:05 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/02 18:55:59 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -21,6 +21,9 @@ HttpParser::HttpParser() {}
 /* Destructor */
 HttpParser::~HttpParser() {}
 
+/**
+ * @brief   Reads & parses complete single part request
+ */
 bool HttpParser::readFullRequest(std::istream &input, ServerBlock &block) {
     char buffer[1024];
     std::string request = _pendingData;
@@ -162,39 +165,10 @@ void HttpParser::parseHeader(std::string &line, HttpRequest &req) {
     if (key == "Content-Length") {
         size_t size = std::stoi(value);
         if (size > _maxBodySize)
-            throw std::runtime_error("413 Payload Too Large"); 
+            throw std::runtime_error("413 Payload Too Large");
     }
     req.addNewHeader(key, value);
 }
-
-/* void HttpParser::parseBody(std::string &body, HttpRequest &req) {
-    Types types; // Use the centralized Types class
-    std::string contentType = req.getHeader("Content-Type");
-    std::cout << RB << contentType << RES << std::endl;
-    std::string non = "";
-
-    if (contentType.empty()) {
-        std::cerr << "Error: Missing Content-Type header" << std::endl;
-        req.setBody(non); // Clear body on error
-        return;
-    }
-
-    if (contentType == "application/x-www-form-urlencoded") {
-        // Parse key-value pairs (e.g., "key1=value1&key2=value2")
-        req.setBody(body); // You may need a proper parsing function
-    }
-    else if (contentType.find("multipart/form-data") == 0) {
-        // Handle file uploads (extract boundary and parse multipart data)
-        req.setBody(body); // A proper multipart parser is needed
-    }
-    else if (types.isValidContent(contentType)) {
-        req.setBody(body); // Store raw body for valid content types
-    }
-    else {
-        std::cerr << "Error: Unsupported Content-Type: " << contentType << std::endl;
-        req.setBody(non); // Clear body on error
-    }
-} */
 
 void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     Types types; // Use the centralized Types class
@@ -203,7 +177,7 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     std::string emptyBody = "";
 
     if (contentType.empty()) {
-        std::cerr << "Error: Missing Content-Type header" << std::endl;
+        // std::cerr << "Empty Body" << std::endl;
         req.setBody(emptyBody);
         return;
     }
