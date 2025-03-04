@@ -20,9 +20,11 @@
 class Location {
 private:
     std::string                 _path;
-    std::vector<std::string>    _allowedMethods;
-    bool                        _autoIndex;
+    std::string                 _index;
     std::string                 _root;
+    std::string                 _uploadStore;
+    bool                        _autoIndex;
+    std::vector<std::string>    _allowedMethods;
     std::map<int, std::string>  _errorPages;
     std::pair<int, std::string> _redirect; 
 
@@ -34,6 +36,8 @@ public:
     std::string                 getPath() const;
     std::string&                getRoot();
     bool&                       getAutoIndex(); 
+    const std::string&          getIndex() const;
+    const std::string&          getUploadStore() const;
     std::vector<std::string>    getAllowedMethods() const;
     std::map<int, std::string>& getErrorPages();
     std::pair<int, std::string> getRedirect() const ;
@@ -41,9 +45,11 @@ public:
     //setters
     void                        setPath(const std::string& path);
     void                        setRoot(std::string root);
-    void                        setAutoIndex(bool b);
-    void                        addAllowedMethod(const std::string& method);
-    void                        setErrorPage(int &code, std::string& path);
+    void                        setIndex(const std::string &name);
+    void                        setUploadStore(const std::string &path);
+    void                        setAutoIndex(const std::string &value);
+    void                        addAllowedMethod(const std::string &method);
+    void                        setErrorPage(int code, const std::string &path);
     void                        setRedirect(int code, const std::string& url); 
 
 };

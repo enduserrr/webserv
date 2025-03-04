@@ -29,6 +29,14 @@ std::string& Location::getRoot() {
     return _root;
 }
 
+const std::string& Location::getIndex() const {
+    return _index;
+}
+
+const std::string& Location::getUploadStore() const {
+    return _uploadStore;
+}
+
 bool& Location::getAutoIndex() {
     return _autoIndex;
 }
@@ -43,12 +51,6 @@ std::map<int, std::string>&  Location::getErrorPages() {
 
 std::pair<int, std::string>  Location::getRedirect() const {
     return _redirect;
-
-    // HOWTOUSE: 
-    // std::pair<int, std::string> redir = location.getRedirect();
-    // int status = redir.first;
-    // std::string url = redir.second;
-
 }
 
 //setters
@@ -60,18 +62,32 @@ void Location::setRoot(std::string root) {
     _root = root;
 }
 
-void Location::setAutoIndex(bool b) {
-    _autoIndex = b;
+void Location::setAutoIndex(const std::string &value) {
+    if (value != "on" && value != "off")
+        throw std::runtime_error("Autoindex has to be 'on' or 'off'");
+    _autoIndex = (value == "on");
+}
+
+void Location::setIndex(const std::string &name) {
+    _index = name;
+}
+
+void Location::setUploadStore(const std::string &path) {
+    _uploadStore = path;
 }
 
 void Location::addAllowedMethod(const std::string& method){
     _allowedMethods.push_back(method);
 }
 
-void Location::setErrorPage(int &code, std::string &path) {
+void Location::setErrorPage(int code, const std::string &path) {
+    if (code < 100 || code > 599)
+        throw std::runtime_error("error_page code is invalid: " + std::to_string(code));
     _errorPages[code] = path;
 }
 
 void Location::setRedirect(int code, const std::string &url) {
+    if (code != 301 && code != 302)
+        throw std::runtime_error("redirection code is invalid: " + std::to_string(code));
     _redirect = std::make_pair(code, url);
 }
