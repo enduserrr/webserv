@@ -23,10 +23,11 @@
 class ServerBlock {
 private:
     std::string                 _serverName;
-    std::string                 _root; 
-    std::vector<int>            _ports;
+    std::string                 _root;
+    std::string                 _index; 
     bool                        _autoIndex;  //1 true - 0 false
     size_t                      _bodySize;
+    std::vector<int>            _ports;
     std::vector<Location>       _locations;
     std::map<int, std::string>  _errorPages; //key value 404 - 404.html --> _errorPages[404] = 404.html
     
@@ -39,21 +40,27 @@ public:
     std::string                 getServerName() const;
     std::string&                getRoot();
     std::vector<int>            getPorts();
+    const std::string&          getIndex() const;
     bool&                       getAutoIndex();
     size_t                      getBodySize() const;
     std::vector<Location>&      getLocations();
     std::map<int, std::string>& getErrorPages();
 
     // Setters
-    void                        setServerName(std::string str);
-    void                        setRoot(std::string root);
-    void                        setPorts(int port);
-    void                        setAutoIndex(bool b);
-    void                        setBodySize(int size, char unit);
-    void                        setErrorPage(int &code, std::string &path);
+    void                        setServerName(const std::string &str);
+    void                        setRoot(const std::string &root);
+    void                        setPort(const std::string &port);
+    void                        setAutoIndex(const std::string &value);
+    void                        setIndex(const std::string &name);
+    void                        setBodySize(const std::string &value);
+    void                        setErrorPage(int code, const std::string &path);
     void                        setLocation(const Location& loc);
 
     // void display() const;
 };
+
+void                            hasForbiddenSymbols(const std::string &word);
+int                             convertToInt(const std::string &word);
+bool                            hasValidUnit(const std::string &word);
 
 #endif

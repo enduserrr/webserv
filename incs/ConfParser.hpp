@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <limits.h>
 
+//KEYWORDS
 #define SERVER          "server {"
 #define SERVER_NAME     "server_name"
 #define PORT            "listen"
@@ -32,7 +33,9 @@
 #define LOCATION        "location"
 #define ROOT            "root"
 #define AUTOI           "autoindex"
+#define INDEX           "index"
 #define REDIR           "return"
+#define USTORE          "upload_store"
 
 
 //ERRORS 
@@ -69,41 +72,37 @@ public:
     std::vector<ServerBlock>& getServers();
 
 
-    //validate file basics before opening
+    //FILE VALIDATION
     void                    fileValidation();
     void                    fileExists();
     void                    filePermissions();
     void                    fileExtension(const std::string &path, const std::string &ext);
     void                    fileSize(); 
 
-    //parse file
+
+    //FILE PARSING
     void                    parseFile();
-    std::string             removeComments(const std::string &line);
     void                    blocks(int block);
     void                    parseLine(std::string &line, int &block);
 
-    //parse data
+
+    //DATA PARSING
     void                    parseData();
     void                    keyWordFinder(std::string line, int serverIndex);
     void                    locationBlock(int serverIndex, size_t &i);
-    void                    parseLocationLine(std::istringstream &ss, Location &loc);
-    void                    parseRoot(std::istringstream &ss, std::string &root);
-    void                    parseAutoIndex(std::istringstream &ss, bool &autoi);
     void                    parseMethods(std::istringstream &ss, Location &loc);
-    void                    parseServerName(std::istringstream &ss, int si);
-    void                    parsePort(std::istringstream &ss, int si);
-    void                    parseBodySize(std::istringstream &ss, int si);
-    void                    parseErrorPages(std::istringstream &ss, std::map<int, std::string> &error_pages);
-    void                    parseRedirect(std::istringstream &ss, Location &loc);
+    template <typename T>
+    void                    parseSingle(std::istringstream &ss, T &obj, void (T::*setter)(const std::string&));
+    template <typename T>
+    void                    parseCodeValue(std::istringstream &ss, T &obj, void (T::*setter)(int, const std::string&));
 
-    void                    whiteSpaceTrim(std::string &str);
-    int                     convertToInt(std::string &word, const std::string &info);
-    void                    hasForbiddenSymbols(std::string& word);
-    bool                    hasValidUnit(std::string &word);
-    void                    wordIsExpected(const std::string &word, const std::string &expected);
 
     // DEBUG
     void                    display();
 };
+
+//HELPERS
+void                        whiteSpaceTrim(std::string &str);
+std::string                 removeComments(const std::string &line);
 
 #endif
