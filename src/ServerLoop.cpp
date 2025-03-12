@@ -141,17 +141,18 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
  */
 void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096]; // For each recv
-    std::cout << "\n\nBUFFF at start: " <<_clients[clientSocket].buffer << std::endl;   
     ssize_t bytesRead;
     HttpParser parser;
 
     while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
         _clients[clientSocket].buffer.append(buffer, bytesRead);
-        if (parser.isFullRequest(_clients[clientSocket].buffer)) {
+        if (parser.isFullRequest(_clients[clientSocket].buffer))
             break ;
+        if (parser.getState() != 0) {
+            std::cerr << "bad request (stoi fails)! " << std::endl; //should propably give 400 bad request errorpage? 
+            return ;
         }
     }
-
     if (bytesRead == 0) {
         removeClient(clientSocket);
         return ;
@@ -173,13 +174,12 @@ void ServerLoop::handleClientRequest(int clientSocket) {
                 std::cerr << "Warning: No matching ServerBlock for port " << port << std::endl;
             }
         }
-    }
-
-    ClientSession &client = _clients[clientSocket];
-    if (client.requestLimiter()) {
+    } 
+    if (_clients[clientSocket].requestLimiter()) {
         sendResponse(clientSocket, ErrorHandler::getInstance().getErrorPage(429));
         return;
     }
+
     // std::istringstream headerStream(client.buffer); // Create a temporary stream to parse headers
     // std::string line;
     // std::string contentType;
@@ -198,13 +198,22 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     //     handleMultipartUpload(client);
     //     return ;
     // }
-    ServerBlock &block = client._block;
-    if (parser.parseRequest(block)) {
-        client.request = parser.getPendingRequest();
-        std::string response = Router().routeRequest(client.request, clientSocket);
+    if (parser.parseRequest(_clients[clientSocket]._block)) {
+        _clients[clientSocket].request = parser.getPendingRequest();
+        std::string response = Router().routeRequest(_clients[clientSocket].request, clientSocket);
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
-    } 
+    } else { //Hardcoded response that shows only return state from parser --> fix later to show proper errorpage 
+        std::cout<< "PARSER return state: " << parser.getState() << std::endl;
+        std::string response =  "HTTP/1.1" + std::to_string(parser.getState()) + "\r\n"
+                                "Content-Type: text/html\r\n"
+                                "Content-Length: 52\r\n"
+                                "Connection: close\r\n"
+                                "\r\n"
+                                "<html><body><h1> request return state: " + std::to_string(parser.getState()) + "</h1></body></html>";
+        sendResponse(clientSocket, response);
+        removeClient(clientSocket);
+    }
 }
 
 /**

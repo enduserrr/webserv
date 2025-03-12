@@ -68,6 +68,7 @@ public:
     void setRoot(std::string root) {
     _root = root;
     }
+    
     void display() const {
     std::cout << "---- HttpRequest Display ----" << std::endl;
     std::cout << "Method: " << _method << std::endl;
