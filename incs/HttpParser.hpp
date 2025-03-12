@@ -28,6 +28,8 @@
 
 class HttpParser {
 private:
+    int                                 _state; 
+    
     std::string                         _fullRequest; 
     std::string                         _pendingData;   //used for storing rest of the chunk
     std::vector<HttpRequest>            _requests;
@@ -47,20 +49,21 @@ public:
     ~HttpParser();
 
 
+    bool startsWithMethod(const std::string &input);
     bool isFullRequest(std::string &input);
     bool readFullRequest(std::istream &input, ServerBlock &block);
     bool parseRequest(ServerBlock &block);
-    void parseStartLine(std::string &line, HttpRequest &req);
+    bool parseStartLine(std::string &line, HttpRequest &req);
 
-    void parseMethod(std::istringstream &ss, HttpRequest &req);
-    void parseUriQuery(const std::string &query, HttpRequest &req);
-    void parseUri(std::istringstream &ss, HttpRequest &req);
-    void isValidUri(std::string& uri);
-    void parseVersion(std::istringstream &ss, HttpRequest &req);
+    bool parseMethod(std::istringstream &ss, HttpRequest &req);
+    bool parseUriQuery(const std::string &query, HttpRequest &req);
+    bool parseUri(std::istringstream &ss, HttpRequest &req);
+    bool isValidUri(std::string& uri);
+    bool parseVersion(std::istringstream &ss, HttpRequest &req);
 
     bool createRequest(ServerBlock &block, HttpRequest &req);
 
-    void parseHeader(std::string &line, HttpRequest &req);
+    bool parseHeader(std::string &line, HttpRequest &req);
     void parseBody(std::string &body, HttpRequest &req);
     void whiteSpaceTrim(std::string& str);
     void display() const;
@@ -73,6 +76,10 @@ public:
 
     std::string getMethod() {
         return _method;
+    }
+
+    int getState() {
+        return _state;
     }
 
     std::string getBody() {

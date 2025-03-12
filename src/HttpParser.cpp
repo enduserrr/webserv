@@ -16,143 +16,208 @@
 #include <iomanip>
 
 /* Constructor */
-HttpParser::HttpParser() {}
+HttpParser::HttpParser() : _state(0) {}
 
 /* Destructor */
 HttpParser::~HttpParser() {}
 
+bool HttpParser::startsWithMethod(const std::string &input) {
+    size_t firstSpace = input.find(' ');  
+    if (firstSpace == std::string::npos)  
+        return false;  // No space means malformed request  
+
+    std::string method = input.substr(0, firstSpace);  
+    return (method == "GET" || method == "POST" || method == "DELETE");  
+}
+
+
+//isfullreq: 
+// jos paska requesti palauta false ja state 400 ala jatka
+// jos pelkka false (state 0) looppaa kunnes request taynnna
+
 bool HttpParser::isFullRequest(std::string &input) {
+    
+    //proper request always start with method 
+    if (!startsWithMethod(input)) {
+        _state = 400; 
+        input.clear(); 
+        return false; 
+    } 
     size_t headerEnd = input.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
         return false;
     size_t bodyStart = headerEnd + 4;
     size_t contentLengthPos = input.find("Content-Length:");
+    size_t contentLength = 0;
+
     if (contentLengthPos != std::string::npos) {
         size_t contentLengthEnd = input.find("\r\n", contentLengthPos);
         if (contentLengthEnd == std::string::npos)
             return false;
         std::string contentLengthValue = input.substr(contentLengthPos + 15, contentLengthEnd - (contentLengthPos + 15));
-        int contentLength = std::stoi(contentLengthValue);
+        try {
+            contentLength = std::stoi(contentLengthValue);
+        } catch (const std::exception &e){ 
+            _state = 400; 
+            input.clear(); 
+            return false; 
+        }
         if (input.size() < bodyStart + contentLength)
             return false;
     }
-    _fullRequest = input.substr(0, bodyStart + contentLengthPos);
-    std::cout << "\nONE FULL REQUEST:" << _fullRequest << std::endl; 
-    input = input.substr(bodyStart);
+    _fullRequest = input.substr(0, bodyStart + contentLength);
+    // std::cout << "\nONE FULL REQUEST:" << _fullRequest << std::endl; 
+    if (bodyStart + contentLength <= input.size())  
+        input = input.substr(bodyStart + contentLength);  
+    else  
+        input.clear();  
     std::cout << "\n\nLEFT OVER:" << input << std::endl; 
     return true;
 }
 
 bool HttpParser::parseRequest(ServerBlock &block) {
     (void)block;
-
     std::istringstream ss(_fullRequest);
     std::string line;
     _maxBodySize = block.getBodySize();
     HttpRequest request;
     std::getline(ss, line);
-    try {
-        parseStartLine(line, request);
-        while (getline(ss, line, '\r') && ss.get() == '\n' && !line.empty()){
-            parseHeader(line, request);
-        }
-        std::string body;
-        body.assign(std::istreambuf_iterator<char>(ss), std::istreambuf_iterator<char>());
-        parseBody(body, request);
-        createRequest(block, request);
-    } catch (...) {
-        std::cout <<"false"<<std::endl;
-        return false;
+    if (!parseStartLine(line, request)) {
+        return false; 
     }
-    std::cout <<"true"<<std::endl;
+    while (getline(ss, line, '\r') && ss.get() == '\n' && !line.empty()) {
+        if (!parseHeader(line, request))
+            return false; 
+    }
+    std::string body;
+    body.assign(std::istreambuf_iterator<char>(ss), std::istreambuf_iterator<char>());
+    parseBody(body, request);
+    createRequest(block, request);
+    // std::cout<< "reg true" << std::endl; 
     return true;
 }
 
-void HttpParser::parseVersion(std::istringstream &ss, HttpRequest &req){
+bool HttpParser::parseVersion(std::istringstream &ss, HttpRequest &req) {
     std::string word;
-    if (!(ss >> word))
-        throw std::runtime_error("Silent");
-    if (word != "HTTP/1.1")
-        throw std::runtime_error("Silent");
+    if (!(ss >> word)) {
+        _state = 400; //BADREQ
+        return false; 
+    }
+    if (word != "HTTP/1.1") {
+        _state = 505; //VERSION NOT SUPPORTED
+        return false; 
+    }
     req.setHttpVersion(word);
+    return true; 
 }
 
 //STARTLINE SYNTAX: [method] [URI] [HTTP_VERSION]
-void HttpParser::parseStartLine(std::string &line, HttpRequest &req) {
+bool HttpParser::parseStartLine(std::string &line, HttpRequest &req) {
     std::istringstream ss(line);
-    parseMethod(ss, req);
-    parseUri(ss, req);
-    parseVersion(ss, req);
+    if (!parseMethod(ss, req))
+        return false; 
+    if (!parseUri(ss, req))
+        return false; 
+    if (!parseVersion(ss, req))
+        return false; 
+    return true; 
 }
 
-void HttpParser::parseMethod(std::istringstream &ss, HttpRequest &req) {
+bool HttpParser::parseMethod(std::istringstream &ss, HttpRequest &req) {
     std::string word;
-    if (!(ss >> word))
-        throw std::runtime_error("Silent");
-    if (word != "GET" && word != "POST" && word != "DELETE")
-        throw std::runtime_error("Silent");
+    if (!(ss >> word)) {
+        _state = 400; //BADREQ
+        return false; 
+    }
+    if (word != "GET" && word != "POST" && word != "DELETE") {
+        _state = 405; //METHOD NOT ALLOWED 
+        return false; 
+    }
     req.setMethod(word);
+    return true; 
 }
 
 //valid syntax: /dir/subdir?query=string  -- /dir/subdir?color=red&size=large
-void HttpParser::parseUri(std::istringstream &ss, HttpRequest &req) {
+bool HttpParser::parseUri(std::istringstream &ss, HttpRequest &req) {
     std::string word;
     std::string temp;
-    if (!(ss >> word))
-        throw std::runtime_error("Silent");
+    if (!(ss >> word)) {
+        _state = 400; //BADREQ
+        return false; 
+    }
     for (size_t i = 0; i < word.length(); i++) {
-        if(word[i] == '?')
-            parseUriQuery(word.substr(i + 1), req);
+        if(word[i] == '?') { 
+            if (!parseUriQuery(word.substr(i + 1), req)) {
+                _state = 400; //BADREQ
+                return false; 
+            } else {
+                break ;
+            }
+
+        }
         temp += word[i];
     }
-    isValidUri(temp);
+    if (!isValidUri(temp)) 
+        return false; 
     req.setUri(temp);
+    return true; 
 }
 
-void HttpParser::parseUriQuery(const std::string &query, HttpRequest &req) {
+bool HttpParser::parseUriQuery(const std::string &query, HttpRequest &req) {
     if (query.empty())
-        throw std::runtime_error("Silent");
+        return false; 
     std::stringstream ss(query);
     std::string token;
     while (std::getline(ss, token, '&')) {
         if (token.empty())
-            throw std::runtime_error("Silent");
+            return false; 
         size_t pos = token.find('=');
         if (pos != std::string::npos) {
             std::string key = token.substr(0, pos);
             std::string value = token.substr(pos + 1);
             if (key.empty())
-                throw std::runtime_error("Silent");
+                return false; 
             req.setUriQuery(key, value);
         } else {
             req.setUriQuery(token, "true");
         }
     }
+    return true; 
 }
 
-void HttpParser::isValidUri(std::string& uri) {
-    if (uri.empty() || uri[0] != '/')
-        throw std::runtime_error("Silent");
+bool HttpParser::isValidUri(std::string& uri) {
+    if (uri.empty() || uri[0] != '/') {
+        _state = 400; //BADREQ
+        return false; 
+    }
     std::string invalidChars = "<>{}|\\^`\" ";
     for (size_t i = 0; i < uri.length(); i++) {
-        if (invalidChars.find(uri[i]) != std::string::npos)
-            throw std::runtime_error("Silent");
+        if (invalidChars.find(uri[i]) != std::string::npos) {
+            _state = 400; //BADREQ
+            return false; 
+        }
     }
+    return true; 
 }
 
-void HttpParser::parseHeader(std::string &line, HttpRequest &req) {
+bool HttpParser::parseHeader(std::string &line, HttpRequest &req) {
     std::istringstream ss(line);
     std::string key;
     std::string value;
-    if (!(ss >> key >> value))
-        throw std::runtime_error("Silent");
+    if (!(ss >> key >> value)){
+        _state = 400; //BADREQ
+        return false; 
+    }
     key.pop_back();
     if (key == "Content-Length") {
         size_t size = std::stoi(value);
-        if (size > _maxBodySize)
-            throw std::runtime_error("413 Payload Too Large");
+        if (size > _maxBodySize) {
+            _state = 413; //PAYLOAD TOO LARGE
+            return false; 
+        }
     }
     req.addNewHeader(key, value);
+    return true;
 }
 
 void HttpParser::parseBody(std::string &body, HttpRequest &req) {

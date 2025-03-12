@@ -32,7 +32,7 @@ bool ClientSession::requestLimiter() {
 
     time_t now = time(nullptr);
 
-    if (now - _lastRequestTime >= 1) {
+    if (now - _lastRequestTime >= 0) {
         _lastRequestTime = now;
         _requestCount = 0;
     }
