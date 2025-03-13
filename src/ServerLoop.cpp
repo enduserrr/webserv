@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/02 19:19:47 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/13 12:59:02 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -149,7 +149,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         if (parser.isFullRequest(_clients[clientSocket].buffer))
             break ;
         if (parser.getState() != 0) {
-            std::cerr << "bad request (stoi fails)! " << std::endl; //should propably give 400 bad request errorpage? 
+            std::cerr << "bad request (stoi fails)! " << std::endl; //should propably give 400 bad request errorpage?
             return ;
         }
     }
@@ -174,36 +174,17 @@ void ServerLoop::handleClientRequest(int clientSocket) {
                 std::cerr << "Warning: No matching ServerBlock for port " << port << std::endl;
             }
         }
-    } 
+    }
     if (_clients[clientSocket].requestLimiter()) {
         sendResponse(clientSocket, ErrorHandler::getInstance().getErrorPage(429));
         return;
     }
-
-    // std::istringstream headerStream(client.buffer); // Create a temporary stream to parse headers
-    // std::string line;
-    // std::string contentType;
-
-    // std::getline(headerStream, line); // Read the request line
-    // while (std::getline(headerStream, line) && line != "\r") {// Read headers until an empty line
-    //     if (line.find("Content-Type:") == 0) {
-    //         contentType = line.substr(strlen("Content-Type:"));
-    //         contentType.erase(0, contentType.find_first_not_of(" \t"));
-    //     }
-    // }
-    /*  After getting multipart upload check it's size before forwarding
-        If multipart request received only partly it should return to not block */
-    // --- Multi part check ---
-    // if (!contentType.empty() && contentType.find("multipart/form-data") == 0) {
-    //     handleMultipartUpload(client);
-    //     return ;
-    // }
     if (parser.parseRequest(_clients[clientSocket]._block)) {
         _clients[clientSocket].request = parser.getPendingRequest();
         std::string response = Router().routeRequest(_clients[clientSocket].request, clientSocket);
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
-    } else { //Hardcoded response that shows only return state from parser --> fix later to show proper errorpage 
+    } else { //Hard response that shows the HATERS who's who and so forth.
         std::cout<< "PARSER return state: " << parser.getState() << std::endl;
         std::string response =  "HTTP/1.1" + std::to_string(parser.getState()) + "\r\n"
                                 "Content-Type: text/html\r\n"
@@ -214,28 +195,6 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
     }
-}
-
-/**
- * @brief   Multipart specific boundary extraction, filename retrieval, saving on to disk
- *          and directing the final result directly to uploadHandler.
- *
- */
-void ServerLoop::handleMultipartUpload(ClientSession &client) {
-    UploadHandler uploadHandler; // Direct to UploadHandler for multipart processing.
-    std::string uploadedFilePath = uploadHandler.uploadReturnPath(client.request);
-
-    if (uploadedFilePath.find("HTTP/1.1") == 0) {
-        sendResponse(client.fd, uploadedFilePath);
-    } else {
-        std::ostringstream responseStream;
-        responseStream << "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
-                       << "<html><body><h1>Upload Successful</h1>"
-                       << "<p>File uploaded: " << uploadedFilePath << "</p></body></html>";
-        sendResponse(client.fd, responseStream.str());
-    }
-    client.buffer.clear();
-    removeClient(client.fd);
 }
 
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {

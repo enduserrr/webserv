@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/04 08:45:38 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/13 13:28:19 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -15,7 +15,8 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h> //Stat
-#include <unistd.h> //Access
+#include <unistd.h> //Access<cstring>
+#include <cstring>
 #define RB     "\033[1;91m"
 #define RES    "\033[0m"
 #define GC     "\033[3;90m"
@@ -37,7 +38,6 @@ static void replaceAll(std::string &str, const std::string &from, const std::str
 }
 
 std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
-    std::cout << RB << "Trying to generate dir listing" << RES << std::endl;
     std::ifstream templateFile("www/templates/listing.html"); // Use the listing template from www/templates
     if (!templateFile) { // Fallback in case the template is missing
         std::cout << "FALLBACK FILE" << std::endl;
@@ -45,12 +45,14 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
         fallback << "<html><head><title>Index of " << uri << "</title></head><body>"
                  << "<h1>Index of " << uri << "</h1><ul>";
         DIR *dir = opendir(directoryPath.c_str());
-        if (!dir) return "";
+        if (!dir) {
+            return "";
+        }
         struct dirent *entry;
         while ((entry = readdir(dir)) != nullptr) {
             std::string name = entry->d_name;
             if (name == "." || name == "..")
-                continue;
+                continue ;
             fallback << "<li><a href=\"" << uri;
             if (uri.back() != '/')
                 fallback << "/";
@@ -112,35 +114,92 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
 }
 
 std::string Methods::mGet(HttpRequest &req) {
+    // std::string uri = req.getUri();
+    // if (uri.substr(uri.length() - 4) == ".ico") {
+    //     std::string newUri = req.getHeader("Referer");
+    //     if (newUri.find("/uploads/"))
+    //         uri = "/uploads/";
+    // }
+    // std::cout << RB << uri << RES << std::endl;
+    // // Use the root specified in the request (populated from ServerBlock or Location)
+    // std::string basePath = req.getRoot();
+    // std::string filePath = basePath + uri;
+    // std::cout << filePath << std::endl;
+
+    // struct stat st;
+    // bool isDirectory = false;
+    // if (stat(filePath.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
+    //     isDirectory = true;
+    // }
     std::string uri = req.getUri();
-    // Use the root specified in the request (populated from ServerBlock or Location)
+    if (uri.length() >= 4 && uri.substr(uri.length() - 4) == ".ico") {
+        std::string newUri = req.getHeader("Referer");
+        if (newUri.find("/uploads/") != std::string::npos) { // Fixed condition
+            uri = "/uploads/";
+        }
+    }
+    std::cout << RB << "URI: " << uri << RES << std::endl;
     std::string basePath = req.getRoot();
     std::string filePath = basePath + uri;
+    std::cout << "filePath: " << filePath << std::endl;
 
     struct stat st;
     bool isDirectory = false;
-    if (stat(filePath.c_str(), &st) == 0 && S_ISDIR(st.st_mode)) {
-        isDirectory = true;
+    if (stat(filePath.c_str(), &st) == 0) {
+        if (S_ISDIR(st.st_mode)) {
+            isDirectory = true;
+            std::cout << "Confirmed: " << filePath << " is a directory" << std::endl;
+        } else {
+            std::cout << filePath << " exists but is not a directory" << std::endl;
+        }
+    } else {
+        std::cerr << "stat failed for " << filePath << ": " << strerror(errno) << std::endl;
     }
-    if (!uri.empty() && uri.back() == '/') {// If the URI ends with '/', it's a directory request.
+    std::cout << "URI before check: " << uri << std::endl;
+    if (!uri.empty() && uri.back() == '/') { // If the URI ends with '/', it's a directory request.
+        std::cout << "Detected directory request for URI: " << uri << std::endl;
+        std::cout << "isDirectory: " << isDirectory << ", autoIndex: " << req.getAutoIndex() << std::endl;
         if (isDirectory && req.getAutoIndex()) {
-            // Generate directory listing using the template.
             std::string listing = generateDirectoryListing(filePath, uri);
+            std::cout << "Directory listing result: '" << listing << "' (size: " << listing.size() << ")" << std::endl;
             if (!listing.empty()) {
                 std::ostringstream responseStream;
                 responseStream << "HTTP/1.1 200 OK\r\n"
-                               << "Content-Length: " << listing.size() << "\r\n"
-                               << "Content-Type: text/html\r\n"
-                               << "\r\n"
-                               << listing;
+                            << "Content-Length: " << listing.size() << "\r\n"
+                            << "Content-Type: text/html\r\n"
+                            << "\r\n"
+                            << listing;
+                std::cout << "Returning directory listing response" << std::endl;
                 return responseStream.str();
             } else {
+                std::cout << "Directory listing empty, returning 500" << std::endl;
                 return ErrorHandler::getInstance().getErrorPage(500);
             }
         } else {
-            filePath += "index.html";// Autoindex is off => return the index page
+            filePath += "index.html";
+            std::cout << "Autoindex off, updated filePath: " << filePath << std::endl;
         }
     }
+    /*Get autoindex doesn't work. Meaby not correctly set for HttpRequest*/
+    // if (!uri.empty() && uri.back() == '/') {// If the URI ends with '/', it's a directory request.
+    //     if (isDirectory && req.getAutoIndex()) {
+    //         // Generate directory listing using the template.
+    //         std::string listing = generateDirectoryListing(filePath, uri);
+    //         if (!listing.empty()) {
+    //             std::ostringstream responseStream;
+    //             responseStream << "HTTP/1.1 200 OK\r\n"
+    //                            << "Content-Length: " << listing.size() << "\r\n"
+    //                            << "Content-Type: text/html\r\n"
+    //                            << "\r\n"
+    //                            << listing;
+    //             return responseStream.str();
+    //         } else {
+    //             return ErrorHandler::getInstance().getErrorPage(500);
+    //         }
+    //     } else {
+    //         filePath += "index.html";// Autoindex is off => return the index page
+    //     }
+    // }
     if (stat(filePath.c_str(), &st) != 0)// Check if the file exists.
         return ErrorHandler::getInstance().getErrorPage(404);
 
@@ -303,7 +362,7 @@ std::string Methods::mPost(HttpRequest &req) {
 }
 
 std::string Methods::mDelete(HttpRequest &req) {
-    std::cout << RB << "Trying to DELETE" << RES << std::endl;
+    std::cout << RB << "mDELETE" << RES << std::endl;
 
     req.display();
 

@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:23:00 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/01 16:52:06 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/13 13:30:13 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -28,7 +28,8 @@ private:
     std::string                         _body;
     std::string                         _fileName;
 
-    bool                                _autoIndex;
+    bool                                _autoIndex;/*Instead add auto index vector which has all the
+                                                    locations that autoindex is on for and set it in HttpParses*/
     std::string                         _root;
 
 public:
@@ -68,7 +69,7 @@ public:
     void setRoot(std::string root) {
     _root = root;
     }
-    
+
     void display() const {
     std::cout << "---- HttpRequest Display ----" << std::endl;
     std::cout << "Method: " << _method << std::endl;

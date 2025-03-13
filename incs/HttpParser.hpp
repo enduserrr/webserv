@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:10 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/16 12:49:22 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/13 11:53:22 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -28,9 +28,9 @@
 
 class HttpParser {
 private:
-    int                                 _state; 
-    
-    std::string                         _fullRequest; 
+    int                                 _state;
+
+    std::string                         _fullRequest;
     std::string                         _pendingData;   //used for storing rest of the chunk
     std::vector<HttpRequest>            _requests;
 
@@ -51,7 +51,7 @@ public:
 
     bool startsWithMethod(const std::string &input);
     bool isFullRequest(std::string &input);
-    bool readFullRequest(std::istream &input, ServerBlock &block);
+    // bool readFullRequest(std::istream &input, ServerBlock &block);
     bool parseRequest(ServerBlock &block);
     bool parseStartLine(std::string &line, HttpRequest &req);
 
