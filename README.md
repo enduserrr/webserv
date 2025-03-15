@@ -16,7 +16,6 @@
  * Delete button in listing.html doesn't work (Methods.cpp)
 
 * POST:
- * PDF & webp uploads causing errors
  * "new_" fix (currently adds to all)
  * Size limit for ups doesn't work
  * Error return doesn't work
@@ -27,8 +26,13 @@
 * Removing client properly after handling request | OK!
 * DELETE method | OK!
 * Multipart upload | OK!
+* Delete | OK!
 
 
 ## SUNDAY:
 * Fix "new_" prefix to only apply on duplicates
 
+## Issues
+* Setting auto index for locations does not work. Issue in setting locations into server block or
+looking for matching location in HttpParser (create request)
+* "/" doesn't go to index page (taken as directory listing)

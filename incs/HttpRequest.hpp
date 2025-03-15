@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:23:00 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/13 13:30:13 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/15 11:42:48 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <map>
+#include <vector>
 
 class HttpRequest {
 private:
@@ -28,6 +29,7 @@ private:
     std::string                         _body;
     std::string                         _fileName;
 
+    std::map<std::string, bool>         _indexLoc;
     bool                                _autoIndex;/*Instead add auto index vector which has all the
                                                     locations that autoindex is on for and set it in HttpParses*/
     std::string                         _root;
@@ -55,17 +57,34 @@ public:
     const std::map <std::string, std::string>&  getUriQuery() const;
     const std::map <std::string, std::string>&  getHeaders() const;
 
-    bool getAutoIndex() {
-        return _autoIndex;
+    /**
+     * @brief   Returns true if auto index in a given location (key) is set to true
+     */
+    bool    getIndexLoc(std::string key) {
+        std::cout << "Location key: " << key << std::endl;
+        if (_indexLoc[key] == true)
+            return true;
+        return false;
     }
+    // bool getAutoIndex() {
+    //     return _autoIndex;
+    // }
 
     std::string getRoot() {
         return _root;
     }
 
-    void setAutoIndex(bool b) {
-        _autoIndex = b;
+    /**
+     * @brief   Set auto index on/off (b) for a given key (location)
+     */
+    void setAutoIndex(std::string location, bool b) {
+        std::cout << "Index location set to: " << b << std::endl;
+        _indexLoc[location] = b;
     }
+
+    // void setAutoIndex(bool b) {
+    //     _autoIndex = b;
+    // }
     void setRoot(std::string root) {
     _root = root;
     }

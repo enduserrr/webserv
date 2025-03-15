@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/13 12:57:26 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/15 11:17:19 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -351,7 +351,7 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     for (size_t i = 0; i < locations.size(); i++) {
         // Use req.getUri() to check the request's URI against each location's path.
         if (req.getUri().find(locations[i].getPath()) == 0) {
-            req.setAutoIndex(locations[i].getAutoIndex());
+            req.setAutoIndex(locations[i].getPath(), locations[i].getAutoIndex());
             req.setRoot(locations[i].getRoot());
             matched = true;
             break;
@@ -359,7 +359,7 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     }
     // If no matching location, use the ServerBlock's global settings.
     if (!matched) {
-        req.setAutoIndex(block.getAutoIndex());
+        req.setAutoIndex(block.getRoot(), block.getAutoIndex());
         req.setRoot(block.getRoot());
     }
     _requests.push_back(req);

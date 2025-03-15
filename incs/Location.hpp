@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:44:35 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/06 08:59:44 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/15 10:38:23 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -23,10 +23,11 @@ private:
     std::string                 _index;
     std::string                 _root;
     std::string                 _uploadStore;
+    std::vector<std::string>    _indexLoc;
     bool                        _autoIndex;
     std::vector<std::string>    _allowedMethods;
     std::map<int, std::string>  _errorPages;
-    std::pair<int, std::string> _redirect; 
+    std::pair<int, std::string> _redirect;
 
 public:
     Location();
@@ -35,7 +36,7 @@ public:
     //getters
     std::string                 getPath() const;
     std::string&                getRoot();
-    bool&                       getAutoIndex(); 
+    bool&                       getAutoIndex();
     const std::string&          getIndex() const;
     const std::string&          getUploadStore() const;
     std::vector<std::string>    getAllowedMethods() const;
@@ -50,7 +51,7 @@ public:
     void                        setAutoIndex(const std::string &value);
     void                        addAllowedMethod(const std::string &method);
     void                        setErrorPage(int code, const std::string &path);
-    void                        setRedirect(int code, const std::string& url); 
+    void                        setRedirect(int code, const std::string& url);
 
 };
 
