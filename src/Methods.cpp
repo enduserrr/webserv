@@ -6,17 +6,19 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/15 11:54:56 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/15 16:42:25 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "../incs/Methods.hpp"
-#include <iostream>
-#include <fstream>
 #include <sstream>
 #include <sys/stat.h> //Stat
-#include <unistd.h> //Access<cstring>
 #include <cstring>
+#include <dirent.h> // For opendir, readdir, closedir
+#include <iostream> // For std::cout, std::cerr
+#include <fstream>  // For std::ifstream
+#include <unistd.h> // For rename
+#include <string>
 #define RB     "\033[1;91m"
 #define RES    "\033[0m"
 #define GC     "\033[3;90m"
@@ -24,10 +26,6 @@
 Methods::Methods() {}
 
 Methods::~Methods() {}
-
-#include <sstream>
-#include <dirent.h>
-#include <string>
 
 static void replaceAll(std::string &str, const std::string &from, const std::string &to) {
     size_t startPos = 0;
@@ -128,11 +126,11 @@ std::string Methods::mGet(HttpRequest &req) {
     }
     std::cout << "URI before check: " << uri << std::endl;
     std::cout << "Root: " << basePath << std::endl;
-    if (!uri.empty() && uri.back() == '/') { // If the URI ends with '/', it's a directory request.
+    if (!uri.empty() && uri.back() == '/') {// If the URI ends with '/', it's a directory request.
         std::cout << "Detected directory request for URI: " << uri << std::endl;
         // std::cout << "isDirectory: " << isDirectory << ", autoIndex: " << req.getAutoIndex() << std::endl;
         std::cout << "Auto index bool: " << req.getIndexLoc(basePath) << std::endl;
-        if (isDirectory && req.getIndexLoc(basePath) == true) {
+        if (isDirectory && req.getIndexLoc(basePath) == true && uri.length() >= 2) {
             std::string listing = generateDirectoryListing(filePath, uri);
             std::cout << "Directory listing result: '" << listing << "' (size: " << listing.size() << ")" << std::endl;
             if (!listing.empty()) {
@@ -177,10 +175,10 @@ std::string Methods::mPost(HttpRequest &req) {
     std::cout << RB << "mPOST" << RES << std::endl;
     std::string body = req.getBody();
     if (body.empty())
-        return "HTTP/1.1 Error: Empty body" + ErrorHandler::getInstance().getErrorPage(500);
-    // For a text upload, if body is just "text_data=" then it's empty.
-    if (body.empty() || (body.find("text_data=") == 0 && body.size() == std::string("text_data=").size())) {
-        // Load folder.html template to display error message at the top.
+        return "HTTP/1.1 500 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(500);
+
+    // Check for empty or invalid text upload
+    if (body.find("text_data=") == 0 && body.size() == std::string("text_data=").size()) {
         std::ifstream file("www/templates/folder.html");
         if (!file.is_open())
             return ErrorHandler::getInstance().getErrorPage(500);
@@ -189,7 +187,6 @@ std::string Methods::mPost(HttpRequest &req) {
         std::string htmlContent = buffer.str();
         file.close();
 
-        // Replace placeholder for error message (ensure folder.html contains {{error_message}})
         replaceAll(htmlContent, "{{error_message}}", "<p style='color:red;'>Upload failed! Add something to upload.</p>");
         std::ostringstream response;
         response << "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n" << htmlContent;
@@ -201,48 +198,68 @@ std::string Methods::mPost(HttpRequest &req) {
     if (uploadedFilePath.find("HTTP/1.1") == 0)
         return uploadedFilePath;
 
-    // Check for duplicate names.
+    // Check for duplicate names if a file name is provided
     if (!req.getFileName().empty()) {
-        // Assume uploads are stored in "./www/uploads/"
         std::string uploadDir = "./www/uploads/";
-        // Extract the current file name from the uploaded file path
-        size_t pos = uploadedFilePath.find_last_of("/");
-        std::string fileName = (pos == std::string::npos) ? uploadedFilePath : uploadedFilePath.substr(pos + 1);
+        std::string fileName = req.getFileName(); // Use the original file name from the request
         std::string fullPath = uploadDir + fileName;
-        std::ifstream checkFile(fullPath.c_str());
-/*         if (access(fullPath.c_str(), F_OK) == 0) { // file exists
+
+        // Check if the file already exists in the upload directory
+        bool fileExists = false;
+        DIR* dir = opendir(uploadDir.c_str());
+        if (!dir) {
+            std::cerr << "Failed to open upload directory " << uploadDir << ": " << strerror(errno) << std::endl;
+            return ErrorHandler::getInstance().getErrorPage(500);
+        }
+
+        struct dirent* entry;
+        while ((entry = readdir(dir)) != nullptr) {
+            std::string entryName = entry->d_name;
+            if (entryName == "." || entryName == "..") {
+                continue; // Skip . and ..
+            }
+            if (entryName == fileName) {
+                fileExists = true;
+                break;
+            }
+        }
+        closedir(dir);
+
+        // If file exists, rename the uploaded file
+        if (fileExists) {
             std::string baseName = fileName.substr(0, fileName.find_last_of('.'));
             std::string extension = fileName.substr(fileName.find_last_of('.'));
             int counter = 1;
             std::string newFileName, newFullPath;
             do {
-                newFileName = "new_" + baseName + "_" + std::to_string(counter) + extension;
+                newFileName = baseName + "_" + std::to_string(counter) + extension;
                 newFullPath = uploadDir + newFileName;
-                counter++;
-            } while (access(newFullPath.c_str(), F_OK) == 0);
 
-            if (rename(uploadedFilePath.c_str(), newFullPath.c_str()) == 0) {
-                uploadedFilePath = newFullPath;
-            } else {
-                std::cerr << "Failed to rename file" << std::endl;
+                // Check if the new name already exists
+                fileExists = false;
+                dir = opendir(uploadDir.c_str());
+                if (!dir) {
+                    std::cerr << "Failed to reopen upload directory: " << strerror(errno) << std::endl;
+                    return ErrorHandler::getInstance().getErrorPage(500);
+                }
+                while ((entry = readdir(dir)) != nullptr) {
+                    if (std::string(entry->d_name) == newFileName) {
+                        fileExists = true;
+                        break;
+                    }
+                }
+                closedir(dir);
+                counter++;
+            } while (fileExists);
+
+            if (rename(uploadedFilePath.c_str(), newFullPath.c_str()) != 0) {
+                std::cerr << "Failed to rename file from " << uploadedFilePath << " to " << newFullPath << ": " << strerror(errno) << std::endl;
                 return ErrorHandler::getInstance().getErrorPage(500);
             }
-        } */
-        if (checkFile.good()) {
-            checkFile.close();
-            std::string newFileName = "new_" + fileName;
-            std::string newFullPath = uploadDir + newFileName;
-            // Rename the file on disk
-            if (rename(uploadedFilePath.c_str(), newFullPath.c_str()) == 0) {
-                uploadedFilePath = newFullPath;
-            } else {
-                std::cerr << "Failed to rename file" << std::endl;
-                return ErrorHandler::getInstance().getErrorPage(500);
-            }
+            uploadedFilePath = newFullPath;
         }
     }
 
-    // Load the upload-success.html template.
     std::ifstream file("www/templates/upload_success.html");
     if (!file.is_open())
         return ErrorHandler::getInstance().getErrorPage(500);
@@ -251,7 +268,6 @@ std::string Methods::mPost(HttpRequest &req) {
     std::string htmlContent = buffer.str();
     file.close();
 
-    // Replace the placeholder with the uploaded file path.
     replaceAll(htmlContent, "{{file_path}}", uploadedFilePath);
 
     std::ostringstream uploadResponse;
@@ -264,8 +280,6 @@ std::string Methods::mDelete(HttpRequest &req) {
 
     req.display();
 
-    // Instead of using the whole URI, extract the 'file' query parameter.
-    // std::string fileParam = req.getUriQuery("file"); // Implement getQueryParameter() in HttpRequest
     std::map<std::string, std::string> queryMap = req.getUriQuery();
 
     std::string fileParam;
@@ -275,15 +289,12 @@ std::string Methods::mDelete(HttpRequest &req) {
             break;
         }
     }
-    if (fileParam.empty()) {
-    // File parameter missing; handle error
+    if (fileParam.empty()) {// File parameter missing; handle error
         return ErrorHandler::getInstance().getErrorPage(400);
     }
 
-    // Now use fileParam for processing the delete request
-    std::string basePath = "www/uploads/"; // Assuming uploads are stored here.
+    std::string basePath = "www/uploads/";
     std::string filePath = basePath + fileParam;
-        // std::string filePath = basePath + fileName;
 
     if (fileParam.empty()) {
         return ErrorHandler::getInstance().getErrorPage(400);
@@ -291,7 +302,6 @@ std::string Methods::mDelete(HttpRequest &req) {
 
     std::cout << "File to delete: " << filePath << std::endl;
 
-    // Verify that the filePath is indeed in the expected uploads directory.
     if (filePath.find("/uploads/") == std::string::npos) {
         std::cout << RB << "Incorrect folder" << RES << std::endl;
         return "HTTP/1.1 403\r\n\r\n" + ErrorHandler::getInstance().getErrorPage(403);
