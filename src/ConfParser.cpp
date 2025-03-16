@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:43:21 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/13 09:56:07 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/16 12:48:08 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -111,7 +111,7 @@ void ConfParser::parseLine(std::string &line, int &block){
     if (line.find('}') != std::string::npos && line.find_first_not_of('}') != std::string::npos)
         throw std::runtime_error(ERR CONF "undefined '}'");
     if (line.find(LOCATION) != std::string::npos && last != ('{'))
-        throw std::runtime_error(ERR CONF "False usage of location"); 
+        throw std::runtime_error(ERR CONF "False usage of location");
 }
 
 void ConfParser::blocks(int block) {
@@ -124,25 +124,25 @@ void ConfParser::blocks(int block) {
 //PARSING DATA FUNCTIONS
 void ConfParser::parseData() {
     int serverIndex = -1;
-    int serverLevel = 0; 
+    int serverLevel = 0;
     for (size_t i = 0; i < _fileLines.size(); ++i) {
         if (_fileLines[i] == "}") {
             continue ;
         }
         else if (_fileLines[i] == SERVER) {
             _servers.push_back(ServerBlock());
-            serverLevel = 0; 
+            serverLevel = 0;
             serverIndex ++;
             continue ;
-        } 
+        }
         else if (_fileLines[i].find(LOCATION) != std::string::npos) {
-            serverLevel = 1; 
+            serverLevel = 1;
             locationBlock(serverIndex, i);
         }
         else if (serverLevel == 0)
-            keyWordFinder(_fileLines[i], serverIndex);    
+            keyWordFinder(_fileLines[i], serverIndex);
         else
-            throw std::runtime_error("false config"); 
+            throw std::runtime_error("false config");
     }
 }
 
@@ -181,15 +181,15 @@ void ConfParser::locationBlock(int si, size_t &i) {
         else if (key == METHODS)
             parseMethods(ss, loc);
         else if (key == ROOT)
-            parseSingle(ss, loc, &Location::setPath);
+            parseSingle(ss, loc, &Location::setRoot);
         else if (key == AUTOI)
             parseSingle(ss, loc, &Location::setAutoIndex);
         else if (key == INDEX)
-            parseSingle(ss, loc, &Location::setIndex);  
+            parseSingle(ss, loc, &Location::setIndex);
         else if (key == USTORE)
             parseSingle(ss, loc, &Location::setUploadStore);
         else if (key == REDIR)
-            parseCodeValue(ss, loc, &Location::setRedirect);  
+            parseCodeValue(ss, loc, &Location::setRedirect);
         else if (key == ERR_PAGE)
             parseCodeValue(ss, loc, &Location::setErrorPage);
         else
@@ -200,7 +200,7 @@ void ConfParser::locationBlock(int si, size_t &i) {
 
 template <typename T>
 void ConfParser::parseCodeValue(std::istringstream &ss, T &obj, void (T::*setter)(int, const std::string&)) {
-    int code; 
+    int code;
     std::string url;
     if (!(ss >> code) || !(ss >> url))
         throw std::runtime_error(ERR CONF "unexpected line");
@@ -211,15 +211,15 @@ void ConfParser::parseCodeValue(std::istringstream &ss, T &obj, void (T::*setter
 
 template <typename T>
 void ConfParser::parseSingle(std::istringstream &ss, T &obj, void (T::*setter)(const std::string&)) {
-    std::string word; 
+    std::string word;
 
     if (!(ss >> word))
         throw std::runtime_error(ERR CONF "unexpected line");
     if (DEBUG == 1)
-        std::cout << word << std::endl; 
+        std::cout << word << std::endl;
     (obj.*setter)(word);
     if ((ss >> word)) {
-        std::cout << word << std::endl; 
+        std::cout << word << std::endl;
         throw std::runtime_error(ERR CONF "unexpected word: " + word);
     }
 }
@@ -281,13 +281,13 @@ void ConfParser::display() {
             std::cout << it->first << "            " << it->second << std::endl;
         }
 
-        std::cout << "\nlocation(s)    " << std::endl;
+        std::cout << RB << "\nlocation(s)    " << RES WB << std::endl;
         for (size_t j = 0; j < _servers[i].getLocations().size(); ++j) {
             std::cout << "path:          " << _servers[i].getLocations()[j].getPath() << std::endl;
             std::cout << "root:          " << _servers[i].getLocations()[j].getRoot() << std::endl;
             std::cout << "autoindex:     " << _servers[i].getLocations()[j].getAutoIndex() << std::endl;
             std::cout << "index:         " << _servers[i].getLocations()[j].getIndex() << std::endl;
-            std::cout << "upload store:  " << _servers[i].getLocations()[j].getUploadStore() << std::endl;
+            std::cout << "upload store:  " << _servers[i].getLocations()[j].getUploadStore() << RES << std::endl;
             // Print allowed methods
             std::cout << "return:        ";
             std::pair<int, std::string> pair = _servers[i].getLocations()[j].getRedirect();
@@ -353,13 +353,13 @@ void ConfParser::display() {
 
 
 // void ConfParser::parseRedirect(std::istringstream &ss, Location &loc){
-//     int code; 
+//     int code;
 //     std::string url;
 //     if (!(ss >> code) || !(ss >> url))
 //         throw std::runtime_error(ERR CONF "unexpected location line");
 //     if (code != 301 && code != 302)
 //         throw std::runtime_error(ERR CONF "redirection code");
-//     loc.setRedirect(code, url); 
+//     loc.setRedirect(code, url);
 //     if (ss >> url)
 //         throw std::runtime_error(ERR CONF "unexpected location line");
 // }
@@ -452,7 +452,7 @@ void ConfParser::display() {
 // }
 
 // void ConfParser::parseIndex(std::istringstream &ss, Location &loc) {
-//     std::string word; 
+//     std::string word;
 
 //     if (!(ss >> word))
 //         throw std::runtime_error(ERR CONF "unexpected index line");
@@ -462,7 +462,7 @@ void ConfParser::display() {
 // }
 
 // void ConfParser::parseUploadStore(std::istringstream &ss, Location &loc) {
-//     std::string word; 
+//     std::string word;
 
 //     if (!(ss >> word))
 //         throw std::runtime_error(ERR CONF "unexpected index line");

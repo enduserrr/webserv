@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 09:06:03 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/20 10:51:03 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/16 12:57:59 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -30,6 +30,14 @@
 #include "CgiHandler.hpp"
 #include "UploadHandler.hpp"
 #include "Types.hpp"
+
+#define GC      "\033[3;90m"
+#define WB      "\033[1;97m"
+#define GB      "\033[1;92m"
+#define RB      "\033[1;91m"
+#define RED     "\033[91m"
+#define GRAY    "\033[0;90m"
+#define RES     "\033[0m"
 
 //DEBUG
 #define DEBUG 1

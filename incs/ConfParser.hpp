@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ConfParser.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:22 by eleppala          #+#    #+#             */
-/*   Updated: 2025/01/28 18:45:24 by eleppala         ###   ########.fr       */
+/*   Updated: 2025/03/16 10:27:30 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef CONFPARSER_HPP
 #define CONFPARSER_HPP
@@ -17,8 +17,8 @@
 #include "ServerBlock.hpp"
 #include <vector>
 #include <sstream>
-#include <algorithm>  
-#include <cctype>     
+#include <algorithm>
+#include <cctype>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <limits.h>
@@ -38,16 +38,10 @@
 #define USTORE          "upload_store"
 
 
-//ERRORS 
-#define ERR RED         "error: " RESET
-#define FILE_V GRAY     "file validation: " RESET
-#define CONF GRAY       "configuration file: " RESET
-
-
-//COLORS
-#define RED             "\033[1;31m"
-#define GRAY            "\033[0;90m"
-#define RESET           "\033[0m"
+//ERRORS
+#define ERR RED         "error: " RES
+#define FILE_V GRAY     "file validation: " RES
+#define CONF GRAY       "configuration file: " RES
 
 //FILESIZES
 #define FILE_SIZE_MAX 1000000000
@@ -68,7 +62,7 @@ public:
     ConfParser(std::string filename);
     ~ConfParser();
 
-    //GETTERS 
+    //GETTERS
     std::vector<ServerBlock>& getServers();
 
 
@@ -77,7 +71,7 @@ public:
     void                    fileExists();
     void                    filePermissions();
     void                    fileExtension(const std::string &path, const std::string &ext);
-    void                    fileSize(); 
+    void                    fileSize();
 
 
     //FILE PARSING

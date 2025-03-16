@@ -26,6 +26,7 @@
 #include <map>
 #include <ctime>
 #include <functional> //std::function
+#include <dirent.h> // For opendir, readdir, closedir
 // #include <atomic>
 
 #endif

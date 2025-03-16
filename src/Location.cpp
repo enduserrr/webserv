@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:43:41 by eleppala          #+#    #+#             */
-/*   Updated: 2025/02/06 09:00:52 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/16 12:48:58 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -58,7 +58,7 @@ void Location::setPath(const std::string& path) {
     _path = path;
 }
 
-void Location::setRoot(std::string root) {
+void Location::setRoot(const std::string &root) {
     _root = root;
 }
 

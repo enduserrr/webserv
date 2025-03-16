@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:35:44 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/07 18:45:24 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/16 12:59:59 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -16,7 +16,7 @@
 #include "HttpRequest.hpp"
 #include "UploadHandler.hpp"
 #include "ErrorHandler.hpp"
-#include <string>
+#include "Webserver.hpp"
 
 class Methods {
     private:

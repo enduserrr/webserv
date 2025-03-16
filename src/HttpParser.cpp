@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/15 11:17:19 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/16 13:03:02 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -30,68 +30,15 @@ bool HttpParser::startsWithMethod(const std::string &input) {
     return (method == "GET" || method == "POST" || method == "DELETE");
 }
 
-/* bool HttpParser::isFullRequest(std::string &input) {
-    if (!startsWithMethod(input)) {
-        _state = 400;
-        input.clear();
-        return false;
-    }
-
-    size_t headerEnd = input.find("\r\n\r\n");
-    if (headerEnd == std::string::npos)
-        return false; // Header section not fully received
-
-    size_t bodyStart = headerEnd + 4;
-    size_t contentLengthPos = input.find("Content-Length:");
-    size_t contentLength = 0;
-
-    if (contentLengthPos != std::string::npos) {
-        size_t contentLengthEnd = input.find("\r\n", contentLengthPos);
-        if (contentLengthEnd == std::string::npos)
-            return false;
-
-        std::string contentLengthValue = input.substr(contentLengthPos + 15, contentLengthEnd - (contentLengthPos + 15));
-        try {
-            contentLength = std::stoi(contentLengthValue);
-        } catch (const std::exception &e) {
-            _state = 400;
-            input.clear();
-            return false;
-        }
-    }
-
-    if (startsWithMethod(input) && contentLength == 0 && input == "GET") {
-        _fullRequest = input.substr(0, bodyStart);
-    } else if (contentLength > 0) {
-        if (input.size() < bodyStart + contentLength)
-            return false;
-        _fullRequest = input.substr(0, bodyStart + contentLength);
-    } else {
-        _fullRequest = input.substr(0, bodyStart);
-    }
-
-    std::cout << "Processing request: " << _fullRequest << std::endl;
-
-    // Remove processed request from input
-    input = (bodyStart + contentLength <= input.size()) ? input.substr(bodyStart + contentLength) : "";
-
-    std::cout << "\n\nFULL REQUEST RECEIVED:\n" << _fullRequest << std::endl;
-    std::cout << "\nLEFT OVER INPUT:\n" << input << std::endl;
-
-    return true;
-} */
-
-
-//isfullreq:
-// jos paska requesti palauta false ja state 400 ala jatka
-// jos pelkka false (state 0) looppaa kunnes request taynnna
-
+/* Should be moved to ServerLoop as technically isn't a part of HttpParsing */
 bool HttpParser::isFullRequest(std::string &input) {
     if (!startsWithMethod(input)) {
         _state = 400;
         input.clear();
         return false;
     }
+    if (input.back() == '/') //Not sure if this is doing anything
+        return true;
     size_t headerEnd = input.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
         return false;
@@ -115,12 +62,11 @@ bool HttpParser::isFullRequest(std::string &input) {
             return false;
     }
     _fullRequest = input.substr(0, bodyStart + contentLength);
-    // std::cout << "\nONE FULL REQUEST:" << _fullRequest << std::endl;
     if (bodyStart + contentLength <= input.size())
         input = input.substr(bodyStart + contentLength);
     else
         input.clear();
-    std::cout << "\n\nLEFT OVER:" << input << std::endl;
+    std::cout << GC << "\n\nLEFT OVER:" << input << RES << std::endl;
     return true;
 }
 
@@ -142,7 +88,6 @@ bool HttpParser::parseRequest(ServerBlock &block) {
     body.assign(std::istreambuf_iterator<char>(ss), std::istreambuf_iterator<char>());
     parseBody(body, request);
     createRequest(block, request);
-    // std::cout<< "reg true" << std::endl;
     return true;
 }
 
@@ -276,11 +221,10 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     std::string emptyBody = "";
 
     if (contentType.empty()) {
-        // std::cerr << "Empty Body" << std::endl;
+        std::cerr << RED << "Empty Body" << RES << std::endl;
         req.setBody(emptyBody);
         return;
     }
-
     if (contentType == "application/x-www-form-urlencoded") {
         req.setBody(body);
     }
@@ -288,20 +232,17 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
         size_t boundaryPos = contentType.find("boundary=");
         if (boundaryPos != std::string::npos) {
             std::string boundary = "--" + contentType.substr(boundaryPos + 9);
-            std::cout << "Extracted boundary: " << boundary << std::endl;
+            std::cout << GC << "Extracted boundary: " << boundary << RES << std::endl;
         } else {
-            std::cerr << "Error: Missing boundary in Content-Type: " << contentType << std::endl;
+            std::cerr << RED << "Error: Missing boundary in Content-Type: " << RES << contentType << std::endl;
         }
-
         std::string boundary = "--" + contentType.substr(boundaryPos + 9);
         size_t dispositionPos = body.find("Content-Disposition: form-data;");
         if (dispositionPos == std::string::npos) {
-            std::cerr << "Error: Missing Content-Disposition header" << std::endl;
+            std::cerr << RED << "Error: Missing Content-Disposition header" << RES << std::endl;
             req.setBody(emptyBody);
             return;
-        }
-
-        // Extract filename
+        }// ↓↓↓ EXTRACT FILENAME ↓↓↓
         size_t filenamePos = body.find("filename=\"", dispositionPos);
         if (filenamePos != std::string::npos) {
             filenamePos += 10; // Move past "filename=\""
@@ -310,9 +251,7 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
                 std::string filename = body.substr(filenamePos, endPos - filenamePos);
                 req.setFileName(filename); // Store filename
             }
-        }
-
-        // Extract file content
+        }// ↓↓↓ Extract file content ↓↓↓
         size_t contentStart = body.find("\r\n\r\n", dispositionPos);
         if (contentStart != std::string::npos) {
             contentStart += 4; // Move past header section
@@ -349,7 +288,6 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     bool matched = false;
     std::vector<Location>& locations = block.getLocations();
     for (size_t i = 0; i < locations.size(); i++) {
-        // Use req.getUri() to check the request's URI against each location's path.
         if (req.getUri().find(locations[i].getPath()) == 0) {
             req.setAutoIndex(locations[i].getPath(), locations[i].getAutoIndex());
             req.setRoot(locations[i].getRoot());
@@ -357,8 +295,7 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
             break;
         }
     }
-    // If no matching location, use the ServerBlock's global settings.
-    if (!matched) {
+    if (!matched) {// If no matching location, use the ServerBlock's global settings.
         req.setAutoIndex(block.getRoot(), block.getAutoIndex());
         req.setRoot(block.getRoot());
     }
@@ -366,12 +303,10 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     return true;
 }
 
-/* Return all requests */
 std::vector<HttpRequest>& HttpParser::getRequests() {
     return _requests;
 }
 
-/* Return one request (FIFO) */
 HttpRequest& HttpParser::getPendingRequest() {
     return _requests.front();
 }
@@ -382,10 +317,9 @@ void HttpParser::removeRequest() {
     }
 }
 
-/* DEBUG */
 void HttpParser::display() const {
 
-    std::cout << "\n\n-- HTTP-PARSER DISPLAY --\n" << std::endl;
+    std::cout << GC << "\n\n-- HTTP-PARSER DISPLAY --\n" << std::endl;
 
     std::cout << "START-LINE" << std::endl;
     std::cout << "method: " << _method << std::endl;
@@ -403,5 +337,5 @@ void HttpParser::display() const {
     for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it) {
         std::cout << std::left << std::setw(15) << it->first << "|" << it->second << std::endl;
     }
-    std::cout << "\nBODY\n" << _body << std::endl;
+    std::cout << "\nBODY\n" << _body << RES << std::endl;
 }

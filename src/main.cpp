@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 11:30:12 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/01 17:02:04 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/16 13:03:15 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -35,6 +35,7 @@ int main(int ac, char **av) {
     try {
         configParse.fileValidation();
         configParse.parseFile();
+        // configParse.display();
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
         std::cerr << "\nShutting down program..." << std::endl;
