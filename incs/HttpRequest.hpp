@@ -29,7 +29,8 @@ private:
     std::string                         _body;
     std::string                         _fileName;
 
-    std::map<std::string, bool>         _indexLoc;
+    // std::map<std::string, bool>         _indexLoc;
+    bool                                _autoIndex;
     std::string                         _root;
 
 public:
@@ -54,16 +55,19 @@ public:
     const std::string&                          getFileName() const;
     const std::map <std::string, std::string>&  getUriQuery() const;
     const std::map <std::string, std::string>&  getHeaders() const;
+    bool                                        getAutoIndex() {
+        return _autoIndex;
+    }
 
     /**
      * @brief   Returns true if auto index in a given location (key) is set to true
      */
-    bool    getIndexLoc(std::string key) {
-        std::cout << "Location key: " << key << std::endl;
-        if (_indexLoc[key] == true)
-            return true;
-        return false;
-    }
+    // bool    getIndexLoc(std::string key) {
+    //     std::cout << "Location key: " << key << std::endl;
+    //     if (_indexLoc[key] == true)
+    //         return true;
+    //     return false;
+    // }
 
     std::string getRoot() {
         return _root;
@@ -72,13 +76,15 @@ public:
     /**
      * @brief   Set auto index on/off (b) for a given key (location)
      */
-    void setAutoIndex(std::string location, bool b) {
+    void setAutoIndex(bool b) {
         std::cout << "Index location set to: " << b << std::endl;
-        _indexLoc[location] = b;
+        // _indexLoc["/uploads"] = b;
+        
+        _autoIndex = b;
     }
 
-    void setRoot(std::string root) {
-    _root = root;
+    void setRoot(const std::string &root) {
+        _root = root;
     }
 
     void display() const {

@@ -37,8 +37,8 @@ bool HttpParser::isFullRequest(std::string &input) {
         input.clear();
         return false;
     }
-    if (input.back() == '/') //Not sure if this is doing anything
-        return true;
+    // if (input.back() == '/') //Not sure if this is doing anything --UPDATE: now im sure that it breaked part of the .pdf file requests 
+    //     return true;
     size_t headerEnd = input.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
         return false;
@@ -124,7 +124,7 @@ bool HttpParser::parseMethod(std::istringstream &ss, HttpRequest &req) {
         return false;
     }
     if (word != "GET" && word != "POST" && word != "DELETE") {
-        _state = 405; //METHOD NOT ALLOWED
+        _state = 400; //METHOD NOT ALLOWED
         return false;
     }
     req.setMethod(word);
@@ -139,22 +139,45 @@ bool HttpParser::parseUri(std::istringstream &ss, HttpRequest &req) {
         _state = 400; //BADREQ
         return false;
     }
-    for (size_t i = 0; i < word.length(); i++) {
-        if(word[i] == '?') {
-            if (!parseUriQuery(word.substr(i + 1), req)) {
-                _state = 400; //BADREQ
+    std::string::iterator it = word.begin();
+    for (; it != word.end(); ++it) {
+        if (*it == '?') {
+            if (!parseUriQuery(std::string(it + 1, word.end()), req)) {
+                _state = 400; // BAD REQUEST
                 return false;
-            } else {
-                break ;
             }
-
+            break;
+        } else if (*it == '%' && std::distance(it, word.end()) > 2) {
+            std::string hexStr = std::string(it + 1, it + 3);
+            char decodedChar = static_cast<char>(std::stoi(hexStr, nullptr, 16));
+            temp += decodedChar;
+            it += 2;
+        } else {
+            temp += *it;
         }
-        temp += word[i];
     }
     if (!isValidUri(temp))
         return false;
     req.setUri(temp);
     return true;
+}
+
+std::string decodePercentEncoding(const std::string &str) {
+    std::string decoded;
+    for (size_t i = 0; i < str.length(); ++i) {
+        if (str[i] == '%' && i + 2 < str.length()) {
+            if (std::isxdigit(str[i + 1]) && std::isxdigit(str[i + 2])) {
+                std::string hexStr = str.substr(i + 1, 2);
+                unsigned char decodedChar = static_cast<unsigned char>(std::stoi(hexStr, nullptr, 16));
+                decoded += decodedChar;
+                i += 2;
+                continue;
+            }
+        }
+        decoded += str[i];
+    }
+    std::cout << "decode: " << decoded << std::endl;
+    return decoded;
 }
 
 bool HttpParser::parseUriQuery(const std::string &query, HttpRequest &req) {
@@ -167,8 +190,8 @@ bool HttpParser::parseUriQuery(const std::string &query, HttpRequest &req) {
             return false;
         size_t pos = token.find('=');
         if (pos != std::string::npos) {
-            std::string key = token.substr(0, pos);
-            std::string value = token.substr(pos + 1);
+            std::string key = decodePercentEncoding(token.substr(0, pos));
+            std::string value = decodePercentEncoding(token.substr(pos + 1));
             if (key.empty())
                 return false;
             req.setUriQuery(key, value);
@@ -285,20 +308,27 @@ void HttpParser::whiteSpaceTrim(std::string &str) {
 }
 
 bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
-    bool matched = false;
-    std::vector<Location>& locations = block.getLocations();
-    for (size_t i = 0; i < locations.size(); i++) {
-        if (req.getUri().find(locations[i].getPath()) == 0) {
-            req.setAutoIndex(locations[i].getPath(), locations[i].getAutoIndex());
-            req.setRoot(locations[i].getRoot());
-            matched = true;
-            break;
-        }
-    }
-    if (!matched) {// If no matching location, use the ServerBlock's global settings.
-        req.setAutoIndex(block.getRoot(), block.getAutoIndex());
+    // bool matched = false;
+
+    req.setAutoIndex(block.getAutoIndex(req.getUri()));
+    try {
+        req.setRoot(block.getLocation(req.getUri()).getRoot());
+    } catch (const std::exception &e) {    
         req.setRoot(block.getRoot());
     }
+    // std::vector<Location>& locations = block.getLocations();
+    // for (size_t i = 0; i < locations.size(); i++) {
+    //     if (req.getUri().find(locations[i].getPath()) == 0) {
+    //         req.setAutoIndex(locations[i].getPath(), locations[i].getAutoIndex());
+    //         req.setRoot(locations[i].getRoot());
+    //         matched = true;
+    //         break;
+    //     }
+    // }
+    // if (!matched) {// If no matching location, use the ServerBlock's global settings.
+    //     req.setAutoIndex(block.getRoot(), block.getAutoIndex());
+    //     req.setRoot(block.getRoot());
+    // }
     _requests.push_back(req);
     return true;
 }

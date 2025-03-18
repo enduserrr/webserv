@@ -258,55 +258,55 @@ std::string removeComments(const std::string &line){
 
 
 // Debug
-void ConfParser::display() {
-    std::cout << "\n\nParser information\n" << std::endl;
-    std::cout << "File name: " <<_fileName << std::endl;
-    std::cout << "File size: "<<_fileSize << std::endl;
-    std::cout << "Server blocks: "<<_serverBlocks << std::endl;
-    std::cout << "\nServer(s): " << std::endl;
-    for (size_t i = 0; i < _servers.size(); ++i) {
-        std::cout << "server_name:   " << _servers[i].getServerName() << std::endl;
-        std::cout << "root:          " << _servers[i].getRoot() << std::endl;
-        std::cout << "listen:        ";
-        for (size_t p = 0; p < _servers[i].getPorts().size(); p ++){
-            std::cout << _servers[i].getPorts()[p] << " ";
-        }
-        std::cout << std::endl;
-        std::cout << "max_body_size: " << _servers[i].getBodySize() << std::endl;
-        std::cout << "autoindex:     " << _servers[i].getAutoIndex() << std::endl;
-        std::cout << "error_page(s): " << std::endl;
-        for (std::map<int, std::string>::const_iterator
-            it = _servers[i].getErrorPages().begin();
-            it != _servers[i].getErrorPages().end(); ++it) {
-            std::cout << it->first << "            " << it->second << std::endl;
-        }
+// void ConfParser::display() {
+//     std::cout << "\n\nParser information\n" << std::endl;
+//     std::cout << "File name: " <<_fileName << std::endl;
+//     std::cout << "File size: "<<_fileSize << std::endl;
+//     std::cout << "Server blocks: "<<_serverBlocks << std::endl;
+//     std::cout << "\nServer(s): " << std::endl;
+//     for (size_t i = 0; i < _servers.size(); ++i) {
+//         std::cout << "server_name:   " << _servers[i].getServerName() << std::endl;
+//         std::cout << "root:          " << _servers[i].getRoot() << std::endl;
+//         std::cout << "listen:        ";
+//         for (size_t p = 0; p < _servers[i].getPorts().size(); p ++){
+//             std::cout << _servers[i].getPorts()[p] << " ";
+//         }
+//         std::cout << std::endl;
+//         std::cout << "max_body_size: " << _servers[i].getBodySize() << std::endl;
+//         std::cout << "autoindex:     " << _servers[i].getAutoIndex() << std::endl;
+//         std::cout << "error_page(s): " << std::endl;
+//         for (std::map<int, std::string>::const_iterator
+//             it = _servers[i].getErrorPages().begin();
+//             it != _servers[i].getErrorPages().end(); ++it) {
+//             std::cout << it->first << "            " << it->second << std::endl;
+//         }
 
-        std::cout << RB << "\nlocation(s)    " << RES WB << std::endl;
-        for (size_t j = 0; j < _servers[i].getLocations().size(); ++j) {
-            std::cout << "path:          " << _servers[i].getLocations()[j].getPath() << std::endl;
-            std::cout << "root:          " << _servers[i].getLocations()[j].getRoot() << std::endl;
-            std::cout << "autoindex:     " << _servers[i].getLocations()[j].getAutoIndex() << std::endl;
-            std::cout << "index:         " << _servers[i].getLocations()[j].getIndex() << std::endl;
-            std::cout << "upload store:  " << _servers[i].getLocations()[j].getUploadStore() << RES << std::endl;
-            // Print allowed methods
-            std::cout << "return:        ";
-            std::pair<int, std::string> pair = _servers[i].getLocations()[j].getRedirect();
-            std::cout << pair.first <<" "<< pair.second << std::endl;
-            std::cout << "Methods:       ";
-            for (size_t k = 0; k < _servers[i].getLocations()[j].getAllowedMethods().size(); ++k) {
-                std::cout << _servers[i].getLocations()[j].getAllowedMethods()[k] << " ";
-            }
-            std::cout << "\nerror_page(s): " << std::endl;
-            for (std::map<int, std::string>::const_iterator
-                it = _servers[i].getLocations()[j].getErrorPages().begin();
-                it != _servers[i].getLocations()[j].getErrorPages().end(); ++it) {
-                std::cout << it->first << "            " << it->second << std::endl;
-        }
+//         std::cout << RB << "\nlocation(s)    " << RES WB << std::endl;
+//         for (size_t j = 0; j < _servers[i].getLocations().size(); ++j) {
+//             std::cout << "path:          " << _servers[i].getLocations()[j].getPath() << std::endl;
+//             std::cout << "root:          " << _servers[i].getLocations()[j].getRoot() << std::endl;
+//             std::cout << "autoindex:     " << _servers[i].getLocations()[j].getAutoIndex() << std::endl;
+//             std::cout << "index:         " << _servers[i].getLocations()[j].getIndex() << std::endl;
+//             std::cout << "upload store:  " << _servers[i].getLocations()[j].getUploadStore() << RES << std::endl;
+//             // Print allowed methods
+//             std::cout << "return:        ";
+//             std::pair<int, std::string> pair = _servers[i].getLocations()[j].getRedirect();
+//             std::cout << pair.first <<" "<< pair.second << std::endl;
+//             std::cout << "Methods:       ";
+//             for (size_t k = 0; k < _servers[i].getLocations()[j].getAllowedMethods().size(); ++k) {
+//                 std::cout << _servers[i].getLocations()[j].getAllowedMethods()[k] << " ";
+//             }
+//             std::cout << "\nerror_page(s): " << std::endl;
+//             for (std::map<int, std::string>::const_iterator
+//                 it = _servers[i].getLocations()[j].getErrorPages().begin();
+//                 it != _servers[i].getLocations()[j].getErrorPages().end(); ++it) {
+//                 std::cout << it->first << "            " << it->second << std::endl;
+//         }
 
-        std::cout << "\n" << std::endl;
-        }
-    }
-}
+//         std::cout << "\n" << std::endl;
+//         }
+//     }
+// }
 
 
 

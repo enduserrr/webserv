@@ -98,6 +98,7 @@ std::string Methods::mGet(HttpRequest &req) {
             uri = "/uploads/";
         }
     }
+    
     std::string basePath = req.getRoot();
     std::string filePath = basePath + uri;
     struct stat st;
@@ -117,7 +118,7 @@ std::string Methods::mGet(HttpRequest &req) {
 
     // ↓↓↓ DIRECTORY REQUEST ↓↓↓
     if (!uri.empty() && uri.back() == '/') {
-        if (isDirectory && req.getIndexLoc(uri) == true && uri.length() >= 2) {
+        if (isDirectory && req.getAutoIndex() == true && uri.length() >= 2) {
             std::string listing = generateDirectoryListing(filePath, uri);
             if (!listing.empty()) {
                 std::ostringstream responseStream;
@@ -277,6 +278,13 @@ std::string Methods::mDelete(HttpRequest &req) {
     }
 
     std::cout << GC "File to delete: " << filePath << RES << std::endl;
+
+    //space is replaced as "%20" in request --> replace %20 for space
+    size_t pos = filePath.find("%20");
+    while (pos != std::string::npos) {
+        filePath.replace(pos, 3, " "); 
+        pos = filePath.find("%20", pos + 1); 
+    }
 
     if (filePath.find("/uploads/") == std::string::npos) {
         std::cout << RB << "Incorrect folder" << RES << std::endl;

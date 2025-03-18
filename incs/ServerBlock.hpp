@@ -28,7 +28,7 @@ private:
     bool                        _autoIndex;  //1 true - 0 false
     size_t                      _bodySize;
     std::vector<int>            _ports;
-    std::vector<Location>       _locations;
+    std::map<std::string, Location> _locations;
     std::map<int, std::string>  _errorPages; //key value 404 - 404.html --> _errorPages[404] = 404.html
     
 
@@ -41,9 +41,9 @@ public:
     std::string&                getRoot();
     std::vector<int>            getPorts();
     const std::string&          getIndex() const;
-    bool&                       getAutoIndex();
+    bool&                       getAutoIndex(const std::string &key);
     size_t                      getBodySize() const;
-    std::vector<Location>&      getLocations();
+    Location&                   getLocation(const std::string &key);
     std::map<int, std::string>& getErrorPages();
 
     // Setters
