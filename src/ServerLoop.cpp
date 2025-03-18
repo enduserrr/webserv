@@ -186,13 +186,13 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         removeClient(clientSocket);
     } else { //Hard response that shows the HATERS who's who and so forth.
         std::cout<< "PARSER return state: " << parser.getState() << std::endl;
-        std::string response =  "HTTP/1.1" + std::to_string(parser.getState()) + "\r\n"
+        std::string respons =  "HTTP/1.1" + std::to_string(parser.getState()) + "\r\n"
                                 "Content-Type: text/html\r\n"
                                 "Content-Length: 52\r\n"
                                 "Connection: close\r\n"
                                 "\r\n"
                                 "<html><body><h1> request return state: " + std::to_string(parser.getState()) + "</h1></body></html>";
-        sendResponse(clientSocket, response);
+        sendResponse(clientSocket, respons);
         removeClient(clientSocket);
     }
 }

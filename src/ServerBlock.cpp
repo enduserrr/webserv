@@ -38,7 +38,11 @@ const std::string& ServerBlock::getIndex() const {
     return _index;
 }
 
-bool& ServerBlock::getAutoIndex() {
+bool& ServerBlock::getAutoIndex(const std::string &key) {
+    if (key != "") {
+        if (_locations.find(key) != _locations.end())
+            return getLocation(key).getAutoIndex();
+    }
     return _autoIndex;
 }
 
@@ -46,8 +50,14 @@ size_t ServerBlock::getBodySize() const {
     return _bodySize;
 }
 
-std::vector<Location>& ServerBlock::getLocations() {
-    return _locations;
+// std::map<std::string, Location>& ServerBlock::getLocations() {
+//     return _locations;
+// }
+
+Location& ServerBlock::getLocation(const std::string &key) {
+    if (_locations.find(key) == _locations.end())
+        throw std::runtime_error("unknown key");     
+    return _locations[key];
 }
 
 std::map<int, std::string>&  ServerBlock::getErrorPages() {
@@ -105,7 +115,7 @@ void ServerBlock::setBodySize(const std::string &value) {
 }
 
 void ServerBlock::setLocation(const Location& loc){
-     _locations.push_back(loc);
+     _locations[loc.getPath()] = loc;
 }
 
 void ServerBlock::setErrorPage(int code, const std::string &path) {
