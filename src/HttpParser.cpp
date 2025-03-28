@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/16 13:03:02 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/28 11:29:16 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -37,7 +37,7 @@ bool HttpParser::isFullRequest(std::string &input) {
         input.clear();
         return false;
     }
-    // if (input.back() == '/') //Not sure if this is doing anything --UPDATE: now im sure that it breaked part of the .pdf file requests 
+    // if (input.back() == '/') //Not sure if this is doing anything --UPDATE: now im sure that it breaked part of the .pdf file requests
     //     return true;
     size_t headerEnd = input.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
@@ -239,6 +239,7 @@ bool HttpParser::parseHeader(std::string &line, HttpRequest &req) {
 
 void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     Types types; // Use the centralized Types class
+    // Types& typesInstance = Types::getInstance();
     std::string contentType = req.getHeader("Content-Type");
     std::cout << RB << contentType << RES << std::endl;
     std::string emptyBody = "";
@@ -313,7 +314,7 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     req.setAutoIndex(block.getAutoIndex(req.getUri()));
     try {
         req.setRoot(block.getLocation(req.getUri()).getRoot());
-    } catch (const std::exception &e) {    
+    } catch (const std::exception &e) {
         req.setRoot(block.getRoot());
     }
     // std::vector<Location>& locations = block.getLocations();

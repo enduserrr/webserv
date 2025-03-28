@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/28 09:35:57 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/28 11:46:18 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -131,27 +131,37 @@ std::string Methods::mGet(HttpRequest &req) {
                 return responseStream.str();
             } else {
                 std::cout << "Directory listing empty, returning 500" << std::endl;
-                return ErrorHandler::getInstance().getErrorPage(500);
+                return "HTTP/1.1 500 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(500);
             }
         } else { // If request is only "/" return index.html
-            filePath += "index.html";
+            filePath = "index.html";
             std::cout << "Autoindex off, updated filePath: " << filePath << std::endl;
         }
     }
     if (stat(filePath.c_str(), &st) != 0)// Check if the file exists
-        return ErrorHandler::getInstance().getErrorPage(404);
+        return "HTTP/1.1 404 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(404);
 
     std::ifstream file(filePath.c_str(), std::ios::in | std::ios::binary);// Open file for reading in binary
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Make a map of files to fetch the location from
     if (!file)
-        return ErrorHandler::getInstance().getErrorPage(500);
+        return "HTTP/1.1 500 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(500);
     std::ostringstream ss;
     ss << file.rdbuf();
     std::string fileContent = ss.str();
+    file.close(); // close the fstream
 
     std::ostringstream responseStream;// Build response
+    Types types; // Create instance (consider making this a member or singleton if performance matters)
+
+    // ↓↓↓ Use filePath to determine the MIME type ↓↓↓
+    std::string mimeType = types.getMimeType(filePath);
+
+    std::cout << GC << "Sent to MIME Check: " << filePath << std::endl;
+    std::cout << "Type Result: " << mimeType << RES << std::endl;
+
     responseStream << "HTTP/1.1 200 OK\r\n"
                    << "Content-Length: " << fileContent.size() << "\r\n"
-                   << "Content-Type: text/html\r\n"
+                   << "Content-Type: " << mimeType << "\r\n" // Use the determined type
                    << "\r\n"
                    << fileContent;
     return responseStream.str();
@@ -164,7 +174,7 @@ std::string Methods::mPost(HttpRequest &req) {
 
     // ↓↓↓ CHECK FOR EMPTY OR INVAL UPLOAD ↓↓↓
     if (body.find("text_data=") == 0 && body.size() == std::string("text_data=").size()) {
-        std::ifstream file("www/folder.html");
+        std::ifstream file("www/listing.html");
         if (!file.is_open())
             return ErrorHandler::getInstance().getErrorPage(500);
         std::stringstream buffer;

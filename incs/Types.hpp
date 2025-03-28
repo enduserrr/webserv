@@ -19,12 +19,17 @@ class Types {
     private:
         std::map<std::string, std::string>  _mimeTypes;
         std::vector<std::string>            _contentTypes; //Change to std::list
-
     public:
         Types();
         ~Types();
-
-        // bool validMime(const std::string &extencion);
+        // Types& Types::getInstance() {
+        // // Meyers' Singleton:
+        // // The 'instance' is created only the *first* time getInstance() is called.
+        // // Its initialization is guaranteed to be thread-safe in C++11 and later.
+        // // It will be automatically destroyed when the program terminates.
+        // static Types instance;
+        // return instance;
+        // }
         std::string getMimeType(const std::string &extension) const;
         bool isValidMime(const std::string &extension) const;
         bool isValidContent(const std::string &contentType) const;

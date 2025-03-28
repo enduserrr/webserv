@@ -2,28 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>POST Request Test</title>
+  <title>UPLOAD STUFF</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <h1>UPLOAD STUFF</h1>
-    <h3>FILE UPLOAD</h3>
+    <h2>SAVE SOMETHING FOR LATER</h2>
     <div class="form-container">
+      <h3>FILE UPLOAD</h3>
       <form action="/upload" method="POST" enctype="multipart/form-data">
-        <p>Select a file to upload:</p>
         <input type="file" name="file" required>
         <input type="submit" value="Upload File">
       </form>
     </div>
-    <h3>TEXT UPLOAD</h3>
+
     <div class="form-container">
+      <h3>TEXT UPLOAD</h3>
       <form action="/submit-text" method="POST">
-        <p>Enter some text:</p>
         <textarea name="text" rows="4" placeholder="Share something..." required></textarea>
         <input type="submit" value="Submit!">
       </form>
     </div>
+  </div>
+  <div class="button-container">
+    <a href="/index.html" role="button">HOME</a>
+    <a href="/uploads/" role="button">FILES</a>
   </div>
 </body>
 </html>
