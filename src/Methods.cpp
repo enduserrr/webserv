@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/16 13:01:55 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/28 09:35:57 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -25,7 +25,7 @@ static void replaceAll(std::string &str, const std::string &from, const std::str
 }
 
 std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
-    std::ifstream templateFile("www/templates/listing.html");
+    std::ifstream templateFile("www/listing.html");
 
     // ↓↓↓ FALLBACK FILE IF TEMPLATE'S MISSING ↓↓↓
     if (!templateFile) {
@@ -98,7 +98,7 @@ std::string Methods::mGet(HttpRequest &req) {
             uri = "/uploads/";
         }
     }
-    
+
     std::string basePath = req.getRoot();
     std::string filePath = basePath + uri;
     struct stat st;
@@ -164,7 +164,7 @@ std::string Methods::mPost(HttpRequest &req) {
 
     // ↓↓↓ CHECK FOR EMPTY OR INVAL UPLOAD ↓↓↓
     if (body.find("text_data=") == 0 && body.size() == std::string("text_data=").size()) {
-        std::ifstream file("www/templates/folder.html");
+        std::ifstream file("www/folder.html");
         if (!file.is_open())
             return ErrorHandler::getInstance().getErrorPage(500);
         std::stringstream buffer;
@@ -242,7 +242,7 @@ std::string Methods::mPost(HttpRequest &req) {
         }
     }
 
-    std::ifstream file("www/templates/upload_success.html");
+    std::ifstream file("www/upload_success.html");
     if (!file.is_open())
         return ErrorHandler::getInstance().getErrorPage(500);
     std::stringstream buffer;
@@ -282,8 +282,8 @@ std::string Methods::mDelete(HttpRequest &req) {
     //space is replaced as "%20" in request --> replace %20 for space
     size_t pos = filePath.find("%20");
     while (pos != std::string::npos) {
-        filePath.replace(pos, 3, " "); 
-        pos = filePath.find("%20", pos + 1); 
+        filePath.replace(pos, 3, " ");
+        pos = filePath.find("%20", pos + 1);
     }
 
     if (filePath.find("/uploads/") == std::string::npos) {

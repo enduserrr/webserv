@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:21:14 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/01 15:43:34 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/28 09:35:38 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -26,7 +26,7 @@ std::string ErrorHandler::loadFileContent(const std::string &filePath) {
 }
 
 ErrorHandler::ErrorHandler() {
-    std::string baseDir = "www/templates/error_pages/";
+    std::string baseDir = "www/error_pages/";
 
     _errorPages[400] = loadFileContent(baseDir + "400.html");
     _errorPages[403] = loadFileContent(baseDir + "403.html");

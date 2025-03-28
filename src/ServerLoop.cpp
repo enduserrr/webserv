@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/13 12:59:02 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/28 07:44:42 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -184,7 +184,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         std::string response = Router().routeRequest(_clients[clientSocket].request, clientSocket);
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
-    } else { //Hard response that shows the HATERS who's who and so forth.
+    } else {
         std::cout<< "PARSER return state: " << parser.getState() << std::endl;
         std::string respons =  "HTTP/1.1" + std::to_string(parser.getState()) + "\r\n"
                                 "Content-Type: text/html\r\n"
@@ -212,11 +212,11 @@ void ServerLoop::startServer() {
     _startUpTime = time(nullptr);
 
     while (_run) {
-        if (hasTimedOut()) {
-            std::cout << "No activity for 10 seconds. Exiting server." << std::endl;
-            closeServer();
-            return;
-        }
+        // if (hasTimedOut()) {
+        //     std::cout << "No activity for 10 seconds. Exiting server." << std::endl;
+        //     closeServer();
+        //     return;
+        // }
         int pollResult = poll(_pollFds.data(), _pollFds.size(), 5000);
         if (pollResult < 0) {
             std::cerr << RB "Error:" RES " in poll()" << std::endl;

@@ -1,0 +1,141 @@
+/* General Body Styles */
+body {
+    background-color: #f9f9f9; /* Slightly off-white background */
+    font-family: Helvetica, sans-serif;
+    color: #333; /* Dark grey font */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+  }
+
+  /* Container for centered content */
+  .container {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+  }
+
+  /* Heading Styles */
+  h1 {
+    font-family: Helvetica, sans-serif;
+    font-size: 65px;
+    margin-bottom: 10px;
+    letter-spacing: 0.25cap;
+  }
+
+  h2 {
+    margin-bottom: 24px;
+    margin-top: 80px;
+    font-weight: 500;
+    letter-spacing: 0.075cap;
+    line-height: 1.5;
+  }
+
+  h3 {
+    margin-bottom: 24px;
+    margin-top: 40px;
+    font-weight: 700;
+    letter-spacing: 0.05cap;
+    line-height: 1;
+    font-size: 20px;
+    text-align: left;
+  }
+
+  /* Paragraph Styles */
+  p {
+    font-size: 20px;
+    margin-bottom: 40px;
+    line-height: 1;
+    font-weight: 400;
+    letter-spacing: 0.025cap;
+    text-align: center;
+  }
+
+  .button-container a {
+    display: inline-block; /* Ensures proper layout and margin application */
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-transform: uppercase;
+    background-color: #f9f9f9;
+    color: #333; /* TEXT COLOR */
+    cursor: pointer;
+    border: 3px solid; /* Define width and style */
+    border-color: #353032; /* <<< BORDER COLOR - Explicitly set border color (can be same or different from shadow) */
+
+    /* Add the SHADOW COLOR (#a23c3c in this case) explicitly to each layer */
+    box-shadow: 1px 1px 0px 0px #353032,
+                2px 2px 0px 0px #353032,
+                3px 3px 0px 0px #353032,
+                4px 4px 0px 0px #353032,
+                5px 5px 0px 0px #353032; /* <<< SHADOW COLOR */
+
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-top: 50px; /* Added from previous rule for spacing */
+}
+
+/* Optional: You might want a different border/shadow color on hover/active */
+.button-container a:hover {
+  /* Example: Slightly different shadow/border on hover */
+  border-color: #8b3333;
+  box-shadow: 1px 1px 0px 0px #8b3333,
+              2px 2px 0px 0px #8b3333,
+              3px 3px 0px 0px #8b3333,
+              4px 4px 0px 0px #8b3333,
+              5px 5px 0px 0px #8b3333;
+  background-color: #8d5151; /* Example background on hover */
+  color: #333; /* Example text color change on hover */
+}
+
+.button-container a:active {
+    box-shadow: 0px 0px 0px 0px; /* Shadow disappears on active */
+    top: 5px;
+    left: 5px;
+    /* Keep border color consistent on active, or change if desired */
+    border-color: #a23c3c;
+}
+  /* Responsive Adjustments for Buttons */
+@media (min-width: 768px) {
+    .button-container a {
+        padding: 0.25em 0.75em;
+    }
+}
+
+.form-container {
+    margin-bottom: 40px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #fff;
+  }
+  input[type="file"],
+  input[type="text"],
+  textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  input[type="submit"] {
+    padding: 10px 20px;
+    border: 2px solid #333;
+    background-color: transparent;
+    color: #333;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  input[type="submit"]:hover {
+    background-color: #e3d5d5;
+  }

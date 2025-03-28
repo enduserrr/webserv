@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/04 08:30:44 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/28 07:34:41 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -20,7 +20,7 @@
 
 UploadHandler::UploadHandler() {
     // Create "uploads" dir with rwxr-xr-x permissions
-    mkdir("./uploads", 0755);
+    // mkdir("./uploads", 0755);
 }
 
 UploadHandler::~UploadHandler() {}
@@ -63,6 +63,7 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
             filePath = "./www/uploads/upload_" + std::to_string(std::time(nullptr)) + ".txt";
         std::ofstream ofs(filePath.c_str(), std::ios::binary);
         if (!ofs) {
+            std::cout << "Error 500 A" << std::endl;
             return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                 + ErrorHandler::getInstance().getErrorPage(500);
         }
@@ -96,6 +97,7 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
         filePath = "./www/uploads/" + filename;
         std::ofstream ofs(filePath.c_str(), std::ios::binary);
         if (!ofs) {
+            std::cout << "Error 500 B" << std::endl;
             return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                 + ErrorHandler::getInstance().getErrorPage(500);
         }
