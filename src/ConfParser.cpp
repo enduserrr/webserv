@@ -215,11 +215,8 @@ void ConfParser::parseSingle(std::istringstream &ss, T &obj, void (T::*setter)(c
 
     if (!(ss >> word))
         throw std::runtime_error(ERR CONF "unexpected line");
-    if (DEBUG == 1)
-        std::cout << word << std::endl;
     (obj.*setter)(word);
     if ((ss >> word)) {
-        std::cout << word << std::endl;
         throw std::runtime_error(ERR CONF "unexpected word: " + word);
     }
 }

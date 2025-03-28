@@ -71,7 +71,9 @@ void ServerBlock::setServerName(const std::string &str) {
 }
 
 void ServerBlock::setRoot(const std::string &root) {
-    _root = root;
+    char cwd[PATH_MAX]; 
+    getcwd(cwd, sizeof(cwd)); 
+    _root = std::string(cwd) + root;
 }
 
 void ServerBlock::setPort(const std::string &port) {
