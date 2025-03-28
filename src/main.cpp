@@ -23,15 +23,26 @@ void signalHandler(int signum) {
         g_serverLoop->stop();
 }
 
+bool preCheckAndSet(int ac, char **av, std::string &fileName) {
+    if (ac > 2) {
+        std::cout << "Usage: ./webserv <configfile.conf>" << std::endl;
+        std::cout << "or to run with default settings: ./webserv" << std::endl;
+        return false;
+    }
+    if (ac == 2) 
+        fileName = av[1]; 
+    else 
+        fileName = DEF_CONF;
+    return true; 
+}
+
 int main(int ac, char **av) {
     signal(SIGPIPE, SIG_IGN);
-    if (ac != 2) {
-        std::cout << "Usage: ./webserv <configfile.conf>" << std::endl;
-        return 1;
-    }
+    std::string fileName; 
+    if (!preCheckAndSet(ac, av, fileName)) 
+        return 1; 
     std::cout << "\nOpening program...\n" << std::endl;
-
-    ConfParser configParse(av[1]);
+    ConfParser configParse(fileName);
     try {
         configParse.fileValidation();
         configParse.parseFile();

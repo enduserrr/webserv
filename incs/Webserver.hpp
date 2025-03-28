@@ -39,6 +39,8 @@
 #define GRAY    "\033[0;90m"
 #define RES     "\033[0m"
 
+#define DEF_CONF "config/default.conf"
+
 //DEBUG
 #define DEBUG 1
 

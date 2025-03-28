@@ -59,7 +59,9 @@ void Location::setPath(const std::string& path) {
 }
 
 void Location::setRoot(const std::string &root) {
-    _root = root;
+    char cwd[PATH_MAX]; 
+    getcwd(cwd, sizeof(cwd)); 
+    _root = std::string(cwd) + root;
 }
 
 void Location::setAutoIndex(const std::string &value) {

@@ -134,7 +134,8 @@ std::string Methods::mGet(HttpRequest &req) {
                 return "HTTP/1.1 500 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(500);
             }
         } else { // If request is only "/" return index.html
-            filePath = "index.html";
+            std::cout << filePath << std::endl; 
+            filePath += "index.html"; //E: changed "="" to be "+=" root + index.html --> now works with localhost:8080 
             std::cout << "Autoindex off, updated filePath: " << filePath << std::endl;
         }
     }
