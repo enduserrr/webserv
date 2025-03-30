@@ -1,11 +1,12 @@
 /* General Body Styles */
 body {
-    background-color: #f9f9f9; /* Slightly off-white background */
+    background-color: #f9f9f9;
     font-family: Helvetica, sans-serif;
-    color: #333; /* Dark grey font */
+    color: #333;
     margin: 0;
     padding: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 50vh;
