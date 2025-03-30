@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/28 11:46:18 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/30 18:07:56 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -25,13 +25,13 @@ static void replaceAll(std::string &str, const std::string &from, const std::str
 }
 
 std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
-    std::ifstream templateFile("www/listing.html");
+    std::ifstream templateFile("www/files.html");
 
     // ↓↓↓ FALLBACK FILE IF TEMPLATE'S MISSING ↓↓↓
     if (!templateFile) {
         std::cout << "FALLBACK FILE" << std::endl;
         std::ostringstream fallback;
-        fallback << "<html><head><title>Index of " << uri << "</title></head><body>"
+        fallback << "<html><head><title>" << uri << "</title></head><body>"
                  << "<h1>Index of " << uri << "</h1><ul>";
         DIR *dir = opendir(directoryPath.c_str());
         if (!dir) {
@@ -83,7 +83,7 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
     closedir(dir);
 
     std::string itemsHtml = itemsStream.str();
-    std::string title = "Index of " + uri;
+    std::string title = "Directory: " + uri;
     replaceAll(templateHtml, "{{title}}", title);
     replaceAll(templateHtml, "{{items}}", itemsHtml);
 
@@ -134,8 +134,8 @@ std::string Methods::mGet(HttpRequest &req) {
                 return "HTTP/1.1 500 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(500);
             }
         } else { // If request is only "/" return index.html
-            std::cout << filePath << std::endl; 
-            filePath += "index.html"; //E: changed "="" to be "+=" root + index.html --> now works with localhost:8080 
+            std::cout << filePath << std::endl;
+            filePath += "index.html"; //E: changed "="" to be "+=" root + index.html --> now works with localhost:8080
             std::cout << "Autoindex off, updated filePath: " << filePath << std::endl;
         }
     }
@@ -143,7 +143,6 @@ std::string Methods::mGet(HttpRequest &req) {
         return "HTTP/1.1 404 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(404);
 
     std::ifstream file(filePath.c_str(), std::ios::in | std::ios::binary);// Open file for reading in binary
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Make a map of files to fetch the location from
     if (!file)
         return "HTTP/1.1 500 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(500);
     std::ostringstream ss;
@@ -175,7 +174,7 @@ std::string Methods::mPost(HttpRequest &req) {
 
     // ↓↓↓ CHECK FOR EMPTY OR INVAL UPLOAD ↓↓↓
     if (body.find("text_data=") == 0 && body.size() == std::string("text_data=").size()) {
-        std::ifstream file("www/listing.html");
+        std::ifstream file("www/files.html");
         if (!file.is_open())
             return ErrorHandler::getInstance().getErrorPage(500);
         std::stringstream buffer;
@@ -225,7 +224,7 @@ std::string Methods::mPost(HttpRequest &req) {
             std::string extension = fileName.substr(fileName.find_last_of('.'));
             int counter = 1;
             std::string newFileName, newFullPath;
-            do { // UPDATE TO NOT USE 'DO'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            do {
                 newFileName = baseName + "_" + std::to_string(counter) + extension;
                 newFullPath = uploadDir + newFileName;
                 // ↓↓↓ CHECK IF NEW NAME HAS DUPS ↓↓↓
