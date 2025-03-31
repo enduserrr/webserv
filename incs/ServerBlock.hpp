@@ -19,6 +19,7 @@
 #include "Location.hpp"
 
 #define DEFAULT_BODY_SIZE 1048576  //1MB
+#define CONFF      "Configuration file: "
 
 class ServerBlock {
 private:
@@ -37,14 +38,15 @@ public:
     ~ServerBlock();
 
     // Getters
-    std::string                 getServerName() const;
-    std::string&                getRoot();
-    std::vector<int>            getPorts();
-    const std::string&          getIndex() const;
-    bool&                       getAutoIndex(const std::string &key);
-    size_t                      getBodySize() const;
-    Location&                   getLocation(const std::string &key);
-    std::map<int, std::string>& getErrorPages();
+    std::string                      getServerName() const;
+    std::string&                     getRoot();
+    std::vector<int>                 getPorts();
+    const std::string&               getIndex() const;
+    bool&                            getAutoIndex(const std::string &key);
+    size_t                           getBodySize() const;
+    Location&                        getLocation(const std::string &key);
+    std::map<std::string, Location>& getLocations();
+    std::map<int, std::string>&      getErrorPages();
 
     // Setters
     void                        setServerName(const std::string &str);

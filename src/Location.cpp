@@ -55,6 +55,8 @@ std::pair<int, std::string>  Location::getRedirect() const {
 
 //setters
 void Location::setPath(const std::string& path) {
+    if (path.empty() || path[0] != '/')
+        throw std::runtime_error("Configuration file: Location path must start with '/'");
     _path = path;
 }
 

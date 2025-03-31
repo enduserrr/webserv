@@ -15,6 +15,7 @@
 
 #include "Libs.hpp"
 
+
 class Location {
     private:
         std::string                 _path;
