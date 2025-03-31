@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/05 12:29:04 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 11:49:44 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -26,7 +26,7 @@ std::string CgiHandler::processRequest(HttpRequest &req) {
     std::string uri = req.getUri();
     if (uri.size() < 4 || uri.substr(uri.size() - 4) != ".php") {
         return "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n"
-            + ErrorHandler::getInstance().getErrorPage(404);
+            + Logger::getInstance().logLevel("ERROR", "Unable to process cgi request.", 404);
     }
 /*  Determine the path to the CGI script. */
 /*  For example, assume CGI scripts are stored in "./cgi-bin/" */
@@ -115,7 +115,7 @@ std::string CgiHandler::executeCgi(const std::string &cgiExecutable,
     FILE* pipe = popen(command.c_str(), "r");
     if (!pipe) {
         return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-               + ErrorHandler::getInstance().getErrorPage(500);
+               + Logger::getInstance().logLevel("ERROR", "Internal server error. No pipe found.", 500);;
     }
     std::string cgiOutput;
     char buffer[1024];

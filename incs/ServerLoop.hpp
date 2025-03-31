@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/02 17:26:33 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 10:43:13 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -14,7 +14,7 @@
 # define SERVERLOOP_HPP
 
 #include "ServerBlock.hpp"
-#include "ErrorHandler.hpp"
+#include "Logger.hpp"
 #include "HttpParser.hpp"
 #include "CgiHandler.hpp"
 #include "UploadHandler.hpp"

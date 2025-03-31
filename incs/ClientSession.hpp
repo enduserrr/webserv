@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 12:18:51 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/17 11:34:23 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 10:43:13 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -15,14 +15,14 @@
 
 #include "HttpRequest.hpp"
 #include "ServerBlock.hpp"
-#include "ErrorHandler.hpp"
+#include "Logger.hpp"
 #include "Libs.hpp"
 // #include <string>
 
 class ClientSession {
     private:
-        size_t _requestCount; 
-        time_t _lastRequestTime; 
+        size_t _requestCount;
+        time_t _lastRequestTime;
 
     public:
         int fd;
@@ -35,7 +35,7 @@ class ClientSession {
         ~ClientSession();
 
     void removeClient();
-    bool requestLimiter(); 
+    bool requestLimiter();
 };
 
 #endif

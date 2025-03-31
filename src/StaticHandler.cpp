@@ -6,12 +6,12 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 11:41:08 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/02 19:01:28 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 11:37:31 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "../incs/StaticHandler.hpp"
-#include "../incs/ErrorHandler.hpp"
+#include "../incs/Logger.hpp"
 #include "../incs/UploadHandler.hpp"
 #include <fstream>
 #include <sstream>
@@ -32,7 +32,8 @@ std::string StaticHandler::processRequest(HttpRequest &req) {
 
     if (method == "POST") {
         if (req.getBody().empty()) {
-            std::cerr << "[ERROR] POST request has an empty body!" << std::endl;
+            Logger::getInstance().logLevel("ERROR", "POST request has an empty body!", 500);
+            // std::cerr << "[ERROR] POST request has an empty body!" << std::endl;
         } else {
             std::cout << "POST METHOD -->" << std::endl;
             return Methods::mPost(req);

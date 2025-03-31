@@ -5,6 +5,7 @@
 * "/" doesn't go to index page (taken as directory listing) | OK!
 * Auto Index per Location | OK!
 * ConfParser udpates location root correctly | OK!
+* Style sheet gets applied correctly (files.html) | OK!
 
 ## Issues
 * Delete & dir listing fail not returning a proper error

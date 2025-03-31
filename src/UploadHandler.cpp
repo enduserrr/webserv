@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/28 07:34:41 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 11:45:08 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -47,12 +47,12 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
 
     if (contentType.empty()) {
         return "HTTP/1.1 415 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                + ErrorHandler::getInstance().getErrorPage(415);
+                + Logger::getInstance().logLevel("ERROR", "Bad request: Empty content type (uploadHandler).", 415);
     }
 
     if (!types.isValidContent(contentType)) {
         return "HTTP/1.1 415 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                + ErrorHandler::getInstance().getErrorPage(415);
+                + Logger::getInstance().logLevel("ERROR", "Bad request: Invalid content type (uploadHandler).", 415);
     }
 
     std::string filePath;
@@ -63,9 +63,9 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
             filePath = "./www/uploads/upload_" + std::to_string(std::time(nullptr)) + ".txt";
         std::ofstream ofs(filePath.c_str(), std::ios::binary);
         if (!ofs) {
-            std::cout << "Error 500 A" << std::endl;
+            // return "HTTP/1.1 500 Internal Server Error\r\n" + Logger::getInstance().logLevel("ERROR", "Fail reading the file.", 500);
             return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                + ErrorHandler::getInstance().getErrorPage(500);
+                + Logger::getInstance().logLevel("ERROR", "Fail reading the file.", 500);
         }
         ofs.write(body.c_str(), body.size());
         ofs.close();
@@ -77,20 +77,20 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
         std::string boundary = contentType.substr(contentType.find("boundary=") + 9);
         if (boundary.empty()) {
             return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
-                + ErrorHandler::getInstance().getErrorPage(400);
+                + Logger::getInstance().logLevel("ERROR", "Bad request (uploadHandler).", 400);
         }
         // std::string filename = extractFilenameFromMultipart(body, boundary);
         std::string filename = req.getFileName();
         if (filename.empty()) {
             return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
-                + ErrorHandler::getInstance().getErrorPage(400);
+                + Logger::getInstance().logLevel("ERROR", "Bad request (uploadHandler).", 400);
         }
 
         // Determine file type and check MIME type
         std::string extension = filename.substr(filename.find_last_of("."));
         if (!types.isValidMime(extension)) {
             return "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
-                + ErrorHandler::getInstance().getErrorPage(415);
+                + Logger::getInstance().logLevel("ERROR", "Unsupported media type (uploadHandler).", 415);
         }
 
         // Save the extracted file
@@ -99,7 +99,7 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
         if (!ofs) {
             std::cout << "Error 500 B" << std::endl;
             return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                + ErrorHandler::getInstance().getErrorPage(500);
+                + Logger::getInstance().logLevel("ERROR", "Internal server error (uploadHandler).", 500);
         }
 
         std::string fileContent = extractFileContentFromMultipart(body, boundary);

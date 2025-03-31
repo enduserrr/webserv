@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:37:11 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/08 10:39:35 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 10:43:13 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -14,7 +14,7 @@
 #define CGIHANDLER_HPP
 
 #include "HttpParser.hpp"
-#include "ErrorHandler.hpp"
+#include "Logger.hpp"
 #include "UploadHandler.hpp"
 #include "HttpRequest.hpp"
 // #include <vector>

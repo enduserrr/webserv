@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:35:44 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/28 10:44:09 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 10:43:13 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -15,7 +15,7 @@
 
 #include "HttpRequest.hpp"
 #include "UploadHandler.hpp"
-#include "ErrorHandler.hpp"
+#include "Logger.hpp"
 #include "Webserver.hpp"
 #include "Types.hpp"
 

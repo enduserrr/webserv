@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:44 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/13 12:38:11 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 10:43:13 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -19,7 +19,7 @@
 #include "HttpRequest.hpp"
 #include "CgiHandler.hpp"
 #include "StaticHandler.hpp"
-#include "ErrorHandler.hpp"
+#include "Logger.hpp"
 
 class Router {
 private:
