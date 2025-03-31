@@ -77,9 +77,6 @@ public:
      * @brief   Set auto index on/off (b) for a given key (location)
      */
     void setAutoIndex(bool b) {
-        std::cout << "Index location set to: " << b << std::endl;
-        // _indexLoc["/uploads"] = b;
-        
         _autoIndex = b;
     }
 

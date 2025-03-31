@@ -87,7 +87,7 @@ void ServerLoop::setupServerSockets() {
             _portToBlock[*portIt] = *it;  // Correct serverblock?
             std::ostringstream logStream;
             logStream   << "Server started on port(s): "
-                        << *portIt << std::endl;
+                        << *portIt;
             Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
             // std::cout << "Server started on port: " << *portIt << std::endl;
         }

@@ -39,9 +39,9 @@
 
 
 //ERRORS
-#define ERR RED         "error: " RES
-#define FILE_V GRAY     "file validation: " RES
-#define CONF GRAY       "configuration file: " RES
+#define ERR RED         "Error: " RES
+#define FILE_V GRAY     "File validation: " RES
+#define CONF GRAY       "Configuration file: " RES
 
 //FILESIZES
 #define FILE_SIZE_MAX 1000000000
@@ -77,7 +77,8 @@ public:
     //FILE PARSING
     void                    parseFile();
     void                    blocks(int block);
-    void                    parseLine(std::string &line, int &block);
+    void                    parseLine(std::string &line, int &block, bool &hasContent);
+    bool                    serverLine(std::string &line, int &block);
 
 
     //DATA PARSING
@@ -89,7 +90,7 @@ public:
     void                    parseSingle(std::istringstream &ss, T &obj, void (T::*setter)(const std::string&));
     template <typename T>
     void                    parseCodeValue(std::istringstream &ss, T &obj, void (T::*setter)(int, const std::string&));
-
+    void                    allSetted();
     void                    configureAutoIndex();
 
     // DEBUG
