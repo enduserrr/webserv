@@ -3,7 +3,7 @@
 
 #include <string>
 #include "HttpRequest.hpp"
-#include "ErrorHandler.hpp"
+#include "Logger.hpp"
 
 class UploadHandler {
     private:

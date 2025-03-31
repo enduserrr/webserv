@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/21 09:06:03 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/16 12:57:59 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 10:43:13 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -18,7 +18,7 @@
 #include "ConfParser.hpp"
 #include "Location.hpp"
 #include "ServerBlock.hpp"
-#include "ErrorHandler.hpp"
+#include "Logger.hpp"
 
 #include "ServerLoop.hpp"
 #include "HttpParser.hpp"
@@ -32,6 +32,8 @@
 #include "Types.hpp"
 
 #define GC      "\033[3;90m"
+#define GREY_B  "\033[1;90m"
+#define YB      "\033[1;93m"
 #define WB      "\033[1;97m"
 #define GB      "\033[1;92m"
 #define RB      "\033[1;91m"

@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/28 07:44:42 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 12:04:44 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -44,39 +44,39 @@ void ServerLoop::setupServerSockets() {
 
         for (std::vector<int>::const_iterator portIt = ports.begin(); portIt != ports.end(); ++portIt) {
             if (std::find(_boundPorts.begin(), _boundPorts.end(), *portIt) != _boundPorts.end()) {
-                continue; // Skip duplicate port binding
+                continue ; // Skip duplicate port binding
             }
 
             int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
             if (serverSocket < 0) {
-                ErrorHandler::getInstance().logError("Failed to create socket for port " + std::to_string(*portIt));
-                continue;
+                Logger::getInstance().logLevel("SYS_ERROR", "Failed to create socket for port " + std::to_string(*portIt), 1);
+                continue ;
             }
 
             int opt = 1;
             if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-                ErrorHandler::getInstance().logError("Failed to set socket options for port " + std::to_string(*portIt));
+                Logger::getInstance().logLevel("SYS_ERROR", "Failed to set socket options for port " + std::to_string(*portIt), 1);
                 close(serverSocket);
-                continue;
+                continue ;
             }
             struct sockaddr_in serverAddr;
             memset(&serverAddr, 0, sizeof(serverAddr));
             serverAddr.sin_family = AF_INET;
             serverAddr.sin_port = htons(*portIt);
             if (inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr) <= 0) {
-                ErrorHandler::getInstance().logError("Invalid address for port " + std::to_string(*portIt));
+                Logger::getInstance().logLevel("SYS_ERROR", "Invalid address for port " + std::to_string(*portIt), 1);
                 close(serverSocket);
-                continue;
+                continue ;
             }
             if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-                ErrorHandler::getInstance().logError("Failed to bind socket for port " + std::to_string(*portIt));
+                Logger::getInstance().logLevel("SYS_ERROR", "Failed to bind socket for port " + std::to_string(*portIt), 1);
                 close(serverSocket);
-                continue;
+                continue ;
             }
             if (listen(serverSocket, SOMAXCONN) < 0) {
-                ErrorHandler::getInstance().logError("Failed to listen on port " + std::to_string(*portIt));
+                Logger::getInstance().logLevel("SYS_ERROR", "Failed to listen on port " + std::to_string(*portIt), 1);
                 close(serverSocket);
-                continue;
+                continue ;
             }
             struct pollfd pfd;
             pfd.fd = serverSocket;
@@ -85,14 +85,19 @@ void ServerLoop::setupServerSockets() {
             _serverSockets.push_back(serverSocket);
             _boundPorts.push_back(*portIt);
             _portToBlock[*portIt] = *it;  // Correct serverblock?
-            std::cout << "Server started on port: " << *portIt << std::endl;
+            std::ostringstream logStream;
+            logStream   << "Server started on port(s): "
+                        << *portIt << std::endl;
+            Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
+            // std::cout << "Server started on port: " << *portIt << std::endl;
         }
     }
 }
 
 bool ServerLoop::serverFull() {
      if (_clients.size() >= MAX_CLIENTS) {
-        std::cerr << "Server is full! Rejecting new client." << std::endl;
+        Logger::getInstance().logLevel("INFO", "Server if full! Rejecting new clients", 0);
+        // std::cerr << "Server is full! Rejecting new client." << std::endl;
         std::cerr << "clients: " << _clients.size()<< std::endl;
         return true;
      }
@@ -106,19 +111,23 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     socklen_t addrLen = sizeof(clientAddr);
     int clientFd = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
     if (clientFd < 0) {
-        ErrorHandler::getInstance().logError("Failed to accept client connection.");
+        Logger::getInstance().logLevel("SYS_ERROR", "Failed to accept client connection.", 1);
         return ;
     }
     struct sockaddr_in localAddr; // Retrieve the local (server) port for the accepted connection.
     socklen_t localLen = sizeof(localAddr);
     if (getsockname(clientFd, (struct sockaddr*)&localAddr, &localLen) < 0) {
-        ErrorHandler::getInstance().logError("Failed to get local address for client connection.");
+        Logger::getInstance().logLevel("SYS_ERROR", "Failed to get local address for client connection.", 1);
         close(clientFd);
         return ;
     }
     int localPort = ntohs(localAddr.sin_port);
     if (_portToBlock.find(localPort) == _portToBlock.end()) {// Find ServerBlock for this port
-        std::cerr << "Warning: No ServerBlock found for port " << localPort << std::endl;
+        std::ostringstream logStream;
+        logStream  << "No ServerBlock found for port: "
+                    << localPort << std::endl;
+        Logger::getInstance().logLevel("WARNING", logStream.str(), 1);
+        // std::cerr << "Warning: No ServerBlock found for port " << localPort << std::endl;
         close(clientFd);
         return ;
     }
@@ -131,8 +140,12 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     pfd.fd = clientFd;
     pfd.events = POLLIN;
     _pollFds.push_back(pfd);
-    std::cout << "New client connected on port " << localPort
-              << " (fd: " << clientFd << ")" << std::endl;
+    std::ostringstream logStream;
+    logStream  << "New client connected on port: "
+                    << localPort  << " (fd: " << clientFd << ")" << std::endl;
+    Logger::getInstance().logLevel("INFO", logStream.str(), 0);
+    // std::cout << "New client connected on port " << localPort
+    //           << " (fd: " << clientFd << ")" << std::endl;
 }
 
 /**
@@ -149,7 +162,8 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         if (parser.isFullRequest(_clients[clientSocket].buffer))
             break ;
         if (parser.getState() != 0) {
-            std::cerr << "bad request (stoi fails)! " << std::endl; //should propably give 400 bad request errorpage?
+            Logger::getInstance().logLevel("SYS_ERROR", "Bad request (stoi fail).", 1);
+            // std::cerr << "bad request (stoi fails)! " << std::endl;
             return ;
         }
     }
@@ -157,8 +171,12 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         removeClient(clientSocket);
         return ;
     } else if (bytesRead < 0) {
-        std::cerr << "Error reading from socket " << clientSocket
-                  << ": " << strerror(errno) << std::endl;
+        std::ostringstream logStream;
+        logStream  << "Unable to read from socket: "
+                    << clientSocket  << ": " << strerror(errno) << std::endl;
+        Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
+        // std::cerr << "Error reading from socket " << clientSocket
+        //           << ": " << strerror(errno) << std::endl;
         removeClient(clientSocket);
         return ;
     }
@@ -171,13 +189,18 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             if (_portToBlock.find(port) != _portToBlock.end()) {
                 _clients[clientSocket]._block = _portToBlock[port];
             } else {
-                std::cerr << "Warning: No matching ServerBlock for port " << port << std::endl;
+                std::ostringstream logStream;
+                logStream  << "No matching ServerBlock for port: "
+                    << port  << std::endl;
+                Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
+                // std::cerr << "Warning: No matching ServerBlock for port " << port << std::endl;
             }
         }
     }
     if (_clients[clientSocket].requestLimiter()) {
-        sendResponse(clientSocket, ErrorHandler::getInstance().getErrorPage(429));
-        return;
+        sendResponse(clientSocket, "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" +
+                    Logger::getInstance().logLevel("ERROR", "Client request limit reached.", 429));
+        return ;
     }
     if (parser.parseRequest(_clients[clientSocket]._block)) {
         _clients[clientSocket].request = parser.getPendingRequest();
@@ -199,9 +222,9 @@ void ServerLoop::handleClientRequest(int clientSocket) {
 
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
-        ErrorHandler::getInstance().logError("Failed to send response to client.");
+        Logger::getInstance().logLevel("SYS_ERROR", "Failed to send response to client.", 1);
         std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                                    + ErrorHandler::getInstance().getErrorPage(500);
+                                    + Logger::getInstance().getErrorPage(500);
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
     }
     return ;
@@ -219,8 +242,9 @@ void ServerLoop::startServer() {
         // }
         int pollResult = poll(_pollFds.data(), _pollFds.size(), 5000);
         if (pollResult < 0) {
-            std::cerr << RB "Error:" RES " in poll()" << std::endl;
-            break;
+            Logger::getInstance().logLevel("SYS_ERROR", "Error in poll().", 1);
+            // std::cerr << RB "Error:" RES " in poll()" << std::endl;
+            break ;
         }
         for (size_t i = 0; i < _pollFds.size(); ++i) {
             if (_pollFds[i].revents & POLLIN) {
@@ -243,7 +267,11 @@ void ServerLoop::removeClient(int clientFd) {
         _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
                         [clientFd](struct pollfd& pfd) { return pfd.fd == clientFd; }),
                         _pollFds.end());
-        std::cout << "Client disconnected (fd: " << clientFd << ")" << std::endl;
+        std::ostringstream logStream;
+        logStream   << "Client disconnected (fd: "
+                    << clientFd << ")" << std::endl;
+        Logger::getInstance().logLevel("INFO", logStream.str(), 0);
+        // std::cout << "Client disconnected (fd: " << clientFd << ")" << std::endl;
     }
 }
 
@@ -252,7 +280,8 @@ void ServerLoop::closeServer() {
         close(it->fd);
     }
     _pollFds.clear();
-    std::cout << "Server closed and resources cleaned." << std::endl;
+    Logger::getInstance().logLevel("INFO", "Server closed and resources cleaned.", 0);
+    // std::cout << "Server closed and resources cleaned." << std::endl;
 }
 
 /* void ServerLoop::test(){

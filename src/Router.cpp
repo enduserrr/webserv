@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:16 by asalo             #+#    #+#             */
-/*   Updated: 2025/02/26 10:58:17 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 11:51:32 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -49,10 +49,9 @@ std::string Router::routeRequest(HttpRequest &req, int clientFd) {
 // Meaby remove this as it's a replica of ServerLoop member func
 void    Router::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
-        ErrorHandler::getInstance().logError("Failed to send response to client.");
-        std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                                    + ErrorHandler::getInstance().getErrorPage(500);
-        send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
+        Logger::getInstance().logLevel("SYS_ERROR", "Failed to send response to client.", 1);
+        std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().getErrorPage(500);
+        send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0); // Sends again after failing to send??
     }
 }
 

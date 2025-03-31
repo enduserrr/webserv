@@ -1,19 +1,19 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eleppala <eleppala@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:44:23 by eleppala          #+#    #+#             */
-/*   Updated: 2025/01/28 18:44:25 by eleppala         ###   ########.fr       */
+/*   Updated: 2025/03/31 10:43:13 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef SERVERBLOCK_HPP
 #define SERVERBLOCK_HPP
 
-#include "ErrorHandler.hpp"
+#include "Logger.hpp"
 #include <iostream>
 #include <vector>
 #include "Location.hpp"
@@ -24,13 +24,13 @@ class ServerBlock {
 private:
     std::string                 _serverName;
     std::string                 _root;
-    std::string                 _index; 
+    std::string                 _index;
     bool                        _autoIndex;  //1 true - 0 false
     size_t                      _bodySize;
     std::vector<int>            _ports;
     std::map<std::string, Location> _locations;
     std::map<int, std::string>  _errorPages; //key value 404 - 404.html --> _errorPages[404] = 404.html
-    
+
 
 public:
     ServerBlock();

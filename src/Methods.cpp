@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/30 18:07:56 by asalo            ###   ########.fr       */
+/*   Updated: 2025/03/31 11:51:26 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -130,8 +130,8 @@ std::string Methods::mGet(HttpRequest &req) {
                 std::cout << "Returning directory listing response" << std::endl;
                 return responseStream.str();
             } else {
-                std::cout << "Directory listing empty, returning 500" << std::endl;
-                return "HTTP/1.1 500 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(500);
+                // std::cout << "Directory listing empty, returning 500" << std::endl;
+                return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Directory listing is empty", 500);
             }
         } else { // If request is only "/" return index.html
             std::cout << filePath << std::endl;
@@ -140,11 +140,11 @@ std::string Methods::mGet(HttpRequest &req) {
         }
     }
     if (stat(filePath.c_str(), &st) != 0)// Check if the file exists
-        return "HTTP/1.1 404 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(404);
+        return "HTTP/1.1 404 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "File does not exist.", 404);
 
     std::ifstream file(filePath.c_str(), std::ios::in | std::ios::binary);// Open file for reading in binary
     if (!file)
-        return "HTTP/1.1 500 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(500);
+        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Fail reading the file.", 500);
     std::ostringstream ss;
     ss << file.rdbuf();
     std::string fileContent = ss.str();
@@ -170,13 +170,13 @@ std::string Methods::mGet(HttpRequest &req) {
 std::string Methods::mPost(HttpRequest &req) {
     std::string body = req.getBody();
     if (body.empty())
-        return "HTTP/1.1 500 Internal Server Error\r\n" + ErrorHandler::getInstance().getErrorPage(500);
+        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Empty request body.", 500);
 
     // ↓↓↓ CHECK FOR EMPTY OR INVAL UPLOAD ↓↓↓
     if (body.find("text_data=") == 0 && body.size() == std::string("text_data=").size()) {
         std::ifstream file("www/files.html");
         if (!file.is_open())
-            return ErrorHandler::getInstance().getErrorPage(500);
+            return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Unable to open file.", 500);
         std::stringstream buffer;
         buffer << file.rdbuf();
         std::string htmlContent = buffer.str();
@@ -201,8 +201,8 @@ std::string Methods::mPost(HttpRequest &req) {
         bool fileExists = false;
         DIR* dir = opendir(uploadDir.c_str());
         if (!dir) {
-            std::cerr << RED << "Failed to open upload directory " << uploadDir << ": " << strerror(errno) << RES << std::endl;
-            return ErrorHandler::getInstance().getErrorPage(500);
+            // std::cerr << RED << "Failed to open upload directory " << uploadDir << ": " << strerror(errno) << RES << std::endl;
+            return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Failed to open directory.", 500);
         }
         struct dirent* entry;
         // // ↓↓↓ SKIP IF STARTS WITH '.' & '..' ↓↓↓
@@ -231,8 +231,8 @@ std::string Methods::mPost(HttpRequest &req) {
                 fileExists = false;
                 dir = opendir(uploadDir.c_str());
                 if (!dir) {
-                    std::cerr << "Failed to reopen upload directory: " << strerror(errno) << std::endl;
-                    return ErrorHandler::getInstance().getErrorPage(500);
+                    // std::cerr << "Failed to reopen upload directory: " << strerror(errno) << std::endl;
+                    return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Failed to reopen directory", 500);
                 }
                 while ((entry = readdir(dir)) != nullptr) {
                     if (std::string(entry->d_name) == newFileName) {
@@ -245,8 +245,8 @@ std::string Methods::mPost(HttpRequest &req) {
             } while (fileExists);
 
             if (rename(uploadedFilePath.c_str(), newFullPath.c_str()) != 0) {
-                std::cerr << "Failed to rename file from " << uploadedFilePath << " to " << newFullPath << ": " << strerror(errno) << std::endl;
-                return ErrorHandler::getInstance().getErrorPage(500);
+                // std::cerr << "Failed to rename file from " << uploadedFilePath << " to " << newFullPath << ": " << strerror(errno) << std::endl;
+                return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Failed to rename file.", 500);
             }
             uploadedFilePath = newFullPath;
         }
@@ -254,7 +254,7 @@ std::string Methods::mPost(HttpRequest &req) {
 
     std::ifstream file("www/upload_success.html");
     if (!file.is_open())
-        return ErrorHandler::getInstance().getErrorPage(500);
+        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Failed to upload file.", 500);
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string htmlContent = buffer.str();
@@ -277,14 +277,14 @@ std::string Methods::mDelete(HttpRequest &req) {
         }
     }
     if (fileParam.empty()) {// File parameter missing; handle error
-        return ErrorHandler::getInstance().getErrorPage(400);
+        return "HTTP/1.1 400 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "File parameter missing.", 400);
     }
 
     std::string basePath = "www/uploads/";
     std::string filePath = basePath + fileParam;
 
     if (fileParam.empty()) {
-        return ErrorHandler::getInstance().getErrorPage(400);
+        return "HTTP/1.1 400 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Empty file parameter.", 400);
     }
 
     std::cout << GC "File to delete: " << filePath << RES << std::endl;
@@ -297,19 +297,19 @@ std::string Methods::mDelete(HttpRequest &req) {
     }
 
     if (filePath.find("/uploads/") == std::string::npos) {
-        std::cout << RB << "Incorrect folder" << RES << std::endl;
-        return "HTTP/1.1 403\r\n\r\n" + ErrorHandler::getInstance().getErrorPage(403);
+        // std::cout << RB << "Incorrect folder" << RES << std::endl;
+        return "HTTP/1.1 403 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Incorrect folder.", 403);
     }
 
     struct stat st;
     if (stat(filePath.c_str(), &st) != 0) { // Check if the file exists
-        std::cout << RB << "File doesn't exist" << RES << std::endl;
-        return "HTTP/1.1 404\r\n\r\n" + ErrorHandler::getInstance().getErrorPage(404);
+        // std::cout << RB << "File doesn't exist" << RES << std::endl;
+        return "HTTP/1.1 404 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "File does not exist.", 404);
     }
 
     if (remove(filePath.c_str()) != 0) { // Try delete
-        std::cout << RB << "Failed to delete" << RES << std::endl;
-        return "HTTP/1.1 500\r\n\r\n" + ErrorHandler::getInstance().getErrorPage(500);
+        // std::cout << RB << "Failed to delete" << RES << std::endl;
+        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Failed to delete file.", 500);
     }
 
     std::ostringstream deleteResponse;
