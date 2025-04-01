@@ -74,17 +74,17 @@ std::string Logger::getCurrentTimestamp() const{
 std::string Logger::logLevel(std::string level, const std::string &message, int code) {
     if (level == "INFO") {
         _state = code;
-        std::cout << GC << "[" << getCurrentTimestamp() << "] " << GB << "[INFO]: " << RES << message << std::endl;
+        std::cout << GREY << "[" << getCurrentTimestamp() << "]" << GB << "[INFO]: " << RES  GC << message << RES << std::endl;
         return std::string();
     }
     else if (level == "WARNING") {
         _state = code;
-        std::cout << GC << "[" << getCurrentTimestamp() << "] " << YB << "[WARN]: " << RES << message<< std::endl;
+        std::cout << GREY << "[" << getCurrentTimestamp() << "]" << YB << "[WARN]: " << RES << message<< std::endl;
         return std::string();
     }
     else if (level == "ERROR") {
         _state = 1;
-        std::cerr << GC << "[" << getCurrentTimestamp() << "] " << RB << "[ERROR]: " << RES << message << std::endl;
+        std::cerr << GREY << "[" << getCurrentTimestamp() << "]" << RB << "[ERROR]: " << RES << message << std::endl;
         if (_errorPages.find(code) != _errorPages.end()) {
             return _errorPages[code];
         }
@@ -92,10 +92,10 @@ std::string Logger::logLevel(std::string level, const std::string &message, int 
     }
     else if (level == "SYS_ERROR") {
         _state = code;
-        std::cout << GC << "[" << getCurrentTimestamp() << "] " << RB << "[SYS_ERR]: " << RES << message << std::endl;
+        std::cout << GREY << "[" << getCurrentTimestamp() << "]" << RB << "[SYS_ERR]: " << RES GC << message << RES << std::endl;
         return std::string();
     }
-    std::cerr << GC << "[" << getCurrentTimestamp() << "] " << RB << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;
+    std::cerr << GREY << "[" << getCurrentTimestamp() << "] " << RB << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;
     return "<html><body><h1>Error</h1><p>An unknown error occurred.</p></body></html>";
 }
 
