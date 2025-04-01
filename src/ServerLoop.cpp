@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:34:17 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:50:04 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -81,8 +81,7 @@ void ServerLoop::setupServerSockets() {
             _boundPorts.push_back(*portIt);
             _portToBlock[*portIt] = *it;
             std::ostringstream logStream;
-            logStream   << "Server started on port(s): "
-                        << *portIt;
+            logStream << "Server started on port(s): " << *portIt;
             Logger::getInstance().logLevel("INFO", logStream.str(), 0);
         }
     }
@@ -117,8 +116,7 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     int localPort = ntohs(localAddr.sin_port);
     if (_portToBlock.find(localPort) == _portToBlock.end()) {// Find ServerBlock for this port
         std::ostringstream logStream;
-        logStream  << "No ServerBlock found for port: "
-                    << localPort << std::endl;
+        logStream << "No ServerBlock found for port: " << localPort;
         Logger::getInstance().logLevel("WARNING", logStream.str(), 1);
         close(clientFd);
         return ;
@@ -133,8 +131,7 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     pfd.events = POLLIN;
     _pollFds.push_back(pfd);
     std::ostringstream logStream;
-    logStream  << "New client connected on port: "
-                    << localPort  << " (fd: " << clientFd << ")" << std::endl;
+    logStream << "New client connected on port: " << localPort  << " (fd: " << clientFd << ")";
     Logger::getInstance().logLevel("INFO", logStream.str(), 0);
 }
 
@@ -161,8 +158,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         return ;
     } else if (bytesRead < 0) {
         std::ostringstream logStream;
-        logStream  << "Unable to read from socket: "
-                    << clientSocket  << ": " << strerror(errno) << std::endl;
+        logStream << "Unable to read from socket: " << clientSocket  << ": " << strerror(errno);
         Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
         removeClient(clientSocket);
         return ;
@@ -177,8 +173,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
                 _clients[clientSocket]._block = _portToBlock[port];
             } else {
                 std::ostringstream logStream;
-                logStream  << "No matching ServerBlock for port: "
-                    << port  << std::endl;
+                logStream << "No matching ServerBlock for port: " << port;
                 Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
             }
         }
@@ -228,7 +223,7 @@ void ServerLoop::startServer() {
         // }
         int pollResult = poll(_pollFds.data(), _pollFds.size(), 5000);
         if (pollResult < 0) {
-            Logger::getInstance().logLevel("SYS_ERROR", "Error in poll().", 1);
+            Logger::getInstance().logLevel("WARNING", "Error in poll().", 0);
             break ;
         }
         for (size_t i = 0; i < _pollFds.size(); ++i) {
@@ -253,8 +248,7 @@ void ServerLoop::removeClient(int clientFd) {
                         [clientFd](struct pollfd& pfd) { return pfd.fd == clientFd; }),
                         _pollFds.end());
         std::ostringstream logStream;
-        logStream   << "Client disconnected (fd: "
-                    << clientFd << ")" << std::endl;
+        logStream << "Client disconnected (fd: " << clientFd << ")";
         Logger::getInstance().logLevel("INFO", logStream.str(), 0);
     }
 }
