@@ -6,12 +6,11 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 10:19:04 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:24:56 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:34:35 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "Types.hpp"
-// #include <algorithm>
 
 Types::Types() {
     _mimeTypes = {

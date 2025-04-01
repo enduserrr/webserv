@@ -6,11 +6,11 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/31 11:51:26 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:32:53 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#include "../incs/Methods.hpp"
+#include "Methods.hpp"
 
 Methods::Methods() {}
 

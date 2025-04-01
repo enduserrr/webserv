@@ -6,14 +6,11 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 11:41:08 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:25:06 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:34:28 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "StaticHandler.hpp"
-// #include "Logger.hpp"
-// #include "UploadHandler.hpp"
-
 
 StaticHandler::StaticHandler() {};
 

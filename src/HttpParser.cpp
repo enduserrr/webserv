@@ -6,19 +6,17 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/01 11:26:21 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:32:12 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "HttpParser.hpp"
 #include "Types.hpp"
-// #include <sstream>
-// #include <iomanip>
 
-/* Constructor */
+// Constructor
 HttpParser::HttpParser() : _state(0) {}
 
-/* Destructor */
+// Destructor
 HttpParser::~HttpParser() {}
 
 bool HttpParser::startsWithMethod(const std::string &input) {
@@ -30,15 +28,13 @@ bool HttpParser::startsWithMethod(const std::string &input) {
     return (method == "GET" || method == "POST" || method == "DELETE");
 }
 
-/* Should be moved to ServerLoop as technically isn't a part of HttpParsing */
+// Should be moved to ServerLoop as technically isn't a part of HttpParsing
 bool HttpParser::isFullRequest(std::string &input) {
     if (!startsWithMethod(input)) {
         _state = 400;
         input.clear();
         return false;
     }
-    // if (input.back() == '/') //Not sure if this is doing anything --UPDATE: now im sure that it breaked part of the .pdf file requests
-    //     return true;
     size_t headerEnd = input.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
         return false;
@@ -105,7 +101,7 @@ bool HttpParser::parseVersion(std::istringstream &ss, HttpRequest &req) {
     return true;
 }
 
-//STARTLINE SYNTAX: [method] [URI] [HTTP_VERSION]
+// STARTLINE SYNTAX: [method] [URI] [HTTP_VERSION]
 bool HttpParser::parseStartLine(std::string &line, HttpRequest &req) {
     std::istringstream ss(line);
     if (!parseMethod(ss, req))
@@ -131,7 +127,7 @@ bool HttpParser::parseMethod(std::istringstream &ss, HttpRequest &req) {
     return true;
 }
 
-//valid syntax: /dir/subdir?query=string  -- /dir/subdir?color=red&size=large
+// Valid syntax: /dir/subdir?query=string  -- /dir/subdir?color=red&size=large
 bool HttpParser::parseUri(std::istringstream &ss, HttpRequest &req) {
     std::string word;
     std::string temp;
@@ -239,7 +235,6 @@ bool HttpParser::parseHeader(std::string &line, HttpRequest &req) {
 
 void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     Types types; // Use the centralized Types class
-    // Types& typesInstance = Types::getInstance();
     std::string contentType = req.getHeader("Content-Type");
     std::cout << RB << contentType << RES << std::endl;
     std::string emptyBody = "";
@@ -317,19 +312,6 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     } catch (const std::exception &e) {
         req.setRoot(block.getRoot());
     }
-    // std::vector<Location>& locations = block.getLocations();
-    // for (size_t i = 0; i < locations.size(); i++) {
-    //     if (req.getUri().find(locations[i].getPath()) == 0) {
-    //         req.setAutoIndex(locations[i].getPath(), locations[i].getAutoIndex());
-    //         req.setRoot(locations[i].getRoot());
-    //         matched = true;
-    //         break;
-    //     }
-    // }
-    // if (!matched) {// If no matching location, use the ServerBlock's global settings.
-    //     req.setAutoIndex(block.getRoot(), block.getAutoIndex());
-    //     req.setRoot(block.getRoot());
-    // }
     _requests.push_back(req);
     return true;
 }

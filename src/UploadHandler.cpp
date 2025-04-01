@@ -6,16 +6,12 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:21:50 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:35:04 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#include "../incs/UploadHandler.hpp"
-#include "../incs/Types.hpp"
-#include <fstream>
-#include <sstream>
-#include <ctime>
-#include <sys/stat.h>
+#include "UploadHandler.hpp"
+#include "Types.hpp"
 
 
 UploadHandler::UploadHandler() {}

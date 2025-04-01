@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 11:10:03 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:16:41 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:39:15 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -49,6 +49,11 @@
 #include <cctype>
 #include <limits.h>
 
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <cstdlib>
+
+
 enum class LogLevel {
     INFO = 0,
     WARNING = 1,
@@ -67,10 +72,10 @@ enum class LogLevel {
 /* COLOR CODES FOR CONSOLE OUTPUTS */
 #define GC      "\033[3;90m"
 #define GREY_B  "\033[1;90m"
-#define YB      "\033[1;93m"
-#define WB      "\033[1;97m"
-#define GB      "\033[1;92m"
-#define RB      "\033[1;91m"
+#define YB      "\033[93m"
+#define WB      "\033[0;97m"
+#define GB      "\033[0;92m"
+#define RB      "\033[0;91m"
 #define RED     "\033[91m"
 #define GRAY    "\033[0;90m"
 #define RES     "\033[0m"

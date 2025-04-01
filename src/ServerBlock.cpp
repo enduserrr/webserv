@@ -6,22 +6,17 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:44:02 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/01 11:25:28 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:33:26 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "ServerBlock.hpp"
-// #include <iostream>
-// #include <algorithm>
 
 
-// Constructor
 ServerBlock::ServerBlock() : _autoIndex(false), _bodySize(DEFAULT_BODY_SIZE) {}
 
-// Destructor
 ServerBlock::~ServerBlock() {}
 
-// Getters
 std::string ServerBlock::getServerName() const {
     return _serverName;
 }
@@ -64,7 +59,6 @@ std::map<int, std::string>&  ServerBlock::getErrorPages() {
     return _errorPages;
 }
 
-//Setters
 void ServerBlock::setServerName(const std::string &str) {
     hasForbiddenSymbols(str);
     _serverName = str;
@@ -126,7 +120,6 @@ void ServerBlock::setErrorPage(int code, const std::string &path) {
     _errorPages[code] = path;
 }
 
-
 int convertToInt(const std::string &word) {
     if (!std::all_of(word.begin(), word.end(), ::isdigit)) {
         throw std::invalid_argument(CONF "unexpected word: " + word);
@@ -137,7 +130,6 @@ int convertToInt(const std::string &word) {
         throw std::invalid_argument(CONF "unexpected word: " + word);
     }
 }
-
 
 void hasForbiddenSymbols(const std::string &word) {
     for (size_t i = 0; i < word.length(); i++) {

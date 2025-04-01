@@ -6,12 +6,11 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:16 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:26:02 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:33:00 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#include "../incs/Router.hpp"
-// #include <iostream>
+#include "Router.hpp"
 
 
 Router::Router() {}

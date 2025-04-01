@@ -6,19 +6,14 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:25:21 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:34:17 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#include "../incs/ServerLoop.hpp"
-#include "../incs/StaticHandler.hpp"
-#include "../incs/Router.hpp"
-#include "../incs/ServerBlock.hpp"
-// #include <algorithm>
-// #include <iostream>
-// #include <cstring> //memset
-// #include <unistd.h> //close()
-// #include <arpa/inet.h> //socket operations
+#include "ServerLoop.hpp"
+#include "StaticHandler.hpp"
+#include "Router.hpp"
+#include "ServerBlock.hpp"
 
 ServerLoop::ServerLoop() {
     _run = true;
@@ -35,7 +30,7 @@ ServerLoop::~ServerLoop() {
 
 bool    ServerLoop::hasTimedOut() {
     time_t currentTime = time(nullptr);
-    return (currentTime - _startUpTime) >= 300;  // Timeout after 5 minutes
+    return (currentTime - _startUpTime) >= 300;
 }
 
 void ServerLoop::setupServerSockets() {
@@ -125,7 +120,6 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
         logStream  << "No ServerBlock found for port: "
                     << localPort << std::endl;
         Logger::getInstance().logLevel("WARNING", logStream.str(), 1);
-        // std::cerr << "Warning: No ServerBlock found for port " << localPort << std::endl;
         close(clientFd);
         return ;
     }
