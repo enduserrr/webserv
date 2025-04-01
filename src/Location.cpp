@@ -6,22 +6,18 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:43:41 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/16 12:48:58 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:32:37 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "Location.hpp"
 
-// Constructor
 Location::Location() : _autoIndex(false) {}
 
-// Destructor
 Location::~Location() {}
 
 
-//getters
 std::string Location::getPath() const {
-    // std::cout << "getpath: "<< _path << std::endl;
     return _path;
 }
 
@@ -53,7 +49,6 @@ std::pair<int, std::string>  Location::getRedirect() const {
     return _redirect;
 }
 
-//setters
 void Location::setPath(const std::string& path) {
     if (path.empty() || path[0] != '/')
         throw std::runtime_error("Configuration file: Location path must start with '/'");
@@ -61,8 +56,8 @@ void Location::setPath(const std::string& path) {
 }
 
 void Location::setRoot(const std::string &root) {
-    char cwd[PATH_MAX]; 
-    getcwd(cwd, sizeof(cwd)); 
+    char cwd[PATH_MAX];
+    getcwd(cwd, sizeof(cwd));
     _root = std::string(cwd) + root;
 }
 

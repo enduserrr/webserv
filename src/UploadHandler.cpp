@@ -6,22 +6,15 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/31 11:45:08 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:35:04 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#include "../incs/UploadHandler.hpp"
-#include "../incs/Types.hpp"
-#include <fstream>
-#include <sstream>
-#include <ctime>
-#include <sys/stat.h>
+#include "UploadHandler.hpp"
+#include "Types.hpp"
 
 
-UploadHandler::UploadHandler() {
-    // Create "uploads" dir with rwxr-xr-x permissions
-    // mkdir("./uploads", 0755);
-}
+UploadHandler::UploadHandler() {}
 
 UploadHandler::~UploadHandler() {}
 
@@ -63,7 +56,6 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
             filePath = "./www/uploads/upload_" + std::to_string(std::time(nullptr)) + ".txt";
         std::ofstream ofs(filePath.c_str(), std::ios::binary);
         if (!ofs) {
-            // return "HTTP/1.1 500 Internal Server Error\r\n" + Logger::getInstance().logLevel("ERROR", "Fail reading the file.", 500);
             return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                 + Logger::getInstance().logLevel("ERROR", "Fail reading the file.", 500);
         }
@@ -79,7 +71,6 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
             return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
                 + Logger::getInstance().logLevel("ERROR", "Bad request (uploadHandler).", 400);
         }
-        // std::string filename = extractFilenameFromMultipart(body, boundary);
         std::string filename = req.getFileName();
         if (filename.empty()) {
             return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"

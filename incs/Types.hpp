@@ -13,7 +13,7 @@
 #ifndef TYPES_HPP
 # define TYPES_HPP
 
-#include "Libs.hpp"
+#include "Global.hpp"
 
 class Types {
     private:
@@ -22,14 +22,7 @@ class Types {
     public:
         Types();
         ~Types();
-        // Types& Types::getInstance() {
-        // // Meyers' Singleton:
-        // // The 'instance' is created only the *first* time getInstance() is called.
-        // // Its initialization is guaranteed to be thread-safe in C++11 and later.
-        // // It will be automatically destroyed when the program terminates.
-        // static Types instance;
-        // return instance;
-        // }
+
         std::string getMimeType(const std::string &extension) const;
         bool isValidMime(const std::string &extension) const;
         bool isValidContent(const std::string &contentType) const;

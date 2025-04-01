@@ -6,15 +6,14 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:44:35 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/16 13:01:27 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #ifndef LOCATION_HPP
 #define LOCATION_HPP
 
-#include "Libs.hpp"
-
+#include "Global.hpp"
 
 class Location {
     private:

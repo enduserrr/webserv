@@ -6,17 +6,14 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:10 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/15 15:33:42 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #ifndef HTTPPARSER_HPP
 #define HTTPPARSER_HPP
 
-#include <iostream>
-#include <map>
-#include <vector>
-#include "Webserver.hpp"
+#include "Global.hpp"
 #include "HttpRequest.hpp"
 #include "ServerBlock.hpp"
 

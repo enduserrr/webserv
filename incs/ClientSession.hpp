@@ -6,18 +6,18 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 12:18:51 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/31 10:43:13 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #ifndef CLIENTSESSION_HPP
 #define CLIENTSESSION_HPP
 
+#include "Global.hpp"
 #include "HttpRequest.hpp"
 #include "ServerBlock.hpp"
 #include "Logger.hpp"
-#include "Libs.hpp"
-// #include <string>
+
 
 class ClientSession {
     private:

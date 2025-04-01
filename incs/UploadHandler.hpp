@@ -1,18 +1,15 @@
 #ifndef UPLOADHANDLER_HPP
 #define UPLOADHANDLER_HPP
 
-#include <string>
+#include "Global.hpp"
 #include "HttpRequest.hpp"
 #include "Logger.hpp"
 
 class UploadHandler {
-    private:
-
     public:
         UploadHandler();
         ~UploadHandler();
 
-        // std::string upload(HttpRequest &req);
         std::string uploadReturnPath(HttpRequest &req);
 };
 

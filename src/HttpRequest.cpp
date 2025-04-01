@@ -6,16 +6,14 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:22:42 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/04 08:45:59 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:32:21 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "HttpRequest.hpp"
 
-/* Constructor */
 HttpRequest::HttpRequest() : _maxBodySize(0) {}
 
-/* Destructor */
 HttpRequest::~HttpRequest() {}
 
 void HttpRequest::setBodySize(size_t size) {

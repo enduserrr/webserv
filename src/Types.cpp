@@ -6,12 +6,11 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 10:19:04 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/28 11:12:57 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:34:35 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#include "../incs/Types.hpp"
-#include <algorithm>
+#include "Types.hpp"
 
 Types::Types() {
     _mimeTypes = {
@@ -40,13 +39,6 @@ Types::Types() {
 
 Types::~Types() {}
 
-// std::string Types::getMimeType(const std::string &extension) const {
-//     std::map<std::string, std::string>::const_iterator it = _mimeTypes.find(extension);
-//     if (it != _mimeTypes.end())
-//         return it->second;
-//     return "application/octet-stream"; // Default for unknown files
-// }
-
 std::string Types::getMimeType(const std::string &filePath) const {
     // Find the position of the last dot
     size_t dotPos = filePath.rfind('.');
@@ -72,10 +64,6 @@ std::string Types::getMimeType(const std::string &filePath) const {
     // If extension not in map, return default
     return "application/octet-stream";
 }
-
-// bool Types::isValidMime(const std::string &extension) const {
-//     return _mimeTypes.find(extension) != _mimeTypes.end();
-// }
 
 bool Types::isValidMime(const std::string &filePath) const {
     size_t dotPos = filePath.rfind('.');
