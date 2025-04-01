@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/31 12:04:44 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:25:21 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -14,11 +14,11 @@
 #include "../incs/StaticHandler.hpp"
 #include "../incs/Router.hpp"
 #include "../incs/ServerBlock.hpp"
-#include <algorithm>
-#include <iostream>
-#include <cstring> //memset
-#include <unistd.h> //close()
-#include <arpa/inet.h> //socket operations
+// #include <algorithm>
+// #include <iostream>
+// #include <cstring> //memset
+// #include <unistd.h> //close()
+// #include <arpa/inet.h> //socket operations
 
 ServerLoop::ServerLoop() {
     _run = true;
@@ -84,12 +84,11 @@ void ServerLoop::setupServerSockets() {
             _pollFds.push_back(pfd);
             _serverSockets.push_back(serverSocket);
             _boundPorts.push_back(*portIt);
-            _portToBlock[*portIt] = *it;  // Correct serverblock?
+            _portToBlock[*portIt] = *it;
             std::ostringstream logStream;
             logStream   << "Server started on port(s): "
                         << *portIt;
-            Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
-            // std::cout << "Server started on port: " << *portIt << std::endl;
+            Logger::getInstance().logLevel("INFO", logStream.str(), 0);
         }
     }
 }
@@ -97,7 +96,6 @@ void ServerLoop::setupServerSockets() {
 bool ServerLoop::serverFull() {
      if (_clients.size() >= MAX_CLIENTS) {
         Logger::getInstance().logLevel("INFO", "Server if full! Rejecting new clients", 0);
-        // std::cerr << "Server is full! Rejecting new client." << std::endl;
         std::cerr << "clients: " << _clients.size()<< std::endl;
         return true;
      }
@@ -144,8 +142,6 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     logStream  << "New client connected on port: "
                     << localPort  << " (fd: " << clientFd << ")" << std::endl;
     Logger::getInstance().logLevel("INFO", logStream.str(), 0);
-    // std::cout << "New client connected on port " << localPort
-    //           << " (fd: " << clientFd << ")" << std::endl;
 }
 
 /**
@@ -163,7 +159,6 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             break ;
         if (parser.getState() != 0) {
             Logger::getInstance().logLevel("SYS_ERROR", "Bad request (stoi fail).", 1);
-            // std::cerr << "bad request (stoi fails)! " << std::endl;
             return ;
         }
     }
@@ -175,8 +170,6 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         logStream  << "Unable to read from socket: "
                     << clientSocket  << ": " << strerror(errno) << std::endl;
         Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
-        // std::cerr << "Error reading from socket " << clientSocket
-        //           << ": " << strerror(errno) << std::endl;
         removeClient(clientSocket);
         return ;
     }
@@ -193,7 +186,6 @@ void ServerLoop::handleClientRequest(int clientSocket) {
                 logStream  << "No matching ServerBlock for port: "
                     << port  << std::endl;
                 Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
-                // std::cerr << "Warning: No matching ServerBlock for port " << port << std::endl;
             }
         }
     }
@@ -243,7 +235,6 @@ void ServerLoop::startServer() {
         int pollResult = poll(_pollFds.data(), _pollFds.size(), 5000);
         if (pollResult < 0) {
             Logger::getInstance().logLevel("SYS_ERROR", "Error in poll().", 1);
-            // std::cerr << RB "Error:" RES " in poll()" << std::endl;
             break ;
         }
         for (size_t i = 0; i < _pollFds.size(); ++i) {
@@ -271,7 +262,6 @@ void ServerLoop::removeClient(int clientFd) {
         logStream   << "Client disconnected (fd: "
                     << clientFd << ")" << std::endl;
         Logger::getInstance().logLevel("INFO", logStream.str(), 0);
-        // std::cout << "Client disconnected (fd: " << clientFd << ")" << std::endl;
     }
 }
 
@@ -281,28 +271,5 @@ void ServerLoop::closeServer() {
     }
     _pollFds.clear();
     Logger::getInstance().logLevel("INFO", "Server closed and resources cleaned.", 0);
-    // std::cout << "Server closed and resources cleaned." << std::endl;
 }
-
-/* void ServerLoop::test(){
-    std::string chunk =
-    "POST /upload HTTP/1.1\r\n"
-    "Host: example.com\r\n"
-    "Content-Type: application/x-www-form-urlencoded\r\n"
-    "Content-Length: 16\r\n"
-    "\r\n";
-
-    HttpParser par;
-    par.parseRequest(_serverBlocks[0], chunk, 100);
-    HttpRequest req;
-    req = par.getPendingRequest();
-
-    std::cout<< req.getBodySize() << std::endl;
-    std::cout<< req.getMethod() << std::endl;
-    std::cout<< req.getUri() << std::endl;
-    std::cout<< req.getHttpVersion() << std::endl;
-    // std::cout<< req.getUriQuery() << std::endl;
-    // std::cout<< req.getHeaders() << std::endl;
-    std::cout<< req.getBody() << std::endl;
-} */
 

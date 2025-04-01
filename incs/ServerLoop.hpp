@@ -6,13 +6,14 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/31 10:43:13 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #ifndef SERVERLOOP_HPP
 # define SERVERLOOP_HPP
 
+#include "Global.hpp"
 #include "ServerBlock.hpp"
 #include "Logger.hpp"
 #include "HttpParser.hpp"
@@ -21,20 +22,7 @@
 #include "HttpRequest.hpp"
 #include "HttpParser.hpp"
 #include "Router.hpp"
-#include "Webserver.hpp"
 #include "ClientSession.hpp"
-#include <vector>
-#include <poll.h>// Pollfd
-#include <map>// For storing client data
-#include <ctime>
-
-#define GC     "\033[3;90m"
-#define WB     "\033[1;97m"
-#define GB     "\033[1;92m"
-#define RB     "\033[1;91m"
-#define RES    "\033[0m"
-
-#define MAX_CLIENTS 100
 
 class ServerLoop {
     private:

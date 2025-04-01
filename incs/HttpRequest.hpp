@@ -6,16 +6,14 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:23:00 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/16 12:43:21 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #ifndef HTTPREQUEST_HPP
 #define HTTPREQUEST_HPP
 
-#include <iostream>
-#include <map>
-#include <vector>
+#include "Global.hpp"
 
 class HttpRequest {
 private:
@@ -29,7 +27,6 @@ private:
     std::string                         _body;
     std::string                         _fileName;
 
-    // std::map<std::string, bool>         _indexLoc;
     bool                                _autoIndex;
     std::string                         _root;
 

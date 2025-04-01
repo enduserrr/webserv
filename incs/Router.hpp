@@ -6,16 +6,14 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:44 by asalo             #+#    #+#             */
-/*   Updated: 2025/03/31 10:43:13 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #ifndef ROUTER_HPP
 #define ROUTER_HPP
 
-#include <string>
-#include <map>
-#include <sstream>
+#include "Global.hpp"
 #include "HttpRequest.hpp"
 #include "CgiHandler.hpp"
 #include "StaticHandler.hpp"

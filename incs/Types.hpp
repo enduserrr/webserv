@@ -13,7 +13,7 @@
 #ifndef TYPES_HPP
 # define TYPES_HPP
 
-#include "Libs.hpp"
+#include "Global.hpp"
 
 class Types {
     private:

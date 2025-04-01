@@ -6,46 +6,15 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:22 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/16 10:27:30 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #ifndef CONFPARSER_HPP
 #define CONFPARSER_HPP
 
-#include "Webserver.hpp"
+#include "Global.hpp"
 #include "ServerBlock.hpp"
-#include <vector>
-#include <sstream>
-#include <algorithm>
-#include <cctype>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <limits.h>
-
-//KEYWORDS
-#define SERVER          "server {"
-#define SERVER_NAME     "server_name"
-#define PORT            "listen"
-#define BODY_SIZE       "client_max_body_size"
-#define ERR_PAGE        "error_page"
-#define METHODS         "allow_methods"
-#define LOCATION        "location"
-#define ROOT            "root"
-#define AUTOI           "autoindex"
-#define INDEX           "index"
-#define REDIR           "return"
-#define USTORE          "upload_store"
-
-
-//ERRORS
-#define ERR RED         "Error: " RES
-#define FILE_V GRAY     "File validation: " RES
-#define CONF GRAY       "Configuration file: " RES
-
-//FILESIZES
-#define FILE_SIZE_MAX 1000000000
-#define FILE_SIZE_MIN 0
 
 class ConfParser {
 private:
