@@ -10,9 +10,6 @@
 /*                                                                            */
 /******************************************************************************/
 
-// #ifndef ERRORHANDLER_HPP
-// # define ERRORHANDLER_HPP
-
 #ifndef LOGGER_HPP
 # define LOGGER_HPP
 
