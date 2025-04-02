@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:37:11 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/02 18:21:09 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -23,9 +23,7 @@ class CgiHandler {
     private:
 		std::vector<std::string> buildCgiEnvironment(HttpRequest &req);// Build CGI env vars
 		char **convertEnvVectorToArray(const std::vector<std::string> &env); //Convert vector of strs to a char* arr
-		std::string executeCgi(const std::string &cgiExecutable,
-							const std::string &scriptPath,
-							HttpRequest &req);//Execute the CGI script and return its output.
+		std::string executeCgi(const std::string &scriptPath, HttpRequest &req);//Execute the CGI script and return its output.
 
     public:
         CgiHandler();
