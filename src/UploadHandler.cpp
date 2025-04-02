@@ -22,17 +22,19 @@ std::string extractFileContentFromMultipart(const std::string &body, const std::
     std::string boundaryDelimiter = "--" + boundary;
     size_t start = body.find("\r\n\r\n"); // Find start of file content
     if (start != std::string::npos) {
+        std::cout << "body found" << std::endl; 
         start += 4; // Move past header section
         size_t end = body.find(boundaryDelimiter, start);
         if (end != std::string::npos) {
+            std::cout << "\nbody:::\n\n\n\n\n"<< body.substr(start, end - start - 2) <<"\n\n\n\n\n\n\n" << std::endl; 
             return body.substr(start, end - start - 2); // Remove trailing CRLF
         }
     }
-    return "";
+    std::cout << "empty" << std::endl; 
+    return body;
 }
 
 std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
-    std::cout << "uploadReturnPath" << std::endl;
     Types types; // Instance of Types class for type validation
     std::string body = req.getBody();
     std::string contentType = req.getHeader("Content-Type");
@@ -92,8 +94,9 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
             return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                 + Logger::getInstance().logLevel("ERROR", "Internal server error (uploadHandler).", 500);
         }
-
-        std::string fileContent = extractFileContentFromMultipart(body, boundary);
+        // extractia ei tarvita, body on suoraan oikeassa kohdassa. 
+        // std::string fileContent = extractFileContentFromMultipart(body, boundary); 
+        std::string fileContent = body;
         ofs.write(fileContent.c_str(), fileContent.size());
         ofs.close();
     }
