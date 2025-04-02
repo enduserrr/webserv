@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/02 18:32:57 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/02 19:19:15 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -15,19 +15,6 @@
 CgiHandler::CgiHandler() {}
 
 CgiHandler::~CgiHandler() {}
-
-#include <chrono>
-#include <csignal>
-#include <setjmp.h>
-
-static sigjmp_buf jmpbuf;
-static volatile bool timeout_flag = false;
-
-static void timeout_handler(int sig) {
-    (void)sig;
-    timeout_flag = true;
-    siglongjmp(jmpbuf, 1);
-}
 
 std::string CgiHandler::processRequest(HttpRequest &req) {
     std::string uri = req.getUri();
@@ -39,30 +26,21 @@ std::string CgiHandler::processRequest(HttpRequest &req) {
     std::string scriptPath = req.getRoot() + uri;
     std::string cgiOutput;
 
-    struct sigaction sa;
-    sa.sa_handler = timeout_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    if (sigaction(SIGALRM, &sa, NULL) == -1) {
-        Logger::getInstance().logLevel("ERROR", "Failed to set signal handler.", 500);
-        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-               "<h1>500 Internal Server Error</h1><p>Failed to set signal handler.</p>";
-    }
-
-    alarm(5);
-    timeout_flag = false;
-
-    if (sigsetjmp(jmpbuf, 1) == 0) {
+    try {
         cgiOutput = executeCgi(scriptPath, req);
-        alarm(0);
+        return cgiOutput;
+    } catch (const CgiException &e) {
 
-        std::ostringstream responseStream;
-        responseStream << "HTTP/1.1 200 OK\r\n" << cgiOutput;
-        return responseStream.str();
-    } else {
-        alarm(0);
-        return "HTTP/1.1 508 Gateway Timeout\r\nContent-Type: text/html\r\n\r\n" +
-               Logger::getInstance().logLevel("ERROR", "CGI script execution timed out.", 408);
+         return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+                +  Logger::getInstance().logLevel("ERROR", e.what(), 500);
+    } catch (const std::exception &e) {
+
+         return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+                + Logger::getInstance().logLevel("ERROR", e.what(), 500);
+    } catch (...) {
+
+        return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+               + Logger::getInstance().logLevel("ERROR", "Unknown error during CGI execution", 500);
     }
 }
 
@@ -104,15 +82,15 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
     std::vector<std::string> envVector = buildCgiEnvironment(req);
     char **envp = convertEnvVectorToArray(envVector);
 
-    // Meaby make this configurable for more script types
-    std::string phpExecutable = "/usr/bin/php"; // 'which php'
+    // PHP executable path
+    std::string phpExecutable = "/usr/bin/php";
 
-    // Construct the command to execute script
+    // Construct the command
     std::vector<const char*> args;
     args.push_back(phpExecutable.c_str());
     args.push_back(scriptPath.c_str());
-    args.push_back(NULL); // execve requires a NULL-terminated argument list
-
+    args.push_back(NULL);
+    // pieps for communication
     int pipe_in[2];
     int pipe_out[2];
     if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1) {
@@ -143,7 +121,7 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
         // Execute script
         execve(phpExecutable.c_str(), const_cast<char* const*>(args.data()), envp);
 
-        // If execve fails
+        // If execve fails - Another solution?
         perror("execve"); // Print the error message
 
         for (size_t i = 0; i < envVector.size(); ++i) {
@@ -161,6 +139,8 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
             if (bytes_written == -1) {
                 Logger::getInstance().logLevel("ERROR", "Error writing to pipe.", 500);
                 close(pipe_in[1]); close(pipe_out[0]);
+                kill(pid, SIGKILL);
+                waitpid(pid, nullptr, 0);
                 return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                        "<h1>500 Internal Server Error</h1><p>Error writing to pipe.</p>";
             }
@@ -171,9 +151,70 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
         std::string cgiOutput;
         char buffer[1024];
         ssize_t bytes_read;
-        while ((bytes_read = read(pipe_out[0], buffer, sizeof(buffer) - 1)) > 0) {
-            buffer[bytes_read] = 0;
-            cgiOutput.append(buffer);
+
+        // Set timeout
+        const int timeout_seconds = 5;
+        auto start = std::chrono::steady_clock::now();
+
+        while (true) {
+            fd_set readfds;
+            FD_ZERO(&readfds);
+            FD_SET(pipe_out[0], &readfds);
+
+            struct timeval timeout;
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 100000;  // Check every 100 milliseconds
+
+            int select_result = select(pipe_out[0] + 1, &readfds, NULL, NULL, &timeout);
+            // REPLACE
+            if (select_result == -1) {
+                if (errno == EINTR) continue;  // Interrupted by signal, try again
+
+                Logger::getInstance().logLevel("ERROR", "Error with select", 500);
+                close(pipe_out[0]);
+                kill(pid, SIGKILL);
+                waitpid(pid, nullptr, 0);
+
+                return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+                       "<h1>500 Internal Server Error</h1><p>Error reading from pipe (select).</p>";
+            } else if (select_result > 0) {
+                bytes_read = read(pipe_out[0], buffer, sizeof(buffer) - 1);
+                if (bytes_read > 0) {
+                    buffer[bytes_read] = 0; // Null-terminate
+                    cgiOutput.append(buffer);
+                } else if (bytes_read == 0) {
+                    break ; // EOF
+                } else {
+                     Logger::getInstance().logLevel("ERROR", "Error reading from pipe.", 500);
+                    close(pipe_out[0]);
+                    kill(pid, SIGKILL);
+                    waitpid(pid, nullptr, 0);
+
+                    return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+                           "<h1>500 Internal Server Error</h1><p>Error reading from pipe.</p>";
+
+                }
+
+            }
+            // Consider not using auto
+            auto now = std::chrono::steady_clock::now();
+            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
+
+            if (elapsed_seconds >= timeout_seconds) {
+                Logger::getInstance().logLevel("ERROR", "CGI script execution timed out.", 508);
+                close(pipe_out[0]);
+                kill(pid, SIGKILL);  // Kill the child process
+                waitpid(pid, nullptr, 0); // Wait for the child to terminate
+
+                return "HTTP/1.1 508 Gateway Timeout\r\nContent-Type: text/html\r\n\r\n"
+                       "<h1>508 Gateway Timeout</h1><p>CGI script execution timed out.</p>";
+            }
+
+             if (waitpid(pid, nullptr, WNOHANG) != 0)
+             {
+                break ;
+             }
+
         }
 
         close(pipe_out[0]);
@@ -181,19 +222,21 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
         int status;
         waitpid(pid, &status, 0);
 
+        // Free allocated memory.
         for (size_t i = 0; i < envVector.size(); ++i) {
             free(envp[i]);
         }
         delete[] envp;
 
-        if (bytes_read == -1 || !WIFEXITED(status) || WEXITSTATUS(status) != 0 )
-        {
+        //check if exited with correct status, but timeout takes presedence.
+       if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - start).count() < timeout_seconds
+       && (!WIFEXITED(status) || WEXITSTATUS(status) != 0)) {
             return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                    + Logger::getInstance().logLevel("ERROR", "Internal server error.  Error reading CGI response.", 500);
-        }
+       }
 
-        // Parse headers and body (This is a SIMPLIFIED header parsing.
-        size_t headerEndPos = cgiOutput.find("\r\n\r\n");
+        // Parse headers and body
+        size_t headerEndPos = cgiOutput.find("\r\n\r\n"); // Find end of headers
 
         std::string headers;
         std::string body;
@@ -206,12 +249,14 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
             headers = "";
         }
 
+        // Build the HTTP response
         std::ostringstream responseStream;
         responseStream << "HTTP/1.1 200 OK\r\n";
         //Add Content-Type header
         if (headers.find("Content-Type:") == std::string::npos) {
             responseStream << "Content-Type: text/html\r\n"; // Default if not specified
         }
+
         responseStream << headers << "\r\n\r\n";
         responseStream << body;
 

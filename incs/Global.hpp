@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 11:10:03 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 13:10:07 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/02 19:15:12 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -37,28 +37,14 @@
 #include <functional>   // For std::function
 #include <dirent.h>     // For opendir, readdir, closedir
 #include <csignal>      // For signal handling
-
 #include <algorithm>
 #include <cctype>
 #include <limits.h>
-
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <cstdlib>
-
-// enum class LogLevel {
-//     WARNING = 1,
-//     SYS_ERROR = 2,
-//     DEF_ERR = 3,
-//     BAD_REQ_ERR = 400,
-//     FORBIDDEN_REQ_ERR = 403,
-//     NOT_FOUND_ERR = 404,
-//     TIME_OUT_ERR = 408,
-//     PAYLOAD_ERR = 413,
-//     MEDIA_TYPE_ERR = 415,
-//     REQ_COUNT_ERR = 429,
-//     INTERNAL_SERV_ERR = 500,
-// };
+#include <sys/types.h>
+#include <thread> // WHAT FOR?
 
 /* COLOR CODES FOR CONSOLE OUTPUTS */
 #define GC      "\033[3;90m"
