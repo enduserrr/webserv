@@ -62,7 +62,7 @@ bool HttpParser::isFullRequest(std::string &input) {
         input = input.substr(bodyStart + contentLength);
     else
         input.clear();
-    std::cout << GC << "\n\nLEFT OVER:" << input << RES << std::endl;
+    // std::cout << GC << "\n\nLEFT OVER:" << input << RES << std::endl;
     return true;
 }
 
@@ -214,23 +214,17 @@ bool HttpParser::isValidUri(std::string& uri) {
 }
 
 bool HttpParser::parseHeader(std::string &line, HttpRequest &req) {
-    std::istringstream ss(line);
-    std::string key;
-    std::string value;
-    if (!(ss >> key >> value)){
-        _state = 400; //BADREQ
+    size_t pos = line.find(':');
+    if (pos == std::string::npos) {
+        _state = 400;
         return false;
     }
-    key.pop_back();
-    if (key == "Content-Length") {
-        size_t size = std::stoi(value);
-        if (size > _maxBodySize) {
-            _state = 413; //PAYLOAD TOO LARGE
-            return false;
-        }
-    }
+    std::string key = line.substr(0, pos);
+    std::string value = line.substr(pos + 1);
+    key.erase(key.find_last_not_of(" \t\r\n") + 1);
+    value.erase(0, value.find_first_not_of(" \t\r\n"));
     req.addNewHeader(key, value);
-    return true;
+    return true; 
 }
 
 void HttpParser::parseBody(std::string &body, HttpRequest &req) {
@@ -273,7 +267,7 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
         }// ↓↓↓ Extract file content ↓↓↓
         size_t contentStart = body.find("\r\n\r\n", dispositionPos);
         if (contentStart != std::string::npos) {
-            contentStart += 4; // Move past header section
+            contentStart += 4; 
             size_t contentEnd = body.find(boundary, contentStart);
             if (contentEnd != std::string::npos) {
                 std::string value = body.substr(contentStart, contentEnd - contentStart - 2);
