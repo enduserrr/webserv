@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:50:04 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/03 10:40:21 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -28,10 +28,7 @@ ServerLoop::~ServerLoop() {
     closeServer();
 }
 
-bool    ServerLoop::hasTimedOut() {
-    time_t currentTime = time(nullptr);
-    return (currentTime - _startUpTime) >= 300;
-}
+
 
 void ServerLoop::setupServerSockets() {
     for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
@@ -58,6 +55,13 @@ void ServerLoop::setupServerSockets() {
             memset(&serverAddr, 0, sizeof(serverAddr));
             serverAddr.sin_family = AF_INET;
             serverAddr.sin_port = htons(*portIt);
+            // // Bind to 0.0.0.0 to accept connections on all interfaces, not just localhost
+            // serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+            // // if (inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr) <= 0) { // Original binding to localhost only
+            // //     Logger::getInstance().logLevel("SYS_ERROR", "Invalid address for port " + std::to_string(*portIt), 1);
+            // //     close(serverSocket);
+            // //     continue ;
+            // // }
             if (inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr) <= 0) {
                 Logger::getInstance().logLevel("SYS_ERROR", "Invalid address for port " + std::to_string(*portIt), 1);
                 close(serverSocket);
@@ -81,9 +85,13 @@ void ServerLoop::setupServerSockets() {
             _boundPorts.push_back(*portIt);
             _portToBlock[*portIt] = *it;
             std::ostringstream logStream;
-            logStream << "Server started on port(s): " << *portIt;
+            logStream << "Server listening on port: " << *portIt;
             Logger::getInstance().logLevel("INFO", logStream.str(), 0);
         }
+    }
+    if (_serverSockets.empty()) {// Meaby an exception instead
+        Logger::getInstance().logLevel("ERROR", "No server sockets were successfully set up. Exiting.", 1);
+        _run = false;
     }
 }
 
@@ -97,13 +105,19 @@ bool ServerLoop::serverFull() {
 }
 
 void ServerLoop::acceptNewConnection(int serverSocket) {
-    if (serverFull())
+    if (serverFull()) // Add logLevel call
         return ;
     struct sockaddr_in clientAddr;
     socklen_t addrLen = sizeof(clientAddr);
     int clientFd = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
     if (clientFd < 0) {
         Logger::getInstance().logLevel("SYS_ERROR", "Failed to accept client connection.", 1);
+        return ;
+    }
+
+    if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
+        Logger::getInstance().logLevel("SYS_ERROR", "Failed to set client socket non-blocking", 1);
+        close(clientFd);
         return ;
     }
     struct sockaddr_in localAddr; // Retrieve the local (server) port for the accepted connection.
@@ -123,15 +137,19 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     }
 
     ClientSession session(clientFd);// Create and store the client session with the correct ServerBlock.
-    session._block = _portToBlock[localPort];
+    session._block = _portToBlock[localPort]; //Assign correct ServerBlock
     _clients[clientFd] = session;
 
     struct pollfd pfd;// Add the new client to the poll vector.
     pfd.fd = clientFd;
     pfd.events = POLLIN;
     _pollFds.push_back(pfd);
+    _clientLastActivity[clientFd] = time(nullptr); //Client activity for time-outs
+
     std::ostringstream logStream;
-    logStream << "New client connected on port: " << localPort  << " (fd: " << clientFd << ")";
+    char clientIp[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
+    logStream << "New client connected from " << clientIp << " on port " << localPort  << " (fd: " << clientFd << ")";
     Logger::getInstance().logLevel("INFO", logStream.str(), 0);
 }
 
@@ -213,45 +231,110 @@ void    ServerLoop::sendResponse(int clientSocket, const std::string &response) 
     return ;
 }
 
+void ServerLoop::checkClientTimeouts() {
+    time_t currentTime = time(nullptr);
+    std::vector<int> fdsToRemove;
+
+    for (std::map<int, time_t>::const_iterator it = _clientLastActivity.begin(); it != _clientLastActivity.end(); ++it) {
+        int fd = it->first;
+        time_t lastActivityTime = it->second;
+
+        if ((currentTime - lastActivityTime) >= _clientTimeoutDuration) {
+            std::ostringstream logStream;
+            logStream << "Client fd " << fd << " timed out after "
+                      << (currentTime - lastActivityTime) << "s. Closing.";
+            Logger::getInstance().logLevel("INFO", logStream.str(), 0);
+            fdsToRemove.push_back(fd);
+        }
+    }
+    // Remove timed-out clients
+    for (std::vector<int>::iterator it = fdsToRemove.begin(); it != fdsToRemove.end(); ++it) {
+        removeClient(*it);
+    }
+}
+
 void ServerLoop::startServer() {
-    setupServerSockets();
+    try {
+        setupServerSockets();
+        if (!_run) {
+            Logger::getInstance().logLevel("ERROR", "Server setup failed. Cannot start loop.", 0);
+            return ;
+        }
+    } catch (const std::exception& e) {
+        Logger::getInstance().logLevel("FATAL", "Exception during server setup: " + std::string(e.what()), 1);
+        return ;
+    }
+
     _startUpTime = time(nullptr);
+    Logger::getInstance().logLevel("INFO", "Server main loop started.", 0);
 
     while (_run) {
-        // if (hasTimedOut()) {
-        //     std::cout << "No activity for 10 seconds. Exiting server." << std::endl;
-        //     closeServer();
-        //     return;
-        // }
         int pollResult = poll(_pollFds.data(), _pollFds.size(), 2000);
         if (pollResult < 0) {
-            Logger::getInstance().logLevel("WARNING", "Error in poll().", 0);
+            Logger::getInstance().logLevel("SYS_ERROR", "Fatal error in poll()", 1);
+            _run = false;
             break ;
         }
-        for (size_t i = 0; i < _pollFds.size(); ++i) {
-            if (_pollFds[i].revents & POLLIN) {
-                int fd = _pollFds[i].fd;
-                if (std::find(_serverSockets.begin(), _serverSockets.end(), fd) != _serverSockets.end()) {
+
+        time_t currentTime = time(nullptr); // Get time once per loop iteration
+
+        // Process ready file descriptors
+        size_t currentPollFdsCount = _pollFds.size();
+        for (size_t i = 0; i < currentPollFdsCount; ++i) {
+            // removeClient can alter _pollFds
+            if (i >= _pollFds.size()) {
+                 break ;
+            }
+
+            struct pollfd& currentPfd = _pollFds[i];
+            int fd = currentPfd.fd;
+
+            // Check ONLY for incoming data/connections (POLLIN)
+            if (currentPfd.revents & POLLIN) {
+                // Determine if it's a listening server socket or a client socket
+                bool isServer = false;
+                for(size_t s = 0; s < _serverSockets.size(); ++s) {
+                    if (_serverSockets[s] == fd) {
+                        isServer = true;
+                        break ;
+                    }
+                }
+                if (isServer) {
                     acceptNewConnection(fd);
                 } else {
+                    _clientLastActivity[fd] = currentTime;
                     handleClientRequest(fd);
+                    // Check if handleClientRequest removed the client
+                    bool clientStillExists = (_clients.find(fd) != _clients.end());
+                    if (!clientStillExists) {
+                        currentPollFdsCount--;
+                        i--;
+                    }
                 }
             }
         }
+        if (_run) {
+            checkClientTimeouts();
+        }
     }
+    Logger::getInstance().logLevel("INFO", "Server loop terminated.", 0);
+    closeServer();
 }
 
 void ServerLoop::removeClient(int clientFd) {
     std::map<int, ClientSession>::iterator it = _clients.find(clientFd);
     if (it != _clients.end()) {
-        close(clientFd);
-        _clients.erase(it);
+        close(clientFd); // Close client socket descriptor
+        _clients.erase(it); // Erase client from map
+        _clientLastActivity.erase(clientFd); // Erase from activity map
         _pollFds.erase(std::remove_if(_pollFds.begin(), _pollFds.end(),
                         [clientFd](struct pollfd& pfd) { return pfd.fd == clientFd; }),
                         _pollFds.end());
         std::ostringstream logStream;
         logStream << "Client disconnected (fd: " << clientFd << ")";
         Logger::getInstance().logLevel("INFO", logStream.str(), 0);
+    } else {
+         Logger::getInstance().logLevel("WARNING", "Tried to remove non-existent client fd: " + std::to_string(clientFd), 0);
     }
 }
 

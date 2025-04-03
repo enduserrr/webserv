@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/03 10:13:07 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -36,14 +36,16 @@ class ServerLoop {
         std::vector<struct pollfd>  _pollFds; // Fd's for polling
         time_t                      _startUpTime;
         bool                        _run;
-        // int                         _clientCount;
+
+        std::map<int, time_t>       _clientLastActivity; // Client last activity time
+        const time_t                _clientTimeoutDuration = 60;
 
         void    removeClient(int clientFd);
         void    setupServerSockets();
         void    acceptNewConnection(int serverSocket);
         void    handleClientRequest(int clientSocket);
         void    sendResponse(int clientSocket, const std::string &response);
-        void    handleMultipartUpload(ClientSession &client);
+        void    checkClientTimeouts();
 
     public:
         ServerLoop();
@@ -52,12 +54,17 @@ class ServerLoop {
 
         void    startServer();
         void    closeServer();
-        bool    hasTimedOut();
+        // bool    hasTimedOut();
         bool    serverFull();
-        void    stop() {
-            _run = false;
+        void    stopServer() {_run = false;}
+        void    stop() {_run = false;}
+
+        bool    hasTimedOut() {
+            time_t currentTime = time(nullptr);
+            return (currentTime - _startUpTime) >= 1800; //30in
         }
-        // void test();
+
+
 };
 
 #endif
