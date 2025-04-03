@@ -191,14 +191,8 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
     } else {
-        std::cout<< "PARSER return state: " << parser.getState() << std::endl;
-        std::string respons =  "HTTP/1.1" + std::to_string(parser.getState()) + "\r\n"
-                                "Content-Type: text/html\r\n"
-                                "Content-Length: 52\r\n"
-                                "Connection: close\r\n"
-                                "\r\n"
-                                "<html><body><h1> request return state: " + std::to_string(parser.getState()) + "</h1></body></html>";
-        sendResponse(clientSocket, respons);
+        sendResponse(clientSocket, std::string("HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n") +
+        Logger::getInstance().logLevel("ERROR", "Bad Request", parser.getState()));
         removeClient(clientSocket);
     }
 }
