@@ -93,6 +93,10 @@ bool HttpParser::parseRequest(ServerBlock &block) {
     std::string body;
     body.assign(std::istreambuf_iterator<char>(ss), std::istreambuf_iterator<char>());
     parseBody(body, request);
+    if (request.getMethod() == "POST" && request.getBody().size() == 0) {
+        _state = 400; 
+        return false;
+    }
     createRequest(block, request);
     return true;
 }
@@ -326,12 +330,6 @@ std::vector<HttpRequest>& HttpParser::getRequests() {
 
 HttpRequest& HttpParser::getPendingRequest() {
     return _requests.front();
-}
-
-void HttpParser::removeRequest() {
-    if (!_requests.empty()) {
-        _requests.erase(_requests.begin());
-    }
 }
 
 void HttpParser::display() const {
