@@ -14,26 +14,38 @@
 #include "Types.hpp"
 
 // Constructor
-HttpParser::HttpParser() : _state(0) {}
+HttpParser::HttpParser(size_t max) : _state(0), _totalRequestSize(0), _maxBodySize(max) {}
 
 // Destructor
 HttpParser::~HttpParser() {}
 
-bool HttpParser::startsWithMethod(const std::string &input) {
+bool HttpParser::startsWithMethod(std::string &input) {
     size_t firstSpace = input.find(' ');
-    if (firstSpace == std::string::npos)
-        return false;  // No space means malformed request
-
+    if (firstSpace == std::string::npos) {
+        _state = 400;
+        input.clear();
+        return false;
+    }
     std::string method = input.substr(0, firstSpace);
     return (method == "GET" || method == "POST" || method == "DELETE");
 }
 
+bool HttpParser::requestSize(ssize_t bytes) {
+    _totalRequestSize += bytes;
+    if (_totalRequestSize > (_maxBodySize + MAX_REQ_SIZE)) {
+        _state = 413;
+        return false; 
+    }
+    return true; 
+}
+
 // Should be moved to ServerLoop as technically isn't a part of HttpParsing
-bool HttpParser::isFullRequest(std::string &input) {
-    if (!startsWithMethod(input)) {
-        _state = 400;
-        input.clear();
+bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
+    if (!startsWithMethod(input))
         return false;
+    if (!requestSize(bytes)) {
+        input.clear();
+        return false; 
     }
     size_t headerEnd = input.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
@@ -67,10 +79,8 @@ bool HttpParser::isFullRequest(std::string &input) {
 }
 
 bool HttpParser::parseRequest(ServerBlock &block) {
-    (void)block;
     std::istringstream ss(_fullRequest);
     std::string line;
-    _maxBodySize = block.getBodySize();
     HttpRequest request;
     std::getline(ss, line);
     if (!parseStartLine(line, request)) {

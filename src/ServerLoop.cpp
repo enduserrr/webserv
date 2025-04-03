@@ -142,14 +142,16 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
 void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096]; // For each recv
     ssize_t bytesRead;
-    HttpParser parser;
+    HttpParser parser(_clients[clientSocket]._block.getBodySize());
 
     while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
         _clients[clientSocket].buffer.append(buffer, bytesRead);
-        if (parser.isFullRequest(_clients[clientSocket].buffer))
+        if (parser.isFullRequest(_clients[clientSocket].buffer, bytesRead))
             break ;
         if (parser.getState() != 0) {
-            Logger::getInstance().logLevel("SYS_ERROR", "Bad request (stoi fail).", 1);
+            sendResponse(clientSocket, std::string("HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n") +
+            Logger::getInstance().logLevel("ERROR", "Bad Request", parser.getState()));
+            removeClient(clientSocket);
             return ;
         }
     }
@@ -221,7 +223,7 @@ void ServerLoop::startServer() {
         //     closeServer();
         //     return;
         // }
-        int pollResult = poll(_pollFds.data(), _pollFds.size(), 5000);
+        int pollResult = poll(_pollFds.data(), _pollFds.size(), 2000);
         if (pollResult < 0) {
             Logger::getInstance().logLevel("WARNING", "Error in poll().", 0);
             break ;
