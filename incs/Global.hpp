@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 11:10:03 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/02 19:15:12 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/04 13:22:41 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -48,7 +48,7 @@
 
 /* COLOR CODES FOR CONSOLE OUTPUTS */
 #define GC      "\033[3;90m"
-#define GREY  "\033[0;90m"
+#define GREY    "\033[1;90m"
 #define YB      "\033[0;93m"
 #define WB      "\033[0;97m"
 #define GB      "\033[0;92m"

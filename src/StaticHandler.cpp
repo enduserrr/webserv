@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 11:41:08 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:34:28 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/04 11:02:03 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -24,15 +24,15 @@ std::string StaticHandler::processRequest(HttpRequest &req) {
         if (req.getBody().empty()) {
             Logger::getInstance().logLevel("ERROR", "POST request has an empty body!", 500);
         } else {
-            std::cout << "POST METHOD -->" << std::endl;
+            // std::cout << "POST METHOD -->" << std::endl;
             return Methods::mPost(req);
         }
     }
     if (method == "DELETE") {
-        std::cout << "DELETE METHOD -->" << std::endl;
+        // std::cout << "DELETE METHOD -->" << std::endl;
         return Methods::mDelete(req);
     }
-    std::cout << "GET METHOD -->" << std::endl;
+    // std::cout << "GET METHOD -->" << std::endl;
     return Methods::mGet(req);
 }
 

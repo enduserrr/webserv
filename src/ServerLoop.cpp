@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/03 10:40:21 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/04 12:57:21 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -28,8 +28,10 @@ ServerLoop::~ServerLoop() {
     closeServer();
 }
 
-
-
+/**
+ * @brief   Initializes and configs listening sockets for each port in the ServerBlocks
+ *          and adds them to the poll structure.
+ */
 void ServerLoop::setupServerSockets() {
     for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
         const std::vector<int>& ports = it->getPorts();
@@ -55,14 +57,10 @@ void ServerLoop::setupServerSockets() {
             memset(&serverAddr, 0, sizeof(serverAddr));
             serverAddr.sin_family = AF_INET;
             serverAddr.sin_port = htons(*portIt);
-            // // Bind to 0.0.0.0 to accept connections on all interfaces, not just localhost
-            // serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-            // // if (inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr) <= 0) { // Original binding to localhost only
-            // //     Logger::getInstance().logLevel("SYS_ERROR", "Invalid address for port " + std::to_string(*portIt), 1);
-            // //     close(serverSocket);
-            // //     continue ;
-            // // }
-            if (inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr) <= 0) {
+
+            serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+            // Binding to 0.0.0.0 to accept connections on all interfaces, not only localhost
+            if (inet_pton(AF_INET, "0.0.0.0", &serverAddr.sin_addr) <= 0) {
                 Logger::getInstance().logLevel("SYS_ERROR", "Invalid address for port " + std::to_string(*portIt), 1);
                 close(serverSocket);
                 continue ;
@@ -98,14 +96,17 @@ void ServerLoop::setupServerSockets() {
 bool ServerLoop::serverFull() {
      if (_clients.size() >= MAX_CLIENTS) {
         Logger::getInstance().logLevel("INFO", "Server if full! Rejecting new clients", 0);
-        std::cerr << "clients: " << _clients.size()<< std::endl;
+        std::cerr << GC "clients: " << _clients.size() << RES << std::endl;
         return true;
      }
     return false;
 }
 
+/**
+ * @brief   Accepts a new client connection on a listening socket and sets it up (non blocking, session info).
+ */
 void ServerLoop::acceptNewConnection(int serverSocket) {
-    if (serverFull()) // Add logLevel call
+    if (serverFull())
         return ;
     struct sockaddr_in clientAddr;
     socklen_t addrLen = sizeof(clientAddr);
@@ -154,8 +155,7 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
 }
 
 /**
- * @brief   Reads and accumulates received data into a given clients buffer
- *          and determines whether received request is single or multi part.
+ * @brief   Reads data from a client and sends incoming requests for parsing and processing.
  */
 void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096]; // For each recv
@@ -178,7 +178,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         return ;
     } else if (bytesRead < 0) {
         std::ostringstream logStream;
-        logStream << "Unable to read from socket: " << clientSocket  << ": " << strerror(errno);
+        logStream << "Unable to read from socket: " << clientSocket;
         Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
         removeClient(clientSocket);
         return ;
@@ -247,6 +247,9 @@ void ServerLoop::checkClientTimeouts() {
     }
 }
 
+/**
+ * @brief   Main Server Loop. Uses poll to monitor sockets.
+ */
 void ServerLoop::startServer() {
     try {
         setupServerSockets();
@@ -260,7 +263,7 @@ void ServerLoop::startServer() {
     }
 
     _startUpTime = time(nullptr);
-    Logger::getInstance().logLevel("INFO", "Server main loop started.", 0);
+    Logger::getInstance().logLevel("INFO", "Server loop started.", 0);
 
     while (_run) {
         int pollResult = poll(_pollFds.data(), _pollFds.size(), 2000);
@@ -269,9 +272,7 @@ void ServerLoop::startServer() {
             _run = false;
             break ;
         }
-
         time_t currentTime = time(nullptr); // Get time once per loop iteration
-
         // Process ready file descriptors
         size_t currentPollFdsCount = _pollFds.size();
         for (size_t i = 0; i < currentPollFdsCount; ++i) {
@@ -279,10 +280,8 @@ void ServerLoop::startServer() {
             if (i >= _pollFds.size()) {
                  break ;
             }
-
             struct pollfd& currentPfd = _pollFds[i];
             int fd = currentPfd.fd;
-
             // Check ONLY for incoming data/connections (POLLIN)
             if (currentPfd.revents & POLLIN) {
                 // Determine if it's a listening server socket or a client socket

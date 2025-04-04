@@ -63,8 +63,8 @@ Logger &Logger::getInstance() {
 Logger::~Logger() {}
 
 std::string Logger::getCurrentTimestamp() const{
-    auto now = std::chrono::system_clock::now();
-    auto now_c = std::chrono::system_clock::to_time_t(now);
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
     // Use std::gmtime for UTC or std::localtime for local time
     ss << std::put_time(std::localtime(&now_c), "%Y-%m-%d %H:%M:%S");
@@ -74,7 +74,7 @@ std::string Logger::getCurrentTimestamp() const{
 std::string Logger::logLevel(std::string level, const std::string &message, int code) {
     if (level == "INFO") {
         _state = code;
-        std::cout << GREY << "[" << getCurrentTimestamp() << "]" << GB << "[INFO]: " << RES  GC << message << RES << std::endl;
+        std::cout << GREY << "[" << getCurrentTimestamp() << "]" << GB << "[INFO]: " << RES << message << std::endl;
         return std::string();
     }
     else if (level == "WARNING") {
@@ -92,7 +92,7 @@ std::string Logger::logLevel(std::string level, const std::string &message, int 
     }
     else if (level == "SYS_ERROR") {
         _state = code;
-        std::cout << GREY << "[" << getCurrentTimestamp() << "]" << RB << "[SYS_ERR]: " << RES GC << message << RES << std::endl;
+        std::cout << GREY << "[" << getCurrentTimestamp() << "]" << GREY << "[SYSTEM]: " << RES GC << message << RES << std::endl;
         return std::string();
     }
     std::cerr << GREY << "[" << getCurrentTimestamp() << "] " << RB << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;

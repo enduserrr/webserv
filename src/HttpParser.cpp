@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/01 11:32:12 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/04 11:02:20 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -34,9 +34,9 @@ bool HttpParser::requestSize(ssize_t bytes) {
     _totalRequestSize += bytes;
     if (_totalRequestSize > (_maxBodySize + MAX_REQ_SIZE)) {
         _state = 413;
-        return false; 
+        return false;
     }
-    return true; 
+    return true;
 }
 
 // Should be moved to ServerLoop as technically isn't a part of HttpParsing
@@ -45,7 +45,7 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
         return false;
     if (!requestSize(bytes)) {
         input.clear();
-        return false; 
+        return false;
     }
     size_t headerEnd = input.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
@@ -94,7 +94,7 @@ bool HttpParser::parseRequest(ServerBlock &block) {
     body.assign(std::istreambuf_iterator<char>(ss), std::istreambuf_iterator<char>());
     parseBody(body, request);
     if (request.getMethod() == "POST" && request.getBody().size() == 0) {
-        _state = 400; 
+        _state = 400;
         return false;
     }
     createRequest(block, request);
@@ -238,7 +238,7 @@ bool HttpParser::parseHeader(std::string &line, HttpRequest &req) {
     key.erase(key.find_last_not_of(" \t\r\n") + 1);
     value.erase(0, value.find_first_not_of(" \t\r\n"));
     req.addNewHeader(key, value);
-    return true; 
+    return true;
 }
 
 void HttpParser::parseBody(std::string &body, HttpRequest &req) {
@@ -248,7 +248,7 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     std::string emptyBody = "";
 
     if (contentType.empty()) {
-        std::cerr << RED << "Empty Body" << RES << std::endl;
+        Logger::getInstance().logLevel("INFO", "Empty body.", 0);
         req.setBody(emptyBody);
         return;
     }
@@ -281,7 +281,7 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
         }// ↓↓↓ Extract file content ↓↓↓
         size_t contentStart = body.find("\r\n\r\n", dispositionPos);
         if (contentStart != std::string::npos) {
-            contentStart += 4; 
+            contentStart += 4;
             size_t contentEnd = body.find(boundary, contentStart);
             if (contentEnd != std::string::npos) {
                 std::string value = body.substr(contentStart, contentEnd - contentStart - 2);

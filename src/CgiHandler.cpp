@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/02 19:19:15 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/04 13:19:19 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -107,11 +107,11 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
         return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
                "<h1>500 Internal Server Error</h1><p>Failed to fork process.</p>";
     }
-
     if (pid == 0) {  // Child process
         // Redirect stdin and stdout
         dup2(pipe_in[0], STDIN_FILENO);
         dup2(pipe_out[1], STDOUT_FILENO);
+
         close(pipe_in[1]);
         close(pipe_out[0]);
 
@@ -122,8 +122,7 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
         execve(phpExecutable.c_str(), const_cast<char* const*>(args.data()), envp);
 
         // If execve fails - Another solution?
-        perror("execve"); // Print the error message
-
+        perror("execve");
         for (size_t i = 0; i < envVector.size(); ++i) {
             free(envp[i]);
         }
@@ -132,7 +131,6 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
     } else {  // Parent process
         close(pipe_in[0]);
         close(pipe_out[1]);
-
         // Send the body to the CGI script's stdin
         if (req.getMethod() == "POST" && !req.getBody().empty()) {
             ssize_t bytes_written = write(pipe_in[1], req.getBody().c_str(), req.getBody().size());
@@ -154,7 +152,7 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
 
         // Set timeout
         const int timeout_seconds = 5;
-        auto start = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
         while (true) {
             fd_set readfds;
@@ -196,38 +194,30 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
                 }
 
             }
-            // Consider not using auto
-            auto now = std::chrono::steady_clock::now();
-            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
-
+            std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+            long long elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
             if (elapsed_seconds >= timeout_seconds) {
                 Logger::getInstance().logLevel("ERROR", "CGI script execution timed out.", 508);
                 close(pipe_out[0]);
                 kill(pid, SIGKILL);  // Kill the child process
                 waitpid(pid, nullptr, 0); // Wait for the child to terminate
-
                 return "HTTP/1.1 508 Gateway Timeout\r\nContent-Type: text/html\r\n\r\n"
                        "<h1>508 Gateway Timeout</h1><p>CGI script execution timed out.</p>";
             }
-
              if (waitpid(pid, nullptr, WNOHANG) != 0)
              {
                 break ;
              }
-
         }
 
         close(pipe_out[0]);
-
         int status;
         waitpid(pid, &status, 0);
-
         // Free allocated memory.
         for (size_t i = 0; i < envVector.size(); ++i) {
             free(envp[i]);
         }
         delete[] envp;
-
         //check if exited with correct status, but timeout takes presedence.
        if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - start).count() < timeout_seconds
        && (!WIFEXITED(status) || WEXITSTATUS(status) != 0)) {
@@ -237,7 +227,6 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
 
         // Parse headers and body
         size_t headerEndPos = cgiOutput.find("\r\n\r\n"); // Find end of headers
-
         std::string headers;
         std::string body;
         if (headerEndPos != std::string::npos) {
@@ -256,7 +245,6 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
         if (headers.find("Content-Type:") == std::string::npos) {
             responseStream << "Content-Type: text/html\r\n"; // Default if not specified
         }
-
         responseStream << headers << "\r\n\r\n";
         responseStream << body;
 

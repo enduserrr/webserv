@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/02 18:47:03 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/04 13:20:08 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -29,7 +29,7 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
 
     // ↓↓↓ FALLBACK FILE IF TEMPLATE'S MISSING ↓↓↓
     if (!templateFile) {
-        std::cout << "FALLBACK FILE" << std::endl;
+        Logger::getInstance().logLevel("INFO", "No directory listing template file. Using a fallback.", 0);
         std::ostringstream fallback;
         fallback << "<html><head><title>" << uri << "</title></head><body>"
                  << "<h1>Index of " << uri << "</h1><ul>";
@@ -109,7 +109,9 @@ std::string Methods::mGet(HttpRequest &req) {
         if (S_ISDIR(st.st_mode)) {
             isDirectory = true;
         } else {
-            std::cout << GC << filePath << " exists but is not a directory" << RES << std::endl;
+            std::ostringstream logStream;
+            logStream << "Filepath: " << filePath << " exists but isn't a directory.";
+            Logger::getInstance().logLevel("INFO", logStream.str(), 0);
         }
     } else {
         std::ostringstream logStream;
@@ -118,8 +120,8 @@ std::string Methods::mGet(HttpRequest &req) {
         // std::cerr << RED << "stat failed for " << filePath << ": " << strerror(errno) << RES << std::endl;
     }
     std::ostringstream logStream;
-    // Logger::getInstance().logLevel("ERROR", logStream.str(), 1); /* LEAVE HERE */
-    std::cout << GC << "URI before check: " << uri << "\n" << "Root: " << basePath << RES << std::endl;
+    logStream << "URI before check: " << uri << "\nRoot: " << basePath;
+    Logger::getInstance().logLevel("INFO", logStream.str(), 0);
 
     // ↓↓↓ DIRECTORY REQUEST ↓↓↓
     if (!uri.empty() && uri.back() == '/') {
@@ -132,15 +134,13 @@ std::string Methods::mGet(HttpRequest &req) {
                             << "Content-Type: text/html\r\n"
                             << "\r\n"
                             << listing;
-                std::cout << "Returning directory listing response" << std::endl;
+                Logger::getInstance().logLevel("INFO", "Returning directory listing response", 0);
                 return responseStream.str();
             } else {
                 return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Directory listing is empty", 500);
             }
         } else { // If request is only "/" return index.html
-            std::cout << filePath << std::endl;
-            filePath += "index.html"; //E: changed "="" to be "+=" root + index.html --> now works with localhost:8080
-            std::cout << "Autoindex off, updated filePath: " << filePath << std::endl;
+            filePath += "index.html";
         }
     }
     if (stat(filePath.c_str(), &st) != 0)// Check if the file exists
@@ -152,20 +152,19 @@ std::string Methods::mGet(HttpRequest &req) {
     std::ostringstream ss;
     ss << file.rdbuf();
     std::string fileContent = ss.str();
-    file.close(); // close the fstream
+    file.close();
 
-    std::ostringstream responseStream;// Build response
-    Types types; // Create instance (consider making this a member or singleton if performance matters)
-
-    // ↓↓↓ Use filePath to determine the MIME type ↓↓↓
+    Types types;
     std::string mimeType = types.getMimeType(filePath);
+    logStream.str(""); // Clean previous contents
+    logStream.clear(); // Clear error flags
+    logStream << "Mime type check for: " << filePath << "\nCheck result: " << mimeType;
+    Logger::getInstance().logLevel("INFO", logStream.str(), 0);
 
-    std::cout << GC << "Sent to MIME Check: " << filePath << std::endl;
-    std::cout << "Type Result: " << mimeType << RES << std::endl;
-
+    std::ostringstream responseStream;
     responseStream << "HTTP/1.1 200 OK\r\n"
                    << "Content-Length: " << fileContent.size() << "\r\n"
-                   << "Content-Type: " << mimeType << "\r\n" // Use the determined type
+                   << "Content-Type: " << mimeType << "\r\n"
                    << "\r\n"
                    << fileContent;
     return responseStream.str();
@@ -221,16 +220,19 @@ std::string Methods::mPost(HttpRequest &req) {
         }
         closedir(dir);
 
-        // ↓↓↓ CHANGE NAME IF DUP NAME EXISTS ↓↓↓
         if (fileExists) {
             std::string baseName = fileName.substr(0, fileName.find_last_of('.'));
             std::string extension = fileName.substr(fileName.find_last_of('.'));
             int counter = 1;
             std::string newFileName, newFullPath;
-            do {
-                newFileName = baseName + "_" + std::to_string(counter) + extension;
-                newFullPath = uploadDir + newFileName;
-                // ↓↓↓ CHECK IF NEW NAME HAS DUPS ↓↓↓
+
+            // Initialize the first filename to check
+            newFileName = baseName + "_" + std::to_string(counter) + extension;
+            newFullPath = uploadDir + newFileName;
+
+            // Loop until a unique filename is found
+            while (fileExists) {
+                // Check if new name has duplicates
                 fileExists = false;
                 dir = opendir(uploadDir.c_str());
                 if (!dir) {
@@ -243,9 +245,14 @@ std::string Methods::mPost(HttpRequest &req) {
                     }
                 }
                 closedir(dir);
-                counter++;
-            } while (fileExists);
 
+                // If the name exists, increment counter and generate a new filename
+                if (fileExists) {
+                    counter++;
+                    newFileName = baseName + "_" + std::to_string(counter) + extension;
+                    newFullPath = uploadDir + newFileName;
+                }
+            }
             if (rename(uploadedFilePath.c_str(), newFullPath.c_str()) != 0) {
                 return "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Failed to rename file.", 500);
             }
@@ -268,6 +275,9 @@ std::string Methods::mPost(HttpRequest &req) {
     return uploadResponse.str();
 }
 
+/**
+ * @brief   Delete
+ */
 std::string Methods::mDelete(HttpRequest &req) {
     std::map<std::string, std::string> queryMap = req.getUriQuery();
     std::string fileParam;
@@ -288,7 +298,9 @@ std::string Methods::mDelete(HttpRequest &req) {
         return "HTTP/1.1 400 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" + Logger::getInstance().logLevel("ERROR", "Empty file parameter.", 400);
     }
 
-    std::cout << GC "File to delete: " << filePath << RES << std::endl;
+    std::ostringstream logStream;
+    logStream << "File to be deleted: " << filePath;
+    Logger::getInstance().logLevel("INFO", logStream.str(), 0);
 
     //space is replaced as "%20" in request --> replace %20 for space
     size_t pos = filePath.find("%20");
