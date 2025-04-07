@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/04 12:57:21 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/07 12:46:34 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -177,8 +177,11 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         removeClient(clientSocket);
         return ;
     } else if (bytesRead < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            return ;
+        }
         std::ostringstream logStream;
-        logStream << "Unable to read from socket: " << clientSocket;
+        logStream << "Unable to read from socket: " << clientSocket << " Error: " << strerror(errno);// Add error uploading the file page
         Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
         removeClient(clientSocket);
         return ;
@@ -266,7 +269,7 @@ void ServerLoop::startServer() {
     Logger::getInstance().logLevel("INFO", "Server loop started.", 0);
 
     while (_run) {
-        int pollResult = poll(_pollFds.data(), _pollFds.size(), 2000);
+        int pollResult = poll(_pollFds.data(), _pollFds.size(), 7000);
         if (pollResult < 0) {
             Logger::getInstance().logLevel("SYS_ERROR", "Fatal error in poll()", 1);
             _run = false;
