@@ -167,6 +167,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         if (parser.isFullRequest(_clients[clientSocket].buffer, bytesRead))
             break ;
         if (parser.getState() != 0) {
+            _clients[clientSocket].buffer.clear();
             sendResponse(clientSocket, std::string("HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n") +
             Logger::getInstance().logLevel("ERROR", "Bad Request", parser.getState()));
             removeClient(clientSocket);
@@ -212,7 +213,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
     } else {
-        sendResponse(clientSocket, std::string("HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n") +
+        sendResponse(clientSocket, std::string("HTTP/1.1 415 Internal Server Error\r\nContent-Type: text/html\r\n\r\n") +
         Logger::getInstance().logLevel("ERROR", "Bad Request", parser.getState()));
         removeClient(clientSocket);
     }

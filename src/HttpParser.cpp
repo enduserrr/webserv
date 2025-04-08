@@ -23,11 +23,13 @@ bool HttpParser::startsWithMethod(std::string &input) {
     size_t firstSpace = input.find(' ');
     if (firstSpace == std::string::npos) {
         _state = 400;
-        input.clear();
         return false;
     }
     std::string method = input.substr(0, firstSpace);
-    return (method == "GET" || method == "POST" || method == "DELETE");
+    if (method == "GET" || method == "POST" || method == "DELETE") 
+        return true; 
+    _state = 405;
+    return false; 
 }
 
 bool HttpParser::requestSize(ssize_t bytes) {
@@ -41,12 +43,11 @@ bool HttpParser::requestSize(ssize_t bytes) {
 
 // Should be moved to ServerLoop as technically isn't a part of HttpParsing
 bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
-    if (!startsWithMethod(input))
-        return false;
     if (!requestSize(bytes)) {
-        input.clear();
         return false;
-    }
+    } 
+    if (_totalRequestSize == static_cast<size_t>(bytes) && !startsWithMethod(input))
+        return false;
     size_t headerEnd = input.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
         return false;
@@ -61,9 +62,12 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
         std::string contentLengthValue = input.substr(contentLengthPos + 15, contentLengthEnd - (contentLengthPos + 15));
         try {
             contentLength = std::stoi(contentLengthValue);
+            if (contentLength > _maxBodySize) {
+                _state = 413; 
+                return false;
+            }
         } catch (const std::exception &e){
             _state = 400;
-            input.clear();
             return false;
         }
         if (input.size() < bodyStart + contentLength)
@@ -74,7 +78,6 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
         input = input.substr(bodyStart + contentLength);
     else
         input.clear();
-    // std::cout << GC << "\n\nLEFT OVER:" << input << RES << std::endl;
     return true;
 }
 
@@ -94,7 +97,8 @@ bool HttpParser::parseRequest(ServerBlock &block) {
     body.assign(std::istreambuf_iterator<char>(ss), std::istreambuf_iterator<char>());
     parseBody(body, request);
     if (request.getMethod() == "POST" && request.getBody().size() == 0) {
-        _state = 400;
+        if (_state == 0)
+            _state = 400;
         return false;
     }
     createRequest(block, request);
@@ -276,6 +280,11 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
             size_t endPos = body.find("\"", filenamePos);
             if (endPos != std::string::npos) {
                 std::string filename = body.substr(filenamePos, endPos - filenamePos);
+                Types type; 
+                if (!type.isValidMime(filename)) {
+                    _state = 415; 
+                    return ;
+                }
                 req.setFileName(filename); // Store filename
             }
         }// ↓↓↓ Extract file content ↓↓↓
