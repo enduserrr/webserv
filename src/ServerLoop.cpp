@@ -157,6 +157,7 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
 /**
  * @brief   Reads data from a client and sends incoming requests for parsing and processing.
  */
+
 void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096]; // For each recv
     ssize_t bytesRead;
@@ -168,8 +169,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             break ;
         if (parser.getState() != 0) {
             _clients[clientSocket].buffer.clear();
-            sendResponse(clientSocket, std::string(INTERNAL) +
-            Logger::getInstance().logLevel("ERROR", "Bad Request", parser.getState()));
+            sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", parser.getState()));
             removeClient(clientSocket);
             return ;
         }
@@ -203,7 +203,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         }
     }
     if (_clients[clientSocket].requestLimiter()) {
-        sendResponse(clientSocket, REQ_LIMIT + Logger::getInstance().logLevel("ERROR", "Client request limit reached.", 429));
+        sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", 429));
         return ;
     }
     if (parser.parseRequest(_clients[clientSocket]._block)) {
@@ -212,7 +212,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
     } else {
-        sendResponse(clientSocket, UNSUPPORTED + Logger::getInstance().logLevel("ERROR", "Unsupported media type", parser.getState()));
+        sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", parser.getState()));
         removeClient(clientSocket);
     }
 }

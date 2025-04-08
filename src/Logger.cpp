@@ -36,6 +36,15 @@ Logger::Logger() {
     _errorPages[429] = loadFileContent(baseDir + "429.html");
     _errorPages[500] = loadFileContent(baseDir + "500.html");
     _defaultErrorPage = loadFileContent(baseDir + "default.html");
+    _responses[400] = std::pair<std::string, std::string>(BAD_REQ, " Bad Request");
+    _responses[403] = std::pair<std::string, std::string>(FORBIDDEN, " Forbidden");
+    _responses[404] = std::pair<std::string, std::string>(NOT_FOUND, " Not Found");
+    _responses[405] = std::pair<std::string, std::string>(NOT_ALLOWED, " Method Not Allowed");
+    _responses[408] = std::pair<std::string, std::string>(REQ_TIMEOUT, "Request Timeout");
+    _responses[415] = std::pair<std::string, std::string>(UNSUPPORTED, " Unsupported media Type");
+    _responses[413] = std::pair<std::string, std::string>(TOO_LARGE, "Payload Too large");
+    _responses[429] = std::pair<std::string, std::string>(REQ_LIMIT, "Too Many requests");
+    _responses[500] = std::pair<std::string, std::string>(INTERNAL, "Internal Server Error");
 
     // Fallback option if any file fails to load
     if (_errorPages[400].empty())
@@ -79,12 +88,17 @@ std::string Logger::logLevel(std::string level, const std::string &message, int 
     }
     else if (level == "WARNING") {
         _state = code;
-        std::cout << GB << "[" << getCurrentTimestamp() << "]" << YELLOW << "[WARN]: " << RES GREY << message<< std::endl;
+        std::cout << GB << "[" << getCurrentTimestamp() << "]" << YELLOW << "[WARN]: " << RES GREY << message << std::endl;
         return std::string();
     }
     else if (level == "ERROR") {
         _state = 1;
-        std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << message << std::endl;
+        if (message.empty()) {
+            std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << getMessage(code) << std::endl;
+            return _responses[code].first + getErrorPage(code);   
+        }
+        else
+            std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << message << std::endl;
         return getErrorPage(code);
     }
     else if (level == "SYSTEM") {
@@ -105,4 +119,11 @@ std::string Logger::getErrorPage(int code) {
 
 void Logger::setCustomErrorPage(int code, const std::string &pageContent) {
     _errorPages[code] = pageContent;
+}
+
+std::string Logger::getMessage(int code) {
+    if (_responses.find(code) != _responses.end()) {
+        return _responses[code].second;
+    }
+    return "";
 }

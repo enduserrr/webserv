@@ -19,6 +19,7 @@ class Logger {
     private:
         int                         _state;
         std::map<int, std::string>  _errorPages;
+        std::map<int, std::pair<std::string, std::string>>  _responses;
         std::string                 _defaultErrorPage;
 
         Logger(); // Singleton => private constructor prevents multiple instances
@@ -32,6 +33,7 @@ class Logger {
         void        setCustomErrorPage(int code, const std::string &pageContent);
         std::string logLevel(std::string level, const std::string &message, int code);
         std::string getErrorPage(int code);
+        std::string getMessage(int code);
 
 };
 
