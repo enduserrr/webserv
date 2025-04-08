@@ -63,6 +63,7 @@
 #define FORBIDDEN   "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html\r\n\r\n"
 #define NOT_FOUND   "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n"
 #define NOT_ALLOWED "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html\r\n\r\n"
+#define REQ_TIMEOUT "HTTP/1.1 408 Request Time Out\r\nContent-Type: text/html\r\n\r\n"
 #define TOO_LARGE   "HTTP/1.1 413 Payload Too Large\r\nContent-Type: text/html\r\n\r\n"
 #define UNSUPPORTED "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
 #define REQ_LIMIT   "HTTP/1.1 429 Too Many Requests\r\nContent-Type: text/html\r\n\r\n"
