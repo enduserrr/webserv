@@ -162,8 +162,8 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096]; // For each recv
     ssize_t bytesRead;
     HttpParser parser(_clients[clientSocket]._block.getBodySize());
-
     while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
+        _clients[clientSocket]._lastRecvTime = time(nullptr);
         _clients[clientSocket].buffer.append(buffer, bytesRead);
         if (parser.isFullRequest(_clients[clientSocket].buffer, bytesRead))
             break ;
@@ -233,6 +233,7 @@ void ServerLoop::checkClientTimeouts() {
     for (std::map<int, time_t>::const_iterator it = _clientLastActivity.begin(); it != _clientLastActivity.end(); ++it) {
         int fd = it->first;
         time_t lastActivityTime = it->second;
+        ClientSession &session = _clients[fd];
 
         if ((currentTime - lastActivityTime) >= _clientTimeoutDuration) {
             std::ostringstream logStream;
@@ -240,6 +241,12 @@ void ServerLoop::checkClientTimeouts() {
                       << (currentTime - lastActivityTime) << "s. Closing.";
             Logger::getInstance().logLevel("INFO", logStream.str(), 0);
             fdsToRemove.push_back(fd);
+        }
+        if (!session.buffer.empty() && session._lastRecvTime != 0) {
+            if ((currentTime - session._lastRecvTime) >= 10) {
+                sendResponse(fd, Logger::getInstance().logLevel("ERROR", "", 408));
+                fdsToRemove.push_back(fd);
+            }
         }
     }
     // Remove timed-out clients

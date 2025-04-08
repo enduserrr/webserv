@@ -1,17 +1,10 @@
-- upload Makefie --> core dump
-- upload file that has no type (example .txt) --> core dump
-
-- upload file that has '.' (kakka2.0.txt) --> unsupported type 
-- upload empty file --> empty body error
-
-- upload favicon.ico can be uploaded, but now wieved in browser --> should be unsupported? 
 
 
 
 
 
-- too long text frozes the whole machine  --> limit textbox size 
-- 
+curl tests: 
 
 
--httpparser fails, give just request return state page, not a specific error page 
+//wrong httg version 
+curl --http1.0 http://localhost:8080/

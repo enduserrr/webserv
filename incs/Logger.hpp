@@ -34,6 +34,7 @@ class Logger {
         std::string logLevel(std::string level, const std::string &message, int code);
         std::string getErrorPage(int code);
         std::string getMessage(int code);
+        std::string getHeader(int code);
 
 };
 

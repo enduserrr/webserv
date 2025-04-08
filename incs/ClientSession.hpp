@@ -29,6 +29,7 @@ class ClientSession {
         HttpRequest request;
         std::string buffer;
         ServerBlock _block;
+        time_t _lastRecvTime;
 
         ClientSession();
         ClientSession(int clientFd);

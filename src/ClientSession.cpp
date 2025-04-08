@@ -12,9 +12,11 @@
 
 #include "ClientSession.hpp"
 
-ClientSession::ClientSession() : _requestCount(0), _lastRequestTime(time(nullptr)), fd(-1) {}
+ClientSession::ClientSession() : _requestCount(0), _lastRequestTime(time(nullptr)), fd(-1), 
+                                _lastRecvTime(time(nullptr)) {}
 
-ClientSession::ClientSession(int clientFd) : _requestCount(0), _lastRequestTime(time(nullptr)), fd(clientFd) {}
+ClientSession::ClientSession(int clientFd) : _requestCount(0), _lastRequestTime(time(nullptr)), 
+                                            fd(clientFd), _lastRecvTime(time(nullptr)) {}
 
 ClientSession::~ClientSession() {}
 

@@ -95,7 +95,7 @@ std::string Logger::logLevel(std::string level, const std::string &message, int 
         _state = 1;
         if (message.empty()) {
             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << getMessage(code) << std::endl;
-            return _responses[code].first + getErrorPage(code);   
+            return getHeader(code) + getErrorPage(code);   
         }
         else
             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << message << std::endl;
@@ -121,9 +121,16 @@ void Logger::setCustomErrorPage(int code, const std::string &pageContent) {
     _errorPages[code] = pageContent;
 }
 
+std::string Logger::getHeader(int code) {
+    if (_responses.find(code) != _responses.end()) {
+        return _responses[code].first;
+    }
+    return _responses[400].first;
+}
+
 std::string Logger::getMessage(int code) {
     if (_responses.find(code) != _responses.end()) {
         return _responses[code].second;
     }
-    return "";
+    return _responses[400].second;
 }
