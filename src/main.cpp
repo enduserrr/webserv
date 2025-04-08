@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 11:30:12 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/08 09:55:57 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -50,7 +50,7 @@ int main(int ac, char **av) {
         configParse.fileValidation();
         configParse.parseFile();
     } catch (const std::exception &e) {
-        Logger::getInstance().logLevel("SYS_ERROR", e.what(), 0);
+        Logger::getInstance().logLevel("SYSTEM", e.what(), 0);
         Logger::getInstance().logLevel("INFO", "Parsing failed, closing program..", 0);
         return 1;
     }

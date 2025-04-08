@@ -17,22 +17,22 @@
 
 class Logger {
     private:
-        Logger(); // Singleton => private constructor prevents multiple instances
-
         int                         _state;
         std::map<int, std::string>  _errorPages;
         std::string                 _defaultErrorPage;
 
-        std::string loadFileContent(const std::string &filePath);
+        Logger(); // Singleton => private constructor prevents multiple instances
+        std::string getCurrentTimestamp() const;
+        std::string loadFileContent(const std::string& filePath);
 
     public:
         ~Logger();
-        static Logger &getInstance();
-        std::string getCurrentTimestamp() const;
+        static Logger& getInstance();
 
-        std::string         logLevel(std::string level, const std::string &message, int code);
-        std::string         getErrorPage(int code);
-        void                setCustomErrorPage(int code, const std::string &pageContent);
+        void        setCustomErrorPage(int code, const std::string &pageContent);
+        std::string logLevel(std::string level, const std::string &message, int code);
+        std::string getErrorPage(int code);
+
 };
 
 #endif

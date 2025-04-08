@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/07 12:46:34 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/08 10:19:26 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -43,13 +43,13 @@ void ServerLoop::setupServerSockets() {
 
             int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
             if (serverSocket < 0) {
-                Logger::getInstance().logLevel("SYS_ERROR", "Failed to create socket for port " + std::to_string(*portIt), 1);
+                Logger::getInstance().logLevel("SYSTEM", "Failed to create socket for port " + std::to_string(*portIt), 1);
                 continue ;
             }
 
             int opt = 1;
             if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-                Logger::getInstance().logLevel("SYS_ERROR", "Failed to set socket options for port " + std::to_string(*portIt), 1);
+                Logger::getInstance().logLevel("SYSTEM", "Failed to set socket options for port " + std::to_string(*portIt), 1);
                 close(serverSocket);
                 continue ;
             }
@@ -61,17 +61,17 @@ void ServerLoop::setupServerSockets() {
             serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
             // Binding to 0.0.0.0 to accept connections on all interfaces, not only localhost
             if (inet_pton(AF_INET, "0.0.0.0", &serverAddr.sin_addr) <= 0) {
-                Logger::getInstance().logLevel("SYS_ERROR", "Invalid address for port " + std::to_string(*portIt), 1);
+                Logger::getInstance().logLevel("SYSTEM", "Invalid address for port " + std::to_string(*portIt), 1);
                 close(serverSocket);
                 continue ;
             }
             if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-                Logger::getInstance().logLevel("SYS_ERROR", "Failed to bind socket for port " + std::to_string(*portIt), 1);
+                Logger::getInstance().logLevel("SYSTEM", "Failed to bind socket for port " + std::to_string(*portIt), 1);
                 close(serverSocket);
                 continue ;
             }
             if (listen(serverSocket, SOMAXCONN) < 0) {
-                Logger::getInstance().logLevel("SYS_ERROR", "Failed to listen on port " + std::to_string(*portIt), 1);
+                Logger::getInstance().logLevel("SYSTEM", "Failed to listen on port " + std::to_string(*portIt), 1);
                 close(serverSocket);
                 continue ;
             }
@@ -112,19 +112,19 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     socklen_t addrLen = sizeof(clientAddr);
     int clientFd = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
     if (clientFd < 0) {
-        Logger::getInstance().logLevel("SYS_ERROR", "Failed to accept client connection.", 1);
+        Logger::getInstance().logLevel("SYSTEM", "Failed to accept client connection.", 1);
         return ;
     }
 
     if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
-        Logger::getInstance().logLevel("SYS_ERROR", "Failed to set client socket non-blocking", 1);
+        Logger::getInstance().logLevel("SYSTEM", "Failed to set client socket non-blocking", 1);
         close(clientFd);
         return ;
     }
     struct sockaddr_in localAddr; // Retrieve the local (server) port for the accepted connection.
     socklen_t localLen = sizeof(localAddr);
     if (getsockname(clientFd, (struct sockaddr*)&localAddr, &localLen) < 0) {
-        Logger::getInstance().logLevel("SYS_ERROR", "Failed to get local address for client connection.", 1);
+        Logger::getInstance().logLevel("SYSTEM", "Failed to get local address for client connection.", 1);
         close(clientFd);
         return ;
     }
@@ -168,7 +168,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             break ;
         if (parser.getState() != 0) {
             _clients[clientSocket].buffer.clear();
-            sendResponse(clientSocket, std::string("HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n") +
+            sendResponse(clientSocket, std::string(INTERNAL) +
             Logger::getInstance().logLevel("ERROR", "Bad Request", parser.getState()));
             removeClient(clientSocket);
             return ;
@@ -203,8 +203,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         }
     }
     if (_clients[clientSocket].requestLimiter()) {
-        sendResponse(clientSocket, "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n" +
-                    Logger::getInstance().logLevel("ERROR", "Client request limit reached.", 429));
+        sendResponse(clientSocket, REQ_LIMIT + Logger::getInstance().logLevel("ERROR", "Client request limit reached.", 429));
         return ;
     }
     if (parser.parseRequest(_clients[clientSocket]._block)) {
@@ -213,17 +212,15 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
     } else {
-        sendResponse(clientSocket, std::string("HTTP/1.1 415 Internal Server Error\r\nContent-Type: text/html\r\n\r\n") +
-        Logger::getInstance().logLevel("ERROR", "Bad Request", parser.getState()));
+        sendResponse(clientSocket, UNSUPPORTED + Logger::getInstance().logLevel("ERROR", "Unsupported media type", parser.getState()));
         removeClient(clientSocket);
     }
 }
 
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
-        Logger::getInstance().logLevel("SYS_ERROR", "Failed to send response to client.", 1);
-        std::string errorResponse = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
-                                    + Logger::getInstance().getErrorPage(500);
+        Logger::getInstance().logLevel("SYSTEM", "Failed to send response to client.", 1);
+        std::string errorResponse = INTERNAL + Logger::getInstance().logLevel("ERROR", "Internal Server Error", 500);
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
     }
     return ;
@@ -262,7 +259,7 @@ void ServerLoop::startServer() {
             return ;
         }
     } catch (const std::exception& e) {
-        Logger::getInstance().logLevel("FATAL", "Exception during server setup: " + std::string(e.what()), 1);
+        Logger::getInstance().logLevel("ERROR", "Exception during server setup: " + std::string(e.what()), 1);
         return ;
     }
 
@@ -270,9 +267,9 @@ void ServerLoop::startServer() {
     Logger::getInstance().logLevel("INFO", "Server loop started.", 0);
 
     while (_run) {
-        int pollResult = poll(_pollFds.data(), _pollFds.size(), 7000);
+        int pollResult = poll(_pollFds.data(), _pollFds.size(), 1000);
         if (pollResult < 0) {
-            Logger::getInstance().logLevel("SYS_ERROR", "Fatal error in poll()", 1);
+            Logger::getInstance().logLevel("SYSTEM", "Error in poll()", 1);
             _run = false;
             break ;
         }

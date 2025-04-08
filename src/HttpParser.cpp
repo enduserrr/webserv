@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/04 11:02:20 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/08 10:02:32 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -26,10 +26,10 @@ bool HttpParser::startsWithMethod(std::string &input) {
         return false;
     }
     std::string method = input.substr(0, firstSpace);
-    if (method == "GET" || method == "POST" || method == "DELETE") 
-        return true; 
+    if (method == "GET" || method == "POST" || method == "DELETE")
+        return true;
     _state = 405;
-    return false; 
+    return false;
 }
 
 bool HttpParser::requestSize(ssize_t bytes) {
@@ -45,7 +45,7 @@ bool HttpParser::requestSize(ssize_t bytes) {
 bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
     if (!requestSize(bytes)) {
         return false;
-    } 
+    }
     if (_totalRequestSize == static_cast<size_t>(bytes) && !startsWithMethod(input))
         return false;
     size_t headerEnd = input.find("\r\n\r\n");
@@ -63,7 +63,7 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
         try {
             contentLength = std::stoi(contentLengthValue);
             if (contentLength > _maxBodySize) {
-                _state = 413; 
+                _state = 413;
                 return false;
             }
         } catch (const std::exception &e){
@@ -248,7 +248,7 @@ bool HttpParser::parseHeader(std::string &line, HttpRequest &req) {
 void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     Types types; // Use the centralized Types class
     std::string contentType = req.getHeader("Content-Type");
-    std::cout << RB << contentType << RES << std::endl;
+    std::cout << RED << contentType << RES << std::endl;
     std::string emptyBody = "";
 
     if (contentType.empty()) {
@@ -280,9 +280,9 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
             size_t endPos = body.find("\"", filenamePos);
             if (endPos != std::string::npos) {
                 std::string filename = body.substr(filenamePos, endPos - filenamePos);
-                Types type; 
+                Types type;
                 if (!type.isValidMime(filename)) {
-                    _state = 415; 
+                    _state = 415;
                     return ;
                 }
                 req.setFileName(filename); // Store filename

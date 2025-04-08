@@ -74,29 +74,26 @@ std::string Logger::getCurrentTimestamp() const{
 std::string Logger::logLevel(std::string level, const std::string &message, int code) {
     if (level == "INFO") {
         _state = code;
-        std::cout << GREY << "[" << getCurrentTimestamp() << "]" << GB << "[INFO]: " << RES << message << std::endl;
+        std::cout << GB << "[" << getCurrentTimestamp() << "]" << GREEN << "[INFO]: " << RES GREY << message << std::endl;
         return std::string();
     }
     else if (level == "WARNING") {
         _state = code;
-        std::cout << GREY << "[" << getCurrentTimestamp() << "]" << YB << "[WARN]: " << RES << message<< std::endl;
+        std::cout << GB << "[" << getCurrentTimestamp() << "]" << YELLOW << "[WARN]: " << RES GREY << message<< std::endl;
         return std::string();
     }
     else if (level == "ERROR") {
         _state = 1;
-        std::cerr << GREY << "[" << getCurrentTimestamp() << "]" << RB << "[ERROR]: " << RES << message << std::endl;
-        if (_errorPages.find(code) != _errorPages.end()) {
-            return _errorPages[code];
-        }
-        return _defaultErrorPage;
+        std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << message << std::endl;
+        return getErrorPage(code);
     }
-    else if (level == "SYS_ERROR") {
+    else if (level == "SYSTEM") {
         _state = code;
-        std::cout << GREY << "[" << getCurrentTimestamp() << "]" << GREY << "[SYSTEM]: " << RES GC << message << RES << std::endl;
+        std::cout << GB << "[" << getCurrentTimestamp() << "]" << RES BLUE << "[SYSTEM]: " << RES GREY << message << RES << std::endl;
         return std::string();
     }
-    std::cerr << GREY << "[" << getCurrentTimestamp() << "] " << RB << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;
-    return "<html><body><h1>Error</h1><p>An unknown error occurred.</p></body></html>";
+    std::cerr << GB << "[" << getCurrentTimestamp() << "] " << RED << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;
+    return getErrorPage(code);
 }
 
 std::string Logger::getErrorPage(int code) {

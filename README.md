@@ -1,39 +1,22 @@
 # WEBSERV
 
-## FIXED:
-* Fix "new_" prefix to only apply to duplicates | OK!
-* "/" doesn't go to index page (taken as directory listing) | OK!
-* Auto Index per Location | OK!
-* ConfParser udpates location root correctly | OK!
-* Style sheet gets applied correctly (files.html) | OK!
+## Html Status Codes
+* Error:
+ * 400 Bad Request              (The request is malformed or invalid)
+ * 403 Forbidden                (The client lacks permission to access the resource)
+ * 404 Not Found                (The reguested resource doesn't exist)
+ * 405 Method Not Allowed       (The requested method isn't allowed for the resource)
+ * 413 Payload Too Large        (The request body size is too large)
+ * 429 Too Many Requests        (Exceeded client or per client request limit)
+ * 500 Internal Server Error    (Unexpected server failure)
 
-## Issues
-* Delete & dir listing fail not returning a proper error
-* Library mess
+* Success:
+ * 200 OK
+ * 201 Created
+ * 202 Accepted
 
-## TO DO LIST:
-* Delete method error handling & replies
-* CGI tests (more tests over all)
+* Redirection
+ * 301 Moved Permanently
+ * 302 Found
 
-## Error State Plan
 
-* ClientSession:
- * Add '_state' attribute + setState() & getState() funcs
- * Add ErrorHandler functions
-
-* ErrorHandler:
- * Remove ErrorHandler all together
-
-* ServerLoop:
- * Remove ErrorHandler usage from setupServerSockets(), replace with console error messages
- * Add logic to check '_state' (ClientSession) and send matching error pages and set back to 0 after
- * Remove needless code from handleClientRequest()
-
-* HttpParser:
- * Add a way to access ClientSessions setState() & getState() functions
-
-* HttpRequest:
- * Add a way to access ClientSessions setState() & getState() functions
-
-* Router, Methods, Cgi, Static
- * Replace ErrorHandler usage with ClientSession setState()
