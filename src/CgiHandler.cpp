@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 14:16:05 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/09 18:42:12 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -22,12 +22,12 @@ std::string CgiHandler::processRequest(HttpRequest &req) {
     if (uri.size() < 4 || uri.substr(uri.size() - 4) != ".php") {
         return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "CGI failed to process.", 404);
     }
-    std::string scriptPath = Router::getInstance().findFromMap(req.getUri());
-    std::cout << "Uri: " << req.getUri() << std::endl;
-    if (scriptPath == "") {
-        return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "Didn't find matching value", 404);
-    }
-    std::string script = req.getRoot() + scriptPath;
+    // std::string scriptPath = Router::getInstance().findFromMap(req.getUri());
+    // std::cout << "Uri: " << req.getUri() << std::endl;
+    // if (scriptPath == "") {
+    //     return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "Didn't find matching value", 404);
+    // }
+    std::string script = req.getRoot() + req.getUri();
     std::cout << "src path: " << script << std::endl;
     std::string cgiOutput = executeCgi(script, req);
     return cgiOutput;

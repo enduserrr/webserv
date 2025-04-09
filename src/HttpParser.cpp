@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/08 10:02:32 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/09 19:13:36 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -246,7 +246,6 @@ bool HttpParser::parseHeader(std::string &line, HttpRequest &req) {
 }
 
 void HttpParser::parseBody(std::string &body, HttpRequest &req) {
-    Types types; // Use the centralized Types class
     std::string contentType = req.getHeader("Content-Type");
     std::cout << RED << contentType << RES << std::endl;
     std::string emptyBody = "";
@@ -280,8 +279,8 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
             size_t endPos = body.find("\"", filenamePos);
             if (endPos != std::string::npos) {
                 std::string filename = body.substr(filenamePos, endPos - filenamePos);
-                Types type;
-                if (!type.isValidMime(filename)) {
+                bool is_valid_mime = Types::getInstance().isValidMime(filename);
+                if (is_valid_mime == false) {
                     _state = 415;
                     return ;
                 }
@@ -301,11 +300,12 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
             }
         }
     }
-    else if (types.isValidContent(contentType)) {
+    else if (Types::getInstance().isValidContent(contentType) == true) {
         req.setBody(body);
     }
     else {
-        std::cerr << "Error: Unsupported Content-Type: " << contentType << std::endl;
+        Logger::getInstance().logLevel("WARN", "Unsupported content-type. Setting empty body", 0);
+        // std::cerr << "Error: Unsupported Content-Type: " << contentType << std::endl;
         req.setBody(emptyBody);
     }
 }
@@ -321,8 +321,6 @@ void HttpParser::whiteSpaceTrim(std::string &str) {
 }
 
 bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
-    // bool matched = false;
-
     req.setAutoIndex(block.getAutoIndex(req.getUri()));
     try {
         req.setRoot(block.getLocation(req.getUri()).getRoot());

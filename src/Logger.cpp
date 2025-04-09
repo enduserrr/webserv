@@ -103,7 +103,7 @@ std::string Logger::logLevel(std::string level, const std::string &message, int 
     }
     else if (level == "SYSTEM") {
         _state = code;
-        std::cout << GB << "[" << getCurrentTimestamp() << "]" << RES REV_WHITE << "[SYSTEM]: " << RES GREY << message << RES << std::endl;
+        std::cout << GB << "[" << getCurrentTimestamp() << "]" << RES F_WHITE << "[SYSTEM]: " << RES GREY << message << RES << std::endl;
         return std::string();
     }
     std::cerr << GB << "[" << getCurrentTimestamp() << "] " << REV_RED << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;

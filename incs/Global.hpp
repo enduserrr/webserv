@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 11:10:03 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 10:38:49 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/09 19:33:55 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -57,6 +57,7 @@
 #define BLUE    "\033[0;96m"
 #define WB      "\u001b[41;1m"
 #define WW      "\033[5m"
+#define F_WHITE "\033[2;97m"
 #define REV_WHITE "\u001b[47;1;2m"
 #define REV_RED  "\u001b[41;1m"
 

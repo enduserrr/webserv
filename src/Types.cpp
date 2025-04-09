@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 10:19:04 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:34:35 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/09 19:04:55 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -37,6 +37,11 @@ Types::Types() {
     };
 }
 
+Types& Types::getInstance() {
+    static Types instance;
+    return instance;
+}
+
 Types::~Types() {}
 
 std::string Types::getMimeType(const std::string &filePath) const {
@@ -47,14 +52,11 @@ std::string Types::getMimeType(const std::string &filePath) const {
     if (dotPos == std::string::npos) {
         return "application/octet-stream";
     }
-
     // Extract the extension, including the dot
     std::string ext = filePath.substr(dotPos);
-
     // Convert extension to lowercase for case-insensitive lookup
     std::transform(ext.begin(), ext.end(), ext.begin(),
                    [](unsigned char c){ return std::tolower(c); }); // C++11 and safer
-
     // Perform the lookup using the extracted, lowercase extension
     std::map<std::string, std::string>::const_iterator it = _mimeTypes.find(ext);
     if (it != _mimeTypes.end()) {

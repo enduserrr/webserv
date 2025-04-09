@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:16 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 14:17:05 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/09 19:01:23 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -18,14 +18,12 @@ Router::Router() {
     _resourceMap["/files.html"] = "/files.html";
     _resourceMap["favicon.ico"] = "/favicon.ico";
     _resourceMap["guestbook.html"] = "/guestbook.html";
-    // _resourceMap["style.css"] = "/style.css";
+    _resourceMap["style.css"] = "/style.css";
     _resourceMap["/upload_success.html"] = "/upload_success.html";
     _resourceMap["/welcome.php"] = "/cgi-bin/welcome.php";
     _resourceMap["/guestbook.php"] = "/cgi-bin/guestbook.php";
     _resourceMap["/guestbook_display.php"] = "/cgi-bin/guestbook_display.php";
     _resourceMap["/comments.txt"] = "/cgi-bin/comments.txt";
-    // _resourceMap[""] = "";
-    // NO NEED FOR ERROR PAGES RIGHT?????
 }
 
 Router& Router::getInstance() {
@@ -42,16 +40,11 @@ void Router::addRedirectionRule(const std::string& resourceUri, const std::strin
 std::string Router::routeRequest(HttpRequest &req, int clientFd) {
     std::string uri = req.getUri();
     (void)clientFd;
-    // Check if the requested URI is a known resource with a different location
-    // if (_resourceMap.count(uri) && _resourceMap[uri] != uri) {
-    //     std::ostringstream response;
-    //     response << MOVED << "Location: " << _resourceMap[uri] << "\r\n"
-    //              << "Content-Type: text/html\r\n\r\n"
-    //              << "<html><body><p>This resource has moved to <a href=\"" << _resourceMap[uri] << "\">"
-    //              << _resourceMap[uri] << "</a>.</p></body></html>";
-    //     sendResponse(clientFd, response.str());
-    //     return response.str();
-    // }
+
+    std::string match = findFromMap(req.getUri());
+    if (match != "") {
+        req.setUri(match);
+    } else { Logger::getInstance().logLevel("INFO", "Router: requested resource has no match in _resourceMap", 0); }
 
     // Handle CGI or static request
     if (uri.find("/cgi-bin/") == 0 || (uri.size() >= 4 && uri.substr(uri.size() - 4) == ".php")) {
