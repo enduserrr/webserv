@@ -95,7 +95,7 @@ std::string Logger::logLevel(std::string level, const std::string &message, int 
         _state = 1;
         if (message.empty()) {
             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << getMessage(code) << std::endl;
-            return _responses[code].first + getErrorPage(code);   
+            return _responses[code].first + getErrorPage(code);
         }
         else
             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << message << std::endl;
@@ -103,10 +103,10 @@ std::string Logger::logLevel(std::string level, const std::string &message, int 
     }
     else if (level == "SYSTEM") {
         _state = code;
-        std::cout << GB << "[" << getCurrentTimestamp() << "]" << RES BLUE << "[SYSTEM]: " << RES GREY << message << RES << std::endl;
+        std::cout << GB << "[" << getCurrentTimestamp() << "]" << RES REV_WHITE << "[SYSTEM]: " << RES GREY << message << RES << std::endl;
         return std::string();
     }
-    std::cerr << GB << "[" << getCurrentTimestamp() << "] " << RED << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;
+    std::cerr << GB << "[" << getCurrentTimestamp() << "] " << REV_RED << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;
     return getErrorPage(code);
 }
 

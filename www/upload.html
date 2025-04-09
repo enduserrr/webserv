@@ -23,6 +23,24 @@
         <input type="submit" value="Upload Text">
       </form>
     </div>
+    <div class="form-container">
+      <h3>STRING UPLOAD</h3>
+      <form action="/cgi-bin/welcome.php" method="POST">
+        <label for="username">Enter your name:</label><br>
+        <input type="text" id="username" name="username" placeholder="Your name" required>
+        <input type="submit" value="Submit Name">
+      </form>
+    </div>
+    <div class="form-container">
+      <h3>GUESTBOOK</h3>
+      <form action="/cgi-bin/guestbook.php" method="POST">
+        <label for="guest-username">Name:</label><br>
+        <input type="text" id="guest-username" name="username" placeholder="Your name"><br>
+        <textarea name="message" rows="2" placeholder="Your message" required></textarea><br>
+        <input type="submit" value="Add Comment">
+      </form>
+      <a href="/cgi-bin/guestbook.php" role="button">View Guestbook</a>
+    </div>
   </div>
   <br>
   <div class="button-container">

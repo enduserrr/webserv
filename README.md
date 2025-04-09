@@ -19,4 +19,9 @@
  * 301 Moved Permanently
  * 302 Found
 
+## Todo
 
+* .php script with POST method
+* DoS protection
+ * Rew per second limit
+* Text length limit for post

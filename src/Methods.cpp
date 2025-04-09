@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/08 08:54:46 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/09 12:41:31 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -73,11 +73,19 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
             filePath += "/";
         filePath += name;
 
-        // ↓↓↓ ADD DELETE BUTTON TO DIRECTORY LISTING RESPONSE ↓↓↓
+/*         // ↓↓↓ ADD DELETE BUTTON TO DIRECTORY LISTING RESPONSE ↓↓↓
         std::string fileItem = "<li>"
                        + std::string("<a href=\"") + filePath + "\">" + name + "</a>"
                        + " <button class='delete' data-target='/delete?file=" + name + "' data-method='DELETE'>Delete</button>"
                        + "</li>\n";
+        itemsStream << fileItem;
+    } */
+    // ↓↓↓ ADD DOWNLOAD AND DELETE BUTTONS TO DIRECTORY LISTING RESPONSE ↓↓↓
+    std::string fileItem = "<li>"
+                    + std::string("<a href=\"") + filePath + "\">" + name + "</a>"
+                    + " <a href=\"" + filePath + "\" download=\"" + name + "\" class=\"download-btn\">Download</a>"
+                    + " <button class='delete' data-target='/delete?file=" + name + "' data-method='DELETE'>Delete</button>"
+                    + "</li>\n";
         itemsStream << fileItem;
     }
     closedir(dir);

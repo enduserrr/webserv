@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 11:10:03 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/08 10:17:44 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/09 10:38:49 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -55,7 +55,10 @@
 #define GREEN   "\033[0;92m"
 #define YELLOW  "\033[0;93m"
 #define BLUE    "\033[0;96m"
-#define WB      "\033[1;97m"
+#define WB      "\u001b[41;1m"
+#define WW      "\033[5m"
+#define REV_WHITE "\u001b[47;1;2m"
+#define REV_RED  "\u001b[41;1m"
 
 #define OK          "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
 #define MOVED       "HTTP/1.1 301 Moved Permanently\r\nContent-Type: text/html\r\n\r\n"
