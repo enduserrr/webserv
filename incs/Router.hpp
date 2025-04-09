@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:44 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/09 14:16:18 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -21,18 +21,17 @@
 
 class Router {
 private:
-    // Mapping of old URIs to new URIs for relocated resources.
-    std::map<std::string, std::string> redirectionMap;
+    std::map<std::string, std::string> _resourceMap;
+    Router();
 
 public:
-    Router();
+    static Router& getInstance();
     ~Router();
 
-    void addRedirectionRule(const std::string& oldUri, const std::string& newUri);
-
-    // std::string routeRequest(HttpRequest &req);
+    void addRedirectionRule(const std::string& resourceUri, const std::string& newLocation);
     std::string routeRequest(HttpRequest &req, int clientFd);
-    void    sendResponse(int clientSocket, const std::string &response);
+    void sendResponse(int clientSocket, const std::string &response);
+    std::string findFromMap(const std::string& key);
 };
 
 #endif
