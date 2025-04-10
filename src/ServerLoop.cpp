@@ -212,7 +212,11 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
     } else {
-        sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", parser.getState()));
+        int state = parser.getState();
+        if (state == 301 || state == 302)
+            sendResponse(clientSocket, Logger::getInstance().logLevel("REDIR", parser.getRedirection(), parser.getState()));
+        else
+            sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", parser.getState()));
         removeClient(clientSocket);
     }
 }

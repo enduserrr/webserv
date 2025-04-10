@@ -324,6 +324,10 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     req.setAutoIndex(block.getAutoIndex(req.getUri()));
     try {
         req.setRoot(block.getLocation(req.getUri()).getRoot());
+        if (block.getLocation(req.getUri()).getRedirect().first != 0) {
+            _state = block.getLocation(req.getUri()).getRedirect().first;
+            _redirTo = block.getLocation(req.getUri()).getRedirect().second;
+        }
     } catch (const std::exception &e) {
         req.setRoot(block.getRoot());
     }
@@ -337,6 +341,10 @@ std::vector<HttpRequest>& HttpParser::getRequests() {
 
 HttpRequest& HttpParser::getPendingRequest() {
     return _requests.front();
+}
+
+std::string HttpParser::getRedirection() {
+    return _redirTo; 
 }
 
 void HttpParser::display() const {

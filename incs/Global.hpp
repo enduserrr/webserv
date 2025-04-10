@@ -62,7 +62,8 @@
 #define REV_RED  "\u001b[41;1m"
 
 #define OK          "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
-#define MOVED       "HTTP/1.1 301 Moved Permanently\r\nContent-Type: text/html\r\n\r\n"
+#define MOVED_PERM  "HTTP/1.1 301 Moved \r\nContent-Type: text/html\r\n\r\n"
+#define MOVED_TEMP  "HTTP/1.1 302 Found \r\nContent-Type: text/html\r\n\r\n"
 #define BAD_REQ     "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n"
 #define FORBIDDEN   "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html\r\n\r\n"
 #define NOT_FOUND   "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n"

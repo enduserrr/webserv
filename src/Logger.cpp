@@ -36,6 +36,8 @@ Logger::Logger() {
     _errorPages[429] = loadFileContent(baseDir + "429.html");
     _errorPages[500] = loadFileContent(baseDir + "500.html");
     _defaultErrorPage = loadFileContent(baseDir + "default.html");
+    _responses[301] = std::pair<std::string, std::string>(MOVED_TEMP, "Moved permanently");
+    _responses[302] = std::pair<std::string, std::string>(MOVED_PERM, "Moved temporarily");
     _responses[400] = std::pair<std::string, std::string>(BAD_REQ, " Bad Request");
     _responses[403] = std::pair<std::string, std::string>(FORBIDDEN, " Forbidden");
     _responses[404] = std::pair<std::string, std::string>(NOT_FOUND, " Not Found");
@@ -100,6 +102,16 @@ std::string Logger::logLevel(std::string level, const std::string &message, int 
         else
             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << message << std::endl;
         return getErrorPage(code);
+    }
+    else if (level == "REDIR") {
+        _state = 1;
+        std::string redirPage = loadFileContent("www" + message);
+        if (redirPage.empty()) {
+            std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << "Redir page" << getMessage(404) << std::endl;
+            return _responses[404].first + _errorPages[404];
+        }
+        std::cerr << GB << "[" << getCurrentTimestamp() << "]" << YELLOW << "[REDIR]: " << RES << message  << ": " << getMessage(code) << std::endl;  
+        return _responses[code].first + redirPage;
     }
     else if (level == "SYSTEM") {
         _state = code;

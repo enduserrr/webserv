@@ -10,6 +10,6 @@ if ($username && $message) {
     file_put_contents($filename, $comment, FILE_APPEND);
 }
 
-$successPage = file_get_contents("/home/asalo/Code/enduserrr/c++/webserv/www/guestbook.html");
+$successPage = file_get_contents("../guestbook.html");
 echo $successPage;
 

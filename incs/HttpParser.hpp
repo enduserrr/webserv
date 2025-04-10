@@ -40,6 +40,7 @@ private:
     std::map <std::string, std::string> _headers;
     std::string                         _body;
     std::string                         _root;
+    std::string                         _redirTo;
 
 public:
     HttpParser(size_t max);
@@ -67,6 +68,8 @@ public:
 
     std::vector<HttpRequest> &getRequests();
     HttpRequest &getPendingRequest();
+
+    std::string getRedirection();
 
     std::string getMethod() {
         return _method;

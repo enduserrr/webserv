@@ -43,7 +43,7 @@ public:
     void                                        addNewHeader(const std::string& key, const std::string& value);
     void                                        setBody(const std::string& headers);
     void                                        setFileName(const std::string& name);
-
+    
     size_t                                      getBodySize() const;
     const std::string&                          getMethod() const;
     std::string                                 getUri() const;
