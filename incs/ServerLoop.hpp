@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:22:34 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/03 10:13:07 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 21:34:56 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -54,17 +54,10 @@ class ServerLoop {
 
         void    startServer();
         void    closeServer();
-        // bool    hasTimedOut();
         bool    serverFull();
-        void    stopServer() {_run = false;}
-        void    stop() {_run = false;}
-
-        bool    hasTimedOut() {
-            time_t currentTime = time(nullptr);
-            return (currentTime - _startUpTime) >= 1800; //30in
-        }
-
-
+        void    stopServer();
+        void    stop();
+        bool    hasTimedOut();
 };
 
 #endif

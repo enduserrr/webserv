@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:44 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/10 12:24:54 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 21:32:38 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -21,16 +21,13 @@
 
 class Router {
 private:
-    std::map<std::string, std::string> _resourceMap;
     Router();
 
 public:
     static Router& getInstance();
     ~Router();
 
-    void addRedirectionRule(const std::string& resourceUri, const std::string& newLocation);
-    std::string routeRequest(HttpRequest &req, int clientFd);
-    std::string findFromMap(const std::string& key);
+    std::string routeRequest(HttpRequest &req);
 };
 
 #endif

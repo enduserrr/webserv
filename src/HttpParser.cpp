@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/10 14:39:26 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 21:28:04 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -18,6 +18,34 @@ HttpParser::HttpParser(size_t max) : _state(0), _totalRequestSize(0), _maxBodySi
 
 // Destructor
 HttpParser::~HttpParser() {}
+
+std::string HttpParser::getMethod() {
+    return _method;
+}
+
+int HttpParser::getState() {
+    return _state;
+}
+
+std::string HttpParser::getBody() {
+    return _body;
+}
+
+std::map<std::string, std::string> HttpParser::getQueryString() {
+    return _uriQuery;
+}
+
+std::string HttpParser::getUri() {
+    return _uri;
+}
+
+std::string HttpParser::getRoot() {
+    return _root;
+}
+
+void HttpParser::setRoot(std::string root) {
+_root = root;
+}
 
 bool HttpParser::startsWithMethod(std::string &input) {
     size_t firstSpace = input.find(' ');
@@ -344,7 +372,7 @@ HttpRequest& HttpParser::getPendingRequest() {
 }
 
 std::string HttpParser::getRedirection() {
-    return _redirTo; 
+    return _redirTo;
 }
 
 void HttpParser::display() const {

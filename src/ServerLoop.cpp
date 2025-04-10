@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 13:52:29 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 21:34:23 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -26,6 +26,18 @@ ServerLoop::ServerLoop(const std::vector<ServerBlock> &serverBlocks)
 
 ServerLoop::~ServerLoop() {
     closeServer();
+}
+
+void ServerLoop::stopServer() {
+    _run = false;
+}
+void ServerLoop::stop() {
+    _run = false;
+}
+
+bool ServerLoop::hasTimedOut() {
+    time_t currentTime = time(nullptr);
+    return (currentTime - _startUpTime) >= 1800;
 }
 
 /**
@@ -208,7 +220,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     }
     if (parser.parseRequest(_clients[clientSocket]._block)) {
         _clients[clientSocket].request = parser.getPendingRequest();
-        std::string response = Router::getInstance().routeRequest(_clients[clientSocket].request, clientSocket);
+        std::string response = Router::getInstance().routeRequest(_clients[clientSocket].request);
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
     } else {

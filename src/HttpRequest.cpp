@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:22:42 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/01 11:32:21 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 21:31:34 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -15,6 +15,45 @@
 HttpRequest::HttpRequest() : _maxBodySize(0) {}
 
 HttpRequest::~HttpRequest() {}
+
+bool HttpRequest::getAutoIndex() {
+    return _autoIndex;
+}
+
+std::string HttpRequest::getRoot() {
+    return _root;
+}
+
+void HttpRequest::setAutoIndex(bool b) {
+    _autoIndex = b;
+}
+
+void HttpRequest::setRoot(const std::string &root) {
+    _root = root;
+}
+
+void HttpRequest::display() const {
+std::cout << "---- HttpRequest Display ----" << std::endl;
+std::cout << "Method: " << _method << std::endl;
+std::cout << "URI: " << _uri << std::endl;
+std::cout << "HTTP Version: " << _httpVersion << std::endl;
+std::cout << "Max Body Size: " << _maxBodySize << std::endl;
+std::cout << "Root: " << _root << std::endl;
+std::cout << "File Name: " << _fileName << std::endl;
+std::cout << "Body: " << _body << std::endl;
+
+std::cout << "Headers:" << std::endl;
+for (const auto &header : _headers) {
+    std::cout << "  " << header.first << ": " << header.second << std::endl;
+}
+
+std::cout << "URI Query:" << std::endl;
+for (const auto &query : _uriQuery) {
+    std::cout << "  " << query.first << ": " << query.second << std::endl;
+}
+
+std::cout << "-----------------------------" << std::endl;
+}
 
 void HttpRequest::setBodySize(size_t size) {
     _maxBodySize = size;

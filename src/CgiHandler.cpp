@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/10 15:51:38 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 21:26:48 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -22,7 +22,7 @@ std::string CgiHandler::processRequest(HttpRequest &req) {
     //     return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "CGI failed to process.", 404);
     // }
     std::string script = req.getRoot() + req.getUri();
-    std::cout << REV_RED << "src path: " << script << RES << std::endl;
+    // std::cout << RES REV_RED << "src path: " << script << RES << std::endl;
     std::string cgiOutput = executeCgi(script, req);
     return cgiOutput;
 }

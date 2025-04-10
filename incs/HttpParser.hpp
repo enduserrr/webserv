@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:10 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/10 14:38:13 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 21:29:14 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -70,34 +70,13 @@ public:
     HttpRequest &getPendingRequest();
 
     std::string getRedirection();
-
-    std::string getMethod() {
-        return _method;
-    }
-
-    int getState() {
-        return _state;
-    }
-
-    std::string getBody() {
-        return _body;
-    }
-
-    std::map<std::string, std::string> getQueryString() {
-        return _uriQuery;
-    }
-
-    std::string getUri() {
-        return _uri;
-    }
-
-    std::string getRoot() {
-        return _root;
-    }
-
-    void setRoot(std::string root) {
-    _root = root;
-    }
+    std::string getMethod();
+    int         getState();
+    std::string getBody();
+    std::map<std::string, std::string> getQueryString();
+    std::string getUri();
+    std::string getRoot();
+    void        setRoot(std::string root);
 };
 
 #endif

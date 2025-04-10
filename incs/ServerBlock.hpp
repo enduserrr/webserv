@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:44:23 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 21:32:50 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -53,8 +53,6 @@ public:
     void                        setBodySize(const std::string &value);
     void                        setErrorPage(int code, const std::string &path);
     void                        setLocation(const Location& loc);
-
-    // void display() const;
 };
 
 void                            hasForbiddenSymbols(const std::string &word);

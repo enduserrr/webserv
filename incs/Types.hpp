@@ -17,12 +17,11 @@
 
 class Types {
     private:
-        Types();
+        Types(); //Singleton
         std::map<std::string, std::string>  _mimeTypes;
-        std::vector<std::string>            _contentTypes; //Change to std::list
+        std::vector<std::string>            _contentTypes;
     public:
         static Types& getInstance();
-        // Types();
         ~Types();
 
         std::string getMimeType(const std::string &extension) const;

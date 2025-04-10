@@ -1,25 +1,3 @@
-Arttu: Greetings! Cool site and so on.
-Arttu: k
-Arska: l
-Herra: Moro
-Sir: Hello. Hope this works!
-sdcdasca: ascasc
-ffff: ascascssss
-asc: asc
-as: asx
-ee: ee
-ee: ee
-eee: eee
-eeee: eeee
-eeee: eeee
-eeee: eeee
-dd: ddddd
-dd: dd
-dd: dd
-dd: dd
-dd: dd
-dd: dd
-dd: dd
-dd: ddd
-dd: dd
-dd: dd
+Arttu: Greetings!
+Sir: Hope this works!
+
