@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:44 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 14:16:18 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 12:24:54 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -30,7 +30,6 @@ public:
 
     void addRedirectionRule(const std::string& resourceUri, const std::string& newLocation);
     std::string routeRequest(HttpRequest &req, int clientFd);
-    void sendResponse(int clientSocket, const std::string &response);
     std::string findFromMap(const std::string& key);
 };
 

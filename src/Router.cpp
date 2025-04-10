@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:16 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 19:01:23 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 12:24:48 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -34,7 +34,9 @@ Router& Router::getInstance() {
 Router::~Router() {}
 
 void Router::addRedirectionRule(const std::string& resourceUri, const std::string& newLocation) {
-    _resourceMap[resourceUri] = newLocation; // Update or add the resource location
+    std::string str = findFromMap(resourceUri);
+    if (str != "")
+        _resourceMap[resourceUri] = newLocation; // Update or add the resource location
 }
 
 std::string Router::routeRequest(HttpRequest &req, int clientFd) {
@@ -53,14 +55,6 @@ std::string Router::routeRequest(HttpRequest &req, int clientFd) {
     } else {
         StaticHandler staticHandler;
         return staticHandler.processRequest(req);
-    }
-}
-
-void Router::sendResponse(int clientSocket, const std::string &response) {
-    if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
-        Logger::getInstance().logLevel("SYSTEM", "Failed to send response to client.", 1);
-        std::string errorResponse = INTERNAL + Logger::getInstance().getErrorPage(500);
-        send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0); // Fallback send
     }
 }
 
