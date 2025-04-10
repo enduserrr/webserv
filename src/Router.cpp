@@ -6,25 +6,13 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:16 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/10 12:24:48 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 20:15:44 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "Router.hpp"
 
-Router::Router() {
-    _resourceMap["/index.html"] = "/index.html";
-    _resourceMap["/upload.html"] = "/upload.html";
-    _resourceMap["/files.html"] = "/files.html";
-    _resourceMap["favicon.ico"] = "/favicon.ico";
-    _resourceMap["guestbook.html"] = "/guestbook.html";
-    _resourceMap["style.css"] = "/style.css";
-    _resourceMap["/upload_success.html"] = "/upload_success.html";
-    _resourceMap["/welcome.php"] = "/cgi-bin/welcome.php";
-    _resourceMap["/guestbook.php"] = "/cgi-bin/guestbook.php";
-    _resourceMap["/guestbook_display.php"] = "/cgi-bin/guestbook_display.php";
-    _resourceMap["/comments.txt"] = "/cgi-bin/comments.txt";
-}
+Router::Router() {}
 
 Router& Router::getInstance() {
     static Router instance;
@@ -48,9 +36,11 @@ std::string Router::routeRequest(HttpRequest &req, int clientFd) {
         req.setUri(match);
     } else { Logger::getInstance().logLevel("INFO", "Router: requested resource has no match in _resourceMap", 0); }
 
+
     // Handle CGI or static request
     if (uri.find("/cgi-bin/") == 0 || (uri.size() >= 4 && uri.substr(uri.size() - 4) == ".php")) {
         CgiHandler cgiHandler;
+        // std::cout << REV_RED << "URI: " << req.getUri() << RES << std::endl;
         return cgiHandler.processRequest(req);
     } else {
         StaticHandler staticHandler;

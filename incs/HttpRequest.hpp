@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:23:00 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 14:55:24 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -29,6 +29,7 @@ private:
 
     bool                                _autoIndex;
     std::string                         _root;
+    // int                                 _state;
 
 public:
     HttpRequest();

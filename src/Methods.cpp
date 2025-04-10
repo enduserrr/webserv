@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/10 14:43:27 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 15:36:35 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -95,9 +95,9 @@ std::string Methods::mGet(HttpRequest &req) {
     std::string uri = req.getUri();
     if (uri.length() >= 4 && uri.substr(uri.length() - 4) == ".ico") {
         std::string newUri = req.getHeader("Referer");
-        if (newUri.find("/uploads/") != std::string::npos) {
-            uri = "/uploads/";
-        }
+        // if (newUri.find("/uploads/") != std::string::npos) {
+        //     uri = "/uploads/";
+        // }
     }
 
     std::string basePath = req.getRoot();
@@ -169,20 +169,9 @@ std::string Methods::mPost(HttpRequest &req) {
     if (body.empty())
         return INTERNAL + Logger::getInstance().logLevel("ERROR", "Empty request body.", 500);
 
-    // ↓↓↓ CHECK FOR EMPTY OR INVAL UPLOAD ↓↓↓
-    if (body.find("text=") == 0 && body.size() == std::string("text=").size()) {//changed from text_data=
-        std::ifstream file("www/files.html"); //ROUTER INSTANCE
-        if (!file.is_open())
-            return INTERNAL + Logger::getInstance().logLevel("ERROR", "Unable to open file.", 500);
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        std::string htmlContent = buffer.str();
-        file.close();
-
-        std::ostringstream response;
-        response << BAD_REQ << htmlContent;
-        return response.str();
-    }
+    // // ↓↓↓ CHECK FOR EMPTY ↓↓↓
+    if (body.find("text=") == 0 && body.size() == std::string("text=").size()) //changed from text_data=
+        return BAD_REQ + Logger::getInstance().logLevel("ERROR", "POST request with an empty body", 400);
 
     UploadHandler uploadHandler;
     std::string uploadedFilePath = uploadHandler.uploadReturnPath(req);
@@ -191,7 +180,7 @@ std::string Methods::mPost(HttpRequest &req) {
 
     // ↓↓↓ CHECK FOR DUP FILE NAMES ↓↓↓
     if (!req.getFileName().empty()) {
-        std::string uploadDir = "./www/uploads/";
+        std::string uploadDir = req.getRoot() + "/uploads/"; //Server side upload location
         std::string fileName = req.getFileName();
         std::string fullPath = uploadDir + fileName;
         bool fileExists = false;
@@ -200,7 +189,7 @@ std::string Methods::mPost(HttpRequest &req) {
             return INTERNAL + Logger::getInstance().logLevel("ERROR", "mPOST: failed to open directory.", 500);
         }
         struct dirent* entry;
-        // // ↓↓↓ SKIP IF STARTS WITH '.' & '..' ↓↓↓
+        // ↓↓↓ SKIP IF STARTS WITH '.' & '..' ↓↓↓
         while ((entry = readdir(dir)) != nullptr) {
             std::string entryName = entry->d_name;
             if (entryName == "." || entryName == "..") {

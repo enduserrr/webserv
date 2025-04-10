@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:43:21 by eleppala          #+#    #+#             */
-/*   Updated: 2025/03/16 12:48:08 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 14:59:22 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -70,7 +70,7 @@ bool ConfParser::serverLine(std::string &line, int &block) {
     block ++;
     _serverBlocks ++;
     _fileLines.push_back(line);
-    return true; 
+    return true;
 }
 
 void ConfParser::allSetted() {
@@ -79,9 +79,9 @@ void ConfParser::allSetted() {
             throw std::runtime_error(CONF "You need to set atleast one port per server");
         if (_servers[i].getRoot().empty())
             throw std::runtime_error(CONF "Root not setted (Global level)");
-        for (std::map<std::string, Location>::iterator it = _servers[i].getLocations().begin(); 
-                it != _servers[i].getLocations().end(); ++it) { 
-            if (it->second.getRoot().empty()) 
+        for (std::map<std::string, Location>::iterator it = _servers[i].getLocations().begin();
+                it != _servers[i].getLocations().end(); ++it) {
+            if (it->second.getRoot().empty())
                 throw std::runtime_error(CONF "Root not setted (Location level)");
         }
     }
@@ -92,7 +92,7 @@ void ConfParser::parseFile() {
     if (!file.is_open())
         throw std::runtime_error("Failed to open file: " + _fileName);
     std::string line;
-    bool hasContent = false; 
+    bool hasContent = false;
     int block = 0;
     while (std::getline(file, line)) {
         line = removeComments(line);
@@ -100,8 +100,8 @@ void ConfParser::parseFile() {
             continue ;
         whiteSpaceTrim(line);
         if (serverLine(line, block)){
-            hasContent = false; 
-            continue; 
+            hasContent = false;
+            continue;
         }
         if (block < 1 || block > 2)
             throw std::runtime_error(CONF "False serverblock configuration");
@@ -113,7 +113,7 @@ void ConfParser::parseFile() {
     }
     blocks(block);
     parseData();
-    allSetted(); 
+    allSetted();
     Logger::getInstance().logLevel("INFO", "Server configurations OK", 0);
 }
 
@@ -138,7 +138,7 @@ void parseLast(std::string &line, int &block, bool hasContent) {
 
 void ConfParser::parseLine(std::string &line, int &block, bool &hasContent){
     whiteSpaceTrim(line);
-    parseLast(line, block, hasContent); 
+    parseLast(line, block, hasContent);
     if (line.find(';') != std::string::npos)
         throw std::runtime_error(CONF "undefined ';'");
     if (line.find('{') != std::string::npos)
@@ -201,6 +201,7 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex) {
     else
         throw std::runtime_error(CONF "unexpected keyword: "+key);
 }
+#include "Router.hpp"
 
 void ConfParser::locationBlock(int si, size_t &i) {
     Location loc;

@@ -25,3 +25,5 @@
 * Text length limit for post | NO!
 * Text upload doesn't have white space like space or new line. | OK!
 * Delete fail page
+* _resourceMap to locate resources correctly (shouldn't set them in constructor => not dynamic)
+* remove any hardcoded locations

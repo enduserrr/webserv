@@ -6,12 +6,11 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/10 14:40:06 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 15:51:38 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "CgiHandler.hpp"
-#include "Router.hpp"
 
 CgiHandler::CgiHandler() {}
 
@@ -19,11 +18,11 @@ CgiHandler::~CgiHandler() {}
 
 std::string CgiHandler::processRequest(HttpRequest &req) {
     std::string uri = req.getUri();
-    if (uri.size() < 4 || uri.substr(uri.size() - 4) != ".php") {
-        return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "CGI failed to process.", 404);
-    }
+    // if (uri.size() < 4 || uri.substr(uri.size() - 4) != ".php") {
+    //     return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "CGI failed to process.", 404);
+    // }
     std::string script = req.getRoot() + req.getUri();
-    // std::cout << "src path: " << script << std::endl;
+    std::cout << REV_RED << "src path: " << script << RES << std::endl;
     std::string cgiOutput = executeCgi(script, req);
     return cgiOutput;
 }
