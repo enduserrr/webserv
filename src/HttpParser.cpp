@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/09 19:13:36 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 14:39:26 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -190,7 +190,7 @@ std::string decodePercentEncoding(const std::string &str) {
         }
         decoded += str[i];
     }
-    std::cout << "decode: " << decoded << std::endl;
+    // std::cout << "decode: " << decoded << std::endl;
     return decoded;
 }
 
@@ -247,7 +247,7 @@ bool HttpParser::parseHeader(std::string &line, HttpRequest &req) {
 
 void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     std::string contentType = req.getHeader("Content-Type");
-    std::cout << RED << contentType << RES << std::endl;
+    // std::cout << RED << contentType << RES << std::endl;
     std::string emptyBody = "";
 
     if (contentType.empty()) {
@@ -262,7 +262,7 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
         size_t boundaryPos = contentType.find("boundary=");
         if (boundaryPos != std::string::npos) {
             std::string boundary = "--" + contentType.substr(boundaryPos + 9);
-            std::cout << GC << "Extracted boundary: " << boundary << RES << std::endl;
+            // std::cout << GC << "Extracted boundary: " << boundary << RES << std::endl;
         } else {
             std::cerr << RED << "Error: Missing boundary in Content-Type: " << RES << contentType << std::endl;
         }
@@ -310,7 +310,7 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     }
 }
 
-void HttpParser::whiteSpaceTrim(std::string &str) {
+void HttpParser::whiteSpaceTrim(std::string &str) {/*Not used?*/
     size_t start = str.find_first_not_of(" \t\r\n");
     size_t end = str.find_last_not_of(" \t\r\n");
     if (start == std::string::npos || end == std::string::npos) {

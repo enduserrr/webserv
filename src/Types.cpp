@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 10:19:04 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 19:04:55 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 14:40:25 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -87,7 +87,6 @@ bool Types::isValidContent(const std::string &contentType) const {
             return true;
         }
     }
-    std::cout << "Type is: " << contentType << std::endl;
     return false;
 }
 

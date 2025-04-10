@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 19:17:05 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 14:43:27 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -155,11 +155,6 @@ std::string Methods::mGet(HttpRequest &req) {
     file.close();
 
     std::string mimeType = Types::getInstance().getMimeType(filePath);
-    logStream.str(""); // Clean previous contents
-    logStream.clear(); // Clear error flags
-    logStream << "Mime type check for: " << filePath << "\nCheck result: " << mimeType;
-    Logger::getInstance().logLevel("INFO", logStream.str(), 0);
-
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 200 OK\r\n"
                    << "Content-Length: " << fileContent.size() << "\r\n"
@@ -175,7 +170,7 @@ std::string Methods::mPost(HttpRequest &req) {
         return INTERNAL + Logger::getInstance().logLevel("ERROR", "Empty request body.", 500);
 
     // ↓↓↓ CHECK FOR EMPTY OR INVAL UPLOAD ↓↓↓
-    if (body.find("text_data=") == 0 && body.size() == std::string("text_data=").size()) {
+    if (body.find("text=") == 0 && body.size() == std::string("text=").size()) {//changed from text_data=
         std::ifstream file("www/files.html"); //ROUTER INSTANCE
         if (!file.is_open())
             return INTERNAL + Logger::getInstance().logLevel("ERROR", "Unable to open file.", 500);
@@ -184,7 +179,6 @@ std::string Methods::mPost(HttpRequest &req) {
         std::string htmlContent = buffer.str();
         file.close();
 
-        replaceAll(htmlContent, "{{error_message}}", "<p style='color:red;'>Upload failed! Add something to upload.</p>");
         std::ostringstream response;
         response << BAD_REQ << htmlContent;
         return response.str();

@@ -21,7 +21,7 @@
 
 ## Todo
 
-* .php script with POST method
-* DoS protection
- * Rew per second limit
-* Text length limit for post
+* DoS protection | OK?
+* Text length limit for post | NO!
+* Text upload doesn't have white space like space or new line. | OK!
+* Delete fail page

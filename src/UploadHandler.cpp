@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 19:15:56 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 14:40:52 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -17,6 +17,37 @@
 UploadHandler::UploadHandler() {}
 
 UploadHandler::~UploadHandler() {}
+
+std::string decodeBnry(const std::string& binaryContent) {
+    std::string decoded;
+    std::string content = binaryContent;
+
+    // Remove 'text=' from the beginning if present
+    if (content.length() >= 5 && content.substr(0, 5) == "text=") {
+        content = content.substr(5); // Skip past 'text='
+    }
+
+    for (size_t i = 0; i < content.length(); ++i) {
+        if (content[i] == '%' && i + 2 < content.length()) {
+            if (std::isxdigit(content[i + 1]) && std::isxdigit(content[i + 2])) {
+                std::string hexStr = content.substr(i + 1, 2);
+                unsigned char decodedChar = static_cast<unsigned char>(std::stoi(hexStr, nullptr, 16));
+                decoded += decodedChar; // Decodes %20 to space, %0A to newline, etc.
+                i += 2;
+                continue;
+            }
+        } else if (content[i] == '&') {
+            decoded += "\n"; // Replace '&' with newline for readability
+            continue;
+        } else if (content[i] == '+') {
+            decoded += " "; // Replace '+' with space for readability
+            continue;
+        }
+        decoded += content[i]; // Keep other characters as-is
+    }
+    // std::cout << "Decoded content: " << decoded << std::endl; // Debug log (re-added from your prior version)
+    return decoded;
+}
 
 std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
     std::string body = req.getBody();
@@ -32,15 +63,15 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
 
     std::string filePath;
 
-    // Handle application/x-www-form-urlencoded (store as text file)
     if (contentType == "application/x-www-form-urlencoded") {
         if (filename.empty())
-            filePath = "./www/uploads/upload_" + std::to_string(std::time(nullptr)) + ".txt";
-        std::ofstream ofs(filePath.c_str(), std::ios::binary);
+            filePath = "./www/uploads/upload_" + std::to_string(std::time(nullptr));
+        std::ofstream ofs(filePath.c_str()); // Text mode for human-readable output
         if (!ofs) {
             return INTERNAL + Logger::getInstance().logLevel("ERROR", "Fail reading the file.", 500);
         }
-        ofs.write(body.c_str(), body.size());
+        std::string decodedBody = decodeBnry(body); // Decode the body
+        ofs << decodedBody; // Write decoded content
         ofs.close();
         return filePath;
     }

@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 18:42:12 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 14:40:06 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -22,13 +22,8 @@ std::string CgiHandler::processRequest(HttpRequest &req) {
     if (uri.size() < 4 || uri.substr(uri.size() - 4) != ".php") {
         return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "CGI failed to process.", 404);
     }
-    // std::string scriptPath = Router::getInstance().findFromMap(req.getUri());
-    // std::cout << "Uri: " << req.getUri() << std::endl;
-    // if (scriptPath == "") {
-    //     return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "Didn't find matching value", 404);
-    // }
     std::string script = req.getRoot() + req.getUri();
-    std::cout << "src path: " << script << std::endl;
+    // std::cout << "src path: " << script << std::endl;
     std::string cgiOutput = executeCgi(script, req);
     return cgiOutput;
 }
@@ -60,7 +55,7 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
     char **envp = convertEnvVectorToArray(envVector);
 
     std::string phpExecutable = "/usr/bin/php-cgi";
-    std::cout << "PHP executable: " << phpExecutable << std::endl;
+    // std::cout << "PHP executable: " << phpExecutable << std::endl;
     if (access(phpExecutable.c_str(), X_OK) != 0) {
         for (size_t i = 0; i < envVector.size(); ++i) free(envp[i]);
         delete[] envp;
@@ -98,7 +93,7 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
     close(pipe_in[0]);
     close(pipe_out[1]);
     if (req.getMethod() == "POST" && !req.getBody().empty()) {
-        std::cout << "Writing POST body: " << req.getBody() << std::endl;
+        // std::cout << "Writing POST body: " << req.getBody() << std::endl;
         ssize_t bytes_written = write(pipe_in[1], req.getBody().c_str(), req.getBody().size());
         if (bytes_written == -1) {
             Logger::getInstance().logLevel("ERROR", "ExecuteCgi: write failed (bytes_written == -1)", 0);

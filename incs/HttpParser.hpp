@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:10 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/10 14:38:13 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -37,9 +37,8 @@ private:
     std::string                         _uri;
     std::map <std::string, std::string> _uriQuery;
     std::string                         _httpVersion;
-    std::map <std::string, std::string> _headers;       //key + value
+    std::map <std::string, std::string> _headers;
     std::string                         _body;
-    // bool                                _autoIndex;
     std::string                         _root;
 
 public:
@@ -50,7 +49,6 @@ public:
     bool startsWithMethod(std::string &input);
     bool requestSize(ssize_t bytes);
     bool isFullRequest(std::string &input, ssize_t bytes);
-    // bool readFullRequest(std::istream &input, ServerBlock &block);
     bool parseRequest(ServerBlock &block);
     bool parseStartLine(std::string &line, HttpRequest &req);
 
@@ -66,10 +64,7 @@ public:
     void parseBody(std::string &body, HttpRequest &req);
     void whiteSpaceTrim(std::string& str);
     void display() const;
-    void removeRequest();
 
-    /* Creates new request to HttpRequests vector after parsing */
-    // bool createRequest();
     std::vector<HttpRequest> &getRequests();
     HttpRequest &getPendingRequest();
 
@@ -93,17 +88,10 @@ public:
         return _uri;
     }
 
-    // bool indexAllowed() {
-    //     return _autoIndex;
-    // }
-
     std::string getRoot() {
         return _root;
     }
 
-    // void setAutoIndex(bool b) {
-    //     _autoIndex = b;
-    // }
     void setRoot(std::string root) {
     _root = root;
     }
