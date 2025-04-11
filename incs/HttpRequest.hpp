@@ -18,17 +18,15 @@
 class HttpRequest {
 private:
     size_t                              _maxBodySize;
+    bool                                _autoIndex;
     std::string                         _method;
     std::string                         _uri;
     std::string                         _httpVersion;
-
-    std::map <std::string, std::string> _uriQuery;
-    std::map <std::string, std::string> _headers;
     std::string                         _body;
     std::string                         _fileName;
-
-    bool                                _autoIndex;
     std::string                         _root;
+    std::map <std::string, std::string> _uriQuery;
+    std::map <std::string, std::string> _headers;
 
 public:
     HttpRequest();
@@ -44,18 +42,19 @@ public:
     void                                        setFileName(const std::string& name);
 
     size_t                                      getBodySize() const;
-    const std::string&                          getMethod() const;
+    bool                                        getAutoIndex();
     std::string                                 getUri() const;
     std::string                                 getHttpVersion() const;
     std::string                                 getHeader(const std::string& key) const;
+    std::string                                 getRoot() const;
     const std::string&                          getBody() const;
+    const std::string&                          getMethod() const;
     const std::string&                          getFileName() const;
     const std::map <std::string, std::string>&  getUriQuery() const;
     const std::map <std::string, std::string>&  getHeaders() const;
-    bool                                        getAutoIndex();
-    std::string                                 getRoot();
     void                                        setAutoIndex(bool b);
     void                                        setRoot(const std::string &root);
+
     void                                        display() const;
 };
 

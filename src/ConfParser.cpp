@@ -74,9 +74,16 @@ bool ConfParser::serverLine(std::string &line, int &block) {
 }
 
 void ConfParser::allSetted() {
+    std::vector<int> allPorts; 
     for (size_t i = 0; i < _servers.size(); ++i) {
         if (_servers[i].getPorts().empty())
             throw std::runtime_error(CONF "You need to set atleast one port per server");
+        const std::vector<int>& ports = _servers[i].getPorts();
+        for (size_t j = 0; j < ports.size(); ++j) {
+            if (std::find(allPorts.begin(), allPorts.end(), ports[j]) != allPorts.end())
+                throw std::runtime_error(CONF "Duplicate port used in multiple servers");
+            allPorts.push_back(ports[j]);
+        }
         if (_servers[i].getRoot().empty())
             throw std::runtime_error(CONF "Root not setted (Global level)");
         for (std::map<std::string, Location>::iterator it = _servers[i].getLocations().begin();

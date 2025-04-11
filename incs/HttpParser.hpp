@@ -17,66 +17,49 @@
 #include "HttpRequest.hpp"
 #include "ServerBlock.hpp"
 
-
-// Socket will give rawchunks of data,
-// meaning there might be incomplete requests or
-// one request + half of second request at same time
-// or multiple requests.
-
 class HttpParser {
 private:
     int                                 _state;
     size_t                              _totalRequestSize;
-
+    size_t                              _maxBodySize;
+    HttpRequest                         _request;
     std::string                         _fullRequest;
-    std::string                         _pendingData;   //used for storing rest of the chunk
-    std::vector<HttpRequest>            _requests;
-
-    size_t                              _maxBodySize;   //get from ServerBlock
+    std::string                         _pendingData;
     std::string                         _method;
     std::string                         _uri;
-    std::map <std::string, std::string> _uriQuery;
     std::string                         _httpVersion;
-    std::map <std::string, std::string> _headers;
     std::string                         _body;
     std::string                         _root;
     std::string                         _redirTo;
+    std::map <std::string, std::string> _headers;
+    std::map <std::string, std::string> _uriQuery;
 
 public:
     HttpParser(size_t max);
     ~HttpParser();
 
+    bool    startsWithMethod(std::string &input);
+    bool    requestSize(ssize_t bytes);
+    bool    isFullRequest(std::string &input, ssize_t bytes);
+    bool    parseRequest(ServerBlock &block);
+    bool    parseStartLine(std::string &line, HttpRequest &req);
+    bool    parseMethod(std::istringstream &ss, HttpRequest &req);
+    bool    parseUriQuery(const std::string &query, HttpRequest &req);
+    bool    parseUri(std::istringstream &ss, HttpRequest &req);
+    bool    isValidUri(std::string& uri);
+    bool    parseVersion(std::istringstream &ss, HttpRequest &req);
+    bool    createRequest(ServerBlock &block, HttpRequest &req);
+    bool    parseHeader(std::string &line, HttpRequest &req);
+    void    parseBody(std::string &body, HttpRequest &req);
 
-    bool startsWithMethod(std::string &input);
-    bool requestSize(ssize_t bytes);
-    bool isFullRequest(std::string &input, ssize_t bytes);
-    bool parseRequest(ServerBlock &block);
-    bool parseStartLine(std::string &line, HttpRequest &req);
-
-    bool parseMethod(std::istringstream &ss, HttpRequest &req);
-    bool parseUriQuery(const std::string &query, HttpRequest &req);
-    bool parseUri(std::istringstream &ss, HttpRequest &req);
-    bool isValidUri(std::string& uri);
-    bool parseVersion(std::istringstream &ss, HttpRequest &req);
-
-    bool createRequest(ServerBlock &block, HttpRequest &req);
-
-    bool parseHeader(std::string &line, HttpRequest &req);
-    void parseBody(std::string &body, HttpRequest &req);
-    void whiteSpaceTrim(std::string& str);
-    void display() const;
-
-    std::vector<HttpRequest> &getRequests();
-    HttpRequest &getPendingRequest();
-
-    std::string getRedirection();
-    std::string getMethod();
-    int         getState();
-    std::string getBody();
-    std::map<std::string, std::string> getQueryString();
-    std::string getUri();
-    std::string getRoot();
-    void        setRoot(std::string root);
+    int                                 getState() const;
+    std::string                         getRedirection() const;
+    std::string                         getMethod() const;
+    std::string                         getBody() const;
+    std::string                         getUri() const;
+    std::string                         getRoot() const;
+    const HttpRequest&                  getPendingRequest() const;
+    std::map<std::string, std::string>  getQueryString() const;
 };
 
 #endif

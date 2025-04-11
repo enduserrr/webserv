@@ -30,6 +30,7 @@ Logger::Logger() {
     _errorPages[400] = loadFileContent(baseDir + "400.html");
     _errorPages[403] = loadFileContent(baseDir + "403.html");
     _errorPages[404] = loadFileContent(baseDir + "404.html");
+    _errorPages[405] = loadFileContent(baseDir + "405.html");
     _errorPages[408] = loadFileContent(baseDir + "408.html");
     _errorPages[415] = loadFileContent(baseDir + "415.html");
     _errorPages[413] = loadFileContent(baseDir + "413.html");

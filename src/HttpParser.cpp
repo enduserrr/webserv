@@ -19,34 +19,6 @@ HttpParser::HttpParser(size_t max) : _state(0), _totalRequestSize(0), _maxBodySi
 // Destructor
 HttpParser::~HttpParser() {}
 
-std::string HttpParser::getMethod() {
-    return _method;
-}
-
-int HttpParser::getState() {
-    return _state;
-}
-
-std::string HttpParser::getBody() {
-    return _body;
-}
-
-std::map<std::string, std::string> HttpParser::getQueryString() {
-    return _uriQuery;
-}
-
-std::string HttpParser::getUri() {
-    return _uri;
-}
-
-std::string HttpParser::getRoot() {
-    return _root;
-}
-
-void HttpParser::setRoot(std::string root) {
-_root = root;
-}
-
 bool HttpParser::startsWithMethod(std::string &input) {
     size_t firstSpace = input.find(' ');
     if (firstSpace == std::string::npos) {
@@ -130,6 +102,8 @@ bool HttpParser::parseRequest(ServerBlock &block) {
         return false;
     }
     createRequest(block, request);
+    if (_state != 0)
+        return false; 
     return true;
 }
 
@@ -218,7 +192,6 @@ std::string decodePercentEncoding(const std::string &str) {
         }
         decoded += str[i];
     }
-    // std::cout << "decode: " << decoded << std::endl;
     return decoded;
 }
 
@@ -338,16 +311,6 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     }
 }
 
-void HttpParser::whiteSpaceTrim(std::string &str) {/*Not used?*/
-    size_t start = str.find_first_not_of(" \t\r\n");
-    size_t end = str.find_last_not_of(" \t\r\n");
-    if (start == std::string::npos || end == std::string::npos) {
-        str.clear();
-    } else {
-        str = str.substr(start, end - start + 1);
-    }
-}
-
 bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     req.setAutoIndex(block.getAutoIndex(req.getUri()));
     try {
@@ -359,41 +322,38 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     } catch (const std::exception &e) {
         req.setRoot(block.getRoot());
     }
-    _requests.push_back(req);
+    _request = req;
     return true;
 }
 
-std::vector<HttpRequest>& HttpParser::getRequests() {
-    return _requests;
+const HttpRequest& HttpParser::getPendingRequest() const {
+    return _request;
 }
 
-HttpRequest& HttpParser::getPendingRequest() {
-    return _requests.front();
-}
-
-std::string HttpParser::getRedirection() {
+std::string HttpParser::getRedirection() const {
     return _redirTo;
 }
 
-void HttpParser::display() const {
+std::string HttpParser::getMethod() const {
+    return _method;
+}
 
-    std::cout << GC << "\n\n-- HTTP-PARSER DISPLAY --\n" << std::endl;
+int HttpParser::getState() const {
+    return _state;
+}
 
-    std::cout << "START-LINE" << std::endl;
-    std::cout << "method: " << _method << std::endl;
-    std::cout << "uri: " << _uri << std::endl;
-    if (!_uriQuery.empty()) {
-        std::cout << "uriquery: " << std::endl;
-        std::cout << std::left << std::setw(15) << "Key" << "|" << "Value" << std::endl;
-        for (std::map<std::string, std::string>::const_iterator it = _uriQuery.begin(); it != _uriQuery.end(); ++it) {
-            std::cout << std::left << std::setw(15) << it->first << "|" << it->second << std::endl;
-        }
-    }
-    std::cout << "http version: " << _httpVersion << std::endl;
-    std::cout << "\nHEADERS" << std::endl;
-    std::cout << std::left << std::setw(15) << "Key" << "|" << "Value" << std::endl;
-    for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it) {
-        std::cout << std::left << std::setw(15) << it->first << "|" << it->second << std::endl;
-    }
-    std::cout << "\nBODY\n" << _body << RES << std::endl;
+std::string HttpParser::getBody() const {
+    return _body;
+}
+
+std::map<std::string, std::string> HttpParser::getQueryString() const {
+    return _uriQuery;
+}
+
+std::string HttpParser::getUri() const {
+    return _uri;
+}
+
+std::string HttpParser::getRoot() const {
+    return _root;
 }
