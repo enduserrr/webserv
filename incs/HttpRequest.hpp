@@ -14,6 +14,7 @@
 #define HTTPREQUEST_HPP
 
 #include "Global.hpp"
+#include "Location.hpp"
 
 class HttpRequest {
 private:
@@ -25,6 +26,7 @@ private:
     std::string                         _body;
     std::string                         _fileName;
     std::string                         _root;
+    Location                            _location; 
     std::map <std::string, std::string> _uriQuery;
     std::map <std::string, std::string> _headers;
 
@@ -40,6 +42,7 @@ public:
     void                                        addNewHeader(const std::string& key, const std::string& value);
     void                                        setBody(const std::string& headers);
     void                                        setFileName(const std::string& name);
+    void                                        setLocation(const Location &loc);
 
     size_t                                      getBodySize() const;
     bool                                        getAutoIndex();
@@ -54,6 +57,7 @@ public:
     const std::map <std::string, std::string>&  getHeaders() const;
     void                                        setAutoIndex(bool b);
     void                                        setRoot(const std::string &root);
+    const Location&                             getLocation() const;
 
     void                                        display() const;
 };

@@ -16,12 +16,11 @@ Location::Location() : _autoIndex(false) {}
 
 Location::~Location() {}
 
-
 std::string Location::getPath() const {
     return _path;
 }
 
-std::string& Location::getRoot() {
+const std::string& Location::getRoot()const {
     return _root;
 }
 
@@ -33,7 +32,7 @@ const std::string& Location::getUploadStore() const {
     return _uploadStore;
 }
 
-bool& Location::getAutoIndex() {
+bool Location::getAutoIndex() const {
     return _autoIndex;
 }
 
@@ -41,7 +40,7 @@ std::vector<std::string> Location::getAllowedMethods() const {
     return _allowedMethods;
 }
 
-std::map<int, std::string>&  Location::getErrorPages() {
+const std::map<int, std::string>&  Location::getErrorPages() const {
     return _errorPages;
 }
 
@@ -55,10 +54,18 @@ void Location::setPath(const std::string& path) {
     _path = path;
 }
 
+static bool isValidDirectory(const std::string& path) {
+    struct stat info;
+    return (stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode));
+}
+
 void Location::setRoot(const std::string &root) {
     char cwd[PATH_MAX];
-    getcwd(cwd, sizeof(cwd));
+    if (!getcwd(cwd, sizeof(cwd)))
+        throw std::runtime_error(CONF "Failed to get current working directory");
     _root = std::string(cwd) + root;
+    if (!isValidDirectory(_root))
+        throw std::runtime_error(CONF "Invalid root directory: " + _root);
 }
 
 void Location::setAutoIndex(const std::string &value) {

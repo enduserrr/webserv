@@ -39,7 +39,7 @@ public:
     std::string&                     getRoot();
     std::vector<int>                 getPorts();
     const std::string&               getIndex() const;
-    bool&                            getAutoIndex(const std::string &key);
+    bool                             getAutoIndex(const std::string &key);
     size_t                           getBodySize() const;
     Location&                        getLocation(const std::string &key);
     std::map<std::string, Location>& getLocations();

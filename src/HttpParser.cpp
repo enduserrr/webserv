@@ -81,6 +81,16 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
     return true;
 }
 
+void matchRoute(ServerBlock &b, HttpRequest &req) {
+    std::string uri = req.getUri(); 
+    const std::map<std::string, Location>& locations = b.getLocations();
+    for (std::map<std::string, Location>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+        const std::string& locPath = it->first;
+        if (uri.compare(0, locPath.length(), locPath) == 0)
+            req.setLocation(it->second);
+    }
+}
+
 bool HttpParser::parseRequest(ServerBlock &block) {
     std::istringstream ss(_fullRequest);
     std::string line;
@@ -89,6 +99,7 @@ bool HttpParser::parseRequest(ServerBlock &block) {
     if (!parseStartLine(line, request)) {
         return false;
     }
+    matchRoute(block, request);
     while (getline(ss, line, '\r') && ss.get() == '\n' && !line.empty()) {
         if (!parseHeader(line, request))
             return false;
@@ -146,6 +157,7 @@ bool HttpParser::parseMethod(std::istringstream &ss, HttpRequest &req) {
     req.setMethod(word);
     return true;
 }
+
 
 // Valid syntax: /dir/subdir?query=string  -- /dir/subdir?color=red&size=large
 bool HttpParser::parseUri(std::istringstream &ss, HttpRequest &req) {

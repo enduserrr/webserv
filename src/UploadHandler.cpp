@@ -66,10 +66,7 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
     if (contentType == "application/x-www-form-urlencoded") {
         if (filename.empty())
             filePath = "./www/uploads/upload_" + std::to_string(std::time(nullptr));
-        std::ofstream ofs(filePath.c_str()); // Text mode for human-readable output
-        if (!ofs) {
-            return INTERNAL + Logger::getInstance().logLevel("ERROR", "Fail reading the file.", 500);
-        }
+        std::ofstream ofs;
         std::string decodedBody = decodeBnry(body); // Decode the body
         ofs << decodedBody; // Write decoded content
         ofs.close();

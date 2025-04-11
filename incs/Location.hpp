@@ -31,14 +31,14 @@ class Location {
         ~Location();
 
         //getters
-        std::string                 getPath() const;
-        std::string&                getRoot();
-        bool&                       getAutoIndex();
-        const std::string&          getIndex() const;
-        const std::string&          getUploadStore() const;
-        std::vector<std::string>    getAllowedMethods() const;
-        std::map<int, std::string>& getErrorPages();
-        std::pair<int, std::string> getRedirect() const ;
+        std::string                         getPath() const;
+        const std::string&                  getRoot() const;
+        bool                                getAutoIndex() const;
+        const std::string&                  getIndex() const;
+        const std::string&                  getUploadStore() const;
+        std::vector<std::string>            getAllowedMethods() const;
+        const std::map<int, std::string>&   getErrorPages() const;
+        std::pair<int, std::string>         getRedirect() const ;
 
         //setters
         void                        setPath(const std::string& path);

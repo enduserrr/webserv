@@ -17,6 +17,11 @@ ServerBlock::ServerBlock() : _autoIndex(false), _bodySize(DEFAULT_BODY_SIZE) {}
 
 ServerBlock::~ServerBlock() {}
 
+bool isValidDirectory(const std::string& path) {
+    struct stat info;
+    return (stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode));
+}
+
 std::string ServerBlock::getServerName() const {
     return _serverName;
 }
@@ -33,7 +38,7 @@ const std::string& ServerBlock::getIndex() const {
     return _index;
 }
 
-bool& ServerBlock::getAutoIndex(const std::string &key) {
+bool ServerBlock::getAutoIndex(const std::string &key) {
     if (key != "") {
         if (_locations.find(key) != _locations.end())
             return getLocation(key).getAutoIndex();
@@ -70,14 +75,21 @@ void ServerBlock::setServerName(const std::string &str) {
 }
 
 void ServerBlock::setHost(const std::string &str) {
+    in_addr addr;
+    if (inet_pton(AF_INET, str.c_str(), &addr) != 1)
+        throw std::runtime_error(CONF "Invalid host format: " + str);
     _host = str;
 }
 
 
-void ServerBlock::setRoot(const std::string &root) {
+void ServerBlock::setRoot(const std::string& root) {
     char cwd[PATH_MAX];
-    getcwd(cwd, sizeof(cwd));
+    if (!getcwd(cwd, sizeof(cwd)))
+        throw std::runtime_error(CONF "Failed to get current working directory");
     _root = std::string(cwd) + root;
+    std::cout << _root << std::endl; 
+    if (!isValidDirectory(_root))
+        throw std::runtime_error(CONF "Invalid root directory: " + _root);
 }
 
 void ServerBlock::setPort(const std::string &port) {

@@ -19,6 +19,15 @@ HttpRequest::~HttpRequest() {}
 void HttpRequest::setBodySize(size_t size) {
     _maxBodySize = size;
 }
+
+void HttpRequest::setLocation(const Location &loc) {
+    _location = loc;
+}
+
+const Location& HttpRequest::getLocation() const {
+    return _location;
+}
+
 void HttpRequest::setMethod(const std::string& method){
     _method = method;
 }
