@@ -87,6 +87,7 @@
 
 /* KEYWORDS FOR CONFIGURATION FILE PARSING */
 #define SERVER          "server {"
+#define HOST            "host"
 #define SERVER_NAME     "server_name"
 #define PORT            "listen"
 #define BODY_SIZE       "client_max_body_size"

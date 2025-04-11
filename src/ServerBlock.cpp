@@ -59,10 +59,20 @@ std::map<int, std::string>&  ServerBlock::getErrorPages() {
     return _errorPages;
 }
 
+const std::string& ServerBlock::getHost() const {
+    return _host;
+}
+
+
 void ServerBlock::setServerName(const std::string &str) {
     hasForbiddenSymbols(str);
     _serverName = str;
 }
+
+void ServerBlock::setHost(const std::string &str) {
+    _host = str;
+}
+
 
 void ServerBlock::setRoot(const std::string &root) {
     char cwd[PATH_MAX];

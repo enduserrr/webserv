@@ -72,7 +72,9 @@ void ServerLoop::setupServerSockets() {
 
             serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
             // Binding to 0.0.0.0 to accept connections on all interfaces, not only localhost
-            if (inet_pton(AF_INET, "0.0.0.0", &serverAddr.sin_addr) <= 0) {
+            std::cout << _serverBlocks[0].getHost() << std::endl; 
+            std::cout << _serverBlocks[1].getHost() << std::endl; 
+            if (inet_pton(AF_INET, it->getHost().c_str(), &serverAddr.sin_addr) <= 0) {
                 Logger::getInstance().logLevel("SYSTEM", "Invalid address for port " + std::to_string(*portIt), 1);
                 close(serverSocket);
                 continue ;

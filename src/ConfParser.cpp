@@ -193,6 +193,8 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex) {
     ss >> key;
     if (key == SERVER_NAME)
         parseSingle(ss, _servers[serverIndex], &ServerBlock::setServerName);
+    if (key == HOST)
+        parseSingle(ss, _servers[serverIndex], &ServerBlock::setHost);
     else if (key == PORT)
         parseSingle(ss, _servers[serverIndex], &ServerBlock::setPort);
     else if (key == BODY_SIZE)
