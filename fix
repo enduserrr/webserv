@@ -15,3 +15,10 @@
 
 
 -httpparser fails, give just request return state page, not a specific error page 
+
+
+
+mmuista chekata ettei jaa fdt auki!! 
+
+valgrind --leak-check=full --track-fds=yes ./webserv
+

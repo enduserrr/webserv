@@ -40,6 +40,7 @@ public:
     ~HttpParser();
 
     void    matchRoute(ServerBlock &b, HttpRequest &req);
+    bool    methodAllowed(HttpRequest &req);
     bool    startsWithMethod(std::string &input);
     bool    requestSize(ssize_t bytes);
     bool    isFullRequest(std::string &input, ssize_t bytes);
