@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/12 18:36:46 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/12 18:39:22 by asalo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -436,13 +436,6 @@ std::string Methods::mPost(HttpRequest &req) {
 
 
 std::string Methods::mDelete(const std::string& fullPathToDelete) {
-    // std::cerr << "Attempting to delete file: " << fullPathToDelete << std::endl; // Logging
-
-    // --- Security Note ---
-    // In a real server, **CRITICALLY IMPORTANT**: You MUST validate fullPathToDelete
-    // to prevent directory traversal attacks (e.g., "DELETE=../../etc/passwd").
-    // Ensure the path is within an expected base directory and doesn't contain ".." etc.
-    // This example omits robust path validation for brevity based on the prompt.
     std::string decoded = decodeBnry1(fullPathToDelete);
     if (std::remove(decoded.c_str()) == 0) {
         // Successfully deleted
@@ -458,10 +451,6 @@ std::string Methods::mDelete(const std::string& fullPathToDelete) {
         std::cerr << "Error deleting file: " << decoded
                   << " - Error (" << errorNum << "): " << strerror(errorNum)
                   << std::endl;
-
-        // Determine *why* it failed (optional but better)
-        // A simple check: does the error suggest the file wasn't found?
-        // ENOENT is "No such file or directory"
         if (errorNum == ENOENT) {
              std::string errorBody = "{\"error\":\"File not found\"}";
              std::string response = "HTTP/1.1 404 Not Found\r\n"
