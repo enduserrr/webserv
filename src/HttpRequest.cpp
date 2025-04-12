@@ -92,11 +92,11 @@ const std::string& HttpRequest::getFileName() const {
 }
 
 bool HttpRequest::getAutoIndex() {
-    return _autoIndex;
+    return _location.getAutoIndex();
 }
 
 std::string HttpRequest::getRoot() const {
-    return _root;
+    return _location.getRoot();
 }
 
 void HttpRequest::setAutoIndex(bool b) {

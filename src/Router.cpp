@@ -24,11 +24,18 @@ Router::~Router() {}
 std::string Router::routeRequest(HttpRequest &req) {
     std::string uri = req.getUri();
 
-    std::string root = req.getLocation().getRoot(); 
-    bool t = req.getLocation().getAutoIndex();
+    std::cout << "==== DEBUG =====" <<std::endl; 
+    std::cout << "uri: " << req.getUri() << std::endl; 
+    std::cout << "Autoindex: " << req.getLocation().getAutoIndex() << std::endl; 
+    std::cout << "Root: " << req.getLocation().getRoot() << std::endl; 
+    std::cout << "UploadStore: " << req.getLocation().getUploadStore() << std::endl;
+    std::cout << "Allowed Methods: " << req.getLocation().getAllowedMethods()[0] << " "<< req.getLocation().getAllowedMethods()[1] << std::endl; 
 
-    std::cout << root << t << std::endl;
-    std::cout << req.getAutoIndex() << std::endl;
+    // std::cout << "uri" << req.getUri() << std::endl; 
+    // std::cout << "uri" << req.getUri() << std::endl; 
+
+    std::cout << "==== DEBUG END=====" <<std::endl; 
+
     // Handle CGI or static request
     if (uri.find("/cgi-bin/") == 0 || (uri.size() >= 4 && uri.substr(uri.size() - 4) == ".php")) {
         CgiHandler cgiHandler;

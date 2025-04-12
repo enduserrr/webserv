@@ -34,10 +34,12 @@ private:
     std::map <std::string, std::string> _headers;
     std::map <std::string, std::string> _uriQuery;
 
+
 public:
     HttpParser(size_t max);
     ~HttpParser();
 
+    void    matchRoute(ServerBlock &b, HttpRequest &req);
     bool    startsWithMethod(std::string &input);
     bool    requestSize(ssize_t bytes);
     bool    isFullRequest(std::string &input, ssize_t bytes);
