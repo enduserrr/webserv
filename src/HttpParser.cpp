@@ -84,15 +84,15 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
 void HttpParser::matchRoute(ServerBlock &b, HttpRequest &req) {
     std::string uri = req.getUri(); 
     const std::map<std::string, Location>& locations = b.getLocations();
+    std::string bestMatch = "";
     for (std::map<std::string, Location>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
         const std::string& locPath = it->first;
         if (uri.compare(0, locPath.length(), locPath) == 0) {
-            req.setLocation(it->second);
-            return ;
+            if (locPath.length() > bestMatch.length())
+                bestMatch = locPath;
         }
     }
-    std::cout << "FALLBACK" << std::endl; 
-    req.setLocation(b.getLocations().at("/"));
+    req.setLocation(locations.at(bestMatch));
 }
 
 
