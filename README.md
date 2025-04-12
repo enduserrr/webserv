@@ -27,3 +27,10 @@
 * Delete fail page
 * _resourceMap to locate resources correctly (shouldn't set them in constructor => not dynamic)
 * remove any hardcoded locations
+
+
+## NOTE AFTER DOING AN EVAL
+* Max header size, url size etc (defined in the config file)
+* Serverloop for each server block
+* DELETE handling re think
+* location for /

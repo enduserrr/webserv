@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/12 18:39:22 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/12 18:39:44 by asalo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -434,7 +434,7 @@ std::string Methods::mPost(HttpRequest &req) {
 //     return deleteResponse.str();
 // }
 
-
+/*CLEAN THIS UP!*/
 std::string Methods::mDelete(const std::string& fullPathToDelete) {
     std::string decoded = decodeBnry1(fullPathToDelete);
     if (std::remove(decoded.c_str()) == 0) {
