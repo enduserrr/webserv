@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:16 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/12 12:13:08 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/12 14:23:05 by asalo            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ Router::~Router() {}
 
 std::string Router::routeRequest(HttpRequest &req) {
     std::string uri = req.getUri();
+    req.display();
     // std::cout << "==== DEBUG =====" <<std::endl; 
     // std::cout << "uri: " << req.getUri() << std::endl; 
     // std::cout << "Autoindex: " << req.getLocation().getAutoIndex() << std::endl; 
