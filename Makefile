@@ -38,6 +38,6 @@ re: fclean all
 
 run: re
 	clear
-	./$(NAME) config/config.conf
+	./$(NAME)
 
 .PHONY: all clean fclean re run

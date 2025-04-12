@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   UploadHandler.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/10 14:40:52 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/12 12:06:49 by asalo            ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "UploadHandler.hpp"
 #include "Types.hpp"
@@ -45,12 +45,12 @@ std::string decodeBnry(const std::string& binaryContent) {
         }
         decoded += content[i]; // Keep other characters as-is
     }
-    // std::cout << "Decoded content: " << decoded << std::endl; // Debug log (re-added from your prior version)
     return decoded;
 }
 
 std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
     std::string body = req.getBody();
+    std::cout << RES REV_RED << "UploadHandler: " << body << RES << std::endl;
     std::string contentType = req.getHeader("Content-Type");
     std::string filename = req.getFileName();
     if (contentType.empty()) {
@@ -64,11 +64,12 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
     std::string filePath;
 
     if (contentType == "application/x-www-form-urlencoded") {
-        if (filename.empty())
-            filePath = "./www/uploads/upload_" + std::to_string(std::time(nullptr));
-        std::ofstream ofs;
-        std::string decodedBody = decodeBnry(body); // Decode the body
-        ofs << decodedBody; // Write decoded content
+        if (filename.empty()){
+            filePath = req.getLocation().getRoot() + req.getLocation().getUploadStore() + "/upload_" + std::to_string(std::time(nullptr));
+        }
+        std::ofstream ofs(filePath.c_str(), std::ios::binary);
+        std::string decodedBody = decodeBnry(body);
+        ofs.write(decodedBody.c_str(), decodedBody.size());
         ofs.close();
         return filePath;
     }
@@ -88,7 +89,7 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
         }
 
         // Save the extracted file
-        filePath = "./www/uploads/" + filename;
+        filePath = req.getLocation().getRoot() + req.getLocation().getUploadStore() + filename;
         std::ofstream ofs(filePath.c_str(), std::ios::binary);
         if (!ofs) {
             return INTERNAL + Logger::getInstance().logLevel("ERROR", "Internal server error (uploadHandler).", 500);

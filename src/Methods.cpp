@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   Methods.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/10 15:36:35 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/12 12:10:19 by asalo            ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "Methods.hpp"
 
@@ -100,7 +100,7 @@ std::string Methods::mGet(HttpRequest &req) {
         // }
     }
 
-    std::string basePath = req.getRoot();
+    std::string basePath = req.getLocation().getRoot();
     std::string filePath = basePath + uri;
     struct stat st;
     bool isDirectory = false;
@@ -125,7 +125,7 @@ std::string Methods::mGet(HttpRequest &req) {
 
     // ↓↓↓ DIRECTORY REQUEST ↓↓↓
     if (!uri.empty() && uri.back() == '/') {
-        if (isDirectory && req.getAutoIndex() == true && uri.length() >= 2) {
+        if (isDirectory && req.getLocation().getAutoIndex() == true && uri.length() >= 2) {
             std::string listing = generateDirectoryListing(filePath, uri);
             if (!listing.empty()) {
                 std::ostringstream responseStream;
@@ -180,7 +180,7 @@ std::string Methods::mPost(HttpRequest &req) {
 
     // ↓↓↓ CHECK FOR DUP FILE NAMES ↓↓↓
     if (!req.getFileName().empty()) {
-        std::string uploadDir = req.getRoot() + "/uploads/"; //Server side upload location
+        std::string uploadDir = req.getLocation().getRoot() + req.getLocation().getUploadStore(); //Server side upload location
         std::string fileName = req.getFileName();
         std::string fullPath = uploadDir + fileName;
         bool fileExists = false;
