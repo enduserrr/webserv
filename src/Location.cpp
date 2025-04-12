@@ -86,7 +86,8 @@ void Location::setUploadStore(const std::string &path) {
     _uploadStore = path;
 }
 
-void Location::addAllowedMethod(const std::string& method){
+
+void Location::addAllowedMethod(const std::string& method) {
     _allowedMethods.push_back(method);
 }
 

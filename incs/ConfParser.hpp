@@ -60,7 +60,7 @@ public:
     template <typename T>
     void                    parseCodeValue(std::istringstream &ss, T &obj, void (T::*setter)(int, const std::string&));
     void                    allSetted();
-    void                    configureAutoIndex();
+    void                    locationFallbacks(int si, Location &loc);
 
     // DEBUG
     void                    display();

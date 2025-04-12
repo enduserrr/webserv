@@ -92,19 +92,28 @@ void HttpParser::matchRoute(ServerBlock &b, HttpRequest &req) {
                 bestMatch = locPath;
         }
     }
-    req.setLocation(locations.at(bestMatch));
+    req.setLocation(locations.at(bestMatch)); 
 }
 
+bool HttpParser::methodAllowed(HttpRequest &req) {
+    const std::vector<std::string>& allowed = req.getLocation().getAllowedMethods();
+    if (std::find(allowed.begin(), allowed.end(), req.getMethod()) == allowed.end()) {
+        _state = 405;
+        return false;
+    }
+    return true;
+}
 
 bool HttpParser::parseRequest(ServerBlock &block) {
     std::istringstream ss(_fullRequest);
     std::string line;
     HttpRequest request;
     std::getline(ss, line);
-    if (!parseStartLine(line, request)) {
+    if (!parseStartLine(line, request))
         return false;
-    }
     matchRoute(block, request);
+    if (!methodAllowed(request))
+        return false; 
     while (getline(ss, line, '\r') && ss.get() == '\n' && !line.empty()) {
         if (!parseHeader(line, request))
             return false;

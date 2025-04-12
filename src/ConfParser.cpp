@@ -212,7 +212,16 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex) {
     else
         throw std::runtime_error(CONF "unexpected keyword: "+key);
 }
-#include "Router.hpp"
+
+void ConfParser::locationFallbacks(int si, Location &loc) {
+    if (loc.getRoot() == "")
+        loc.setRoot(_servers[si].getRoot());
+    if (loc.getAllowedMethods().empty()) {
+        loc.addAllowedMethod("GET");
+        loc.addAllowedMethod("POST");
+        loc.addAllowedMethod("DELETE");
+    }
+}
 
 void ConfParser::locationBlock(int si, size_t &i) {
     Location loc;
@@ -241,8 +250,7 @@ void ConfParser::locationBlock(int si, size_t &i) {
         else
             throw std::runtime_error(CONF "unexpected keyword in location: "+key);
     }
-    if (loc.getRoot() == "")
-        loc.setRoot(_servers[si].getRoot());
+    locationFallbacks(si, loc); 
     _servers[si].setLocation(loc);
 }
 
