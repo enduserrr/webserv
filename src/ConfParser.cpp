@@ -76,6 +76,8 @@ bool ConfParser::serverLine(std::string &line, int &block) {
 void ConfParser::allSetted() {
     std::vector<int> allPorts; 
     for (size_t i = 0; i < _servers.size(); ++i) {
+        if (_servers[i].getLocations().count("/") == 0)
+            throw std::runtime_error(CONF "Missing '/' location block");
         if (_servers[i].getPorts().empty())
             throw std::runtime_error(CONF "You need to set atleast one port per server");
         const std::vector<int>& ports = _servers[i].getPorts();
@@ -239,6 +241,8 @@ void ConfParser::locationBlock(int si, size_t &i) {
         else
             throw std::runtime_error(CONF "unexpected keyword in location: "+key);
     }
+    if (loc.getRoot() == "")
+        loc.setRoot(_servers[si].getRoot());
     _servers[si].setLocation(loc);
 }
 

@@ -60,6 +60,10 @@ static bool isValidDirectory(const std::string& path) {
 }
 
 void Location::setRoot(const std::string &root) {
+    if (isValidDirectory(root)) {
+        _root = root; 
+        return; 
+    }
     char cwd[PATH_MAX];
     if (!getcwd(cwd, sizeof(cwd)))
         throw std::runtime_error(CONF "Failed to get current working directory");
