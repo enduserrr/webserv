@@ -25,12 +25,14 @@
           event.preventDefault();
           const targetUrl = this.getAttribute("data-target");
           const method = this.getAttribute("data-method") || "DELETE";
+          // Optionally, disable the button to prevent multiple clicks.
           this.disabled = true;
           fetch(targetUrl, { method: method })
             .then(response => {
               if (!response.ok) {
                 throw new Error("Network response was not ok");
               }
+              // Refresh the page or update the listing dynamically.
               location.reload();
             })
             .catch(error => {

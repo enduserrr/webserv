@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   Methods.cpp                                        :+:      :+:    :+:   */
@@ -6,45 +6,15 @@
 /*   By: asalo <asalo@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/12 18:39:44 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/13 13:25:23 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "Methods.hpp"
 
 Methods::Methods() {}
 
 Methods::~Methods() {}
-
-std::string decodeBnry1(const std::string& binaryContent) {
-    std::string decoded;
-    std::string content = binaryContent;
-
-    // Remove 'text=' from the beginning if present
-    if (content.length() >= 5 && content.substr(0, 5) == "text=") {
-        content = content.substr(5); // Skip past 'text='
-    }
-
-    for (size_t i = 0; i < content.length(); ++i) {
-        if (content[i] == '%' && i + 2 < content.length()) {
-            if (std::isxdigit(content[i + 1]) && std::isxdigit(content[i + 2])) {
-                std::string hexStr = content.substr(i + 1, 2);
-                unsigned char decodedChar = static_cast<unsigned char>(std::stoi(hexStr, nullptr, 16));
-                decoded += decodedChar; // Decodes %20 to space, %0A to newline, etc.
-                i += 2;
-                continue;
-            }
-        } else if (content[i] == '&') {
-            decoded += "\n"; // Replace '&' with newline for readability
-            continue;
-        } else if (content[i] == '+') {
-            decoded += " "; // Replace '+' with space for readability
-            continue;
-        }
-        decoded += content[i]; // Keep other characters as-is
-    }
-    return decoded;
-}
 
 static void replaceAll(std::string &str, const std::string &from, const std::string &to) {
     size_t startPos = 0;
@@ -59,92 +29,7 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
 
     // ↓↓↓ FALLBACK FILE IF TEMPLATE'S MISSING ↓↓↓
     if (!templateFile) {
-        Logger::getInstance().logLevel("INFO", "No directory listing template file. Using a fallback.", 0);
-        std::ostringstream fallback;
-        fallback << "<html><head><title>" << uri << "</title></head><body>"
-                 << "<h1>Index of " << uri << "</h1><ul>";
-        DIR *dir = opendir(directoryPath.c_str());
-        if (!dir) {
-            return "";
-        }
-        struct dirent *entry;
-        while ((entry = readdir(dir)) != nullptr) {
-            std::string name = entry->d_name;
-            if (name == "." || name == "..")
-                continue;
-            // Construct full path
-            std::string fullPath = directoryPath;
-            if (fullPath.back() != '/')
-                fullPath += "/";
-            fullPath += name;
-            fallback << "<li><a href=\"" << uri;
-            if (uri.back() != '/')
-                fallback << "/";
-            fallback << name << "\">" << name << "</a>"
-                     << " <form action=\"/delete\" method=\"POST\" style=\"display:inline;\">"
-                     << "<input type=\"hidden\" name=\"DELETE\" value=\"" << fullPath << "\">"
-                     << "<input type=\"submit\" value=\"Delete\">"
-                     << "</form></li>\n";
-        }
-        closedir(dir);
-        fallback << "</ul></body></html>";
-        return fallback.str();
-    }
-
-    std::ostringstream tmplStream;
-    tmplStream << templateFile.rdbuf();
-    std::string templateHtml = tmplStream.str();
-
-    // ↓↓↓ GENERATE DIR LISTING FROM THE DIR CONTENTS ↓↓↓
-    std::ostringstream itemsStream;
-    DIR *dir = opendir(directoryPath.c_str());
-    if (!dir) {
-        return "";
-    }
-    struct dirent *entry;
-    while ((entry = readdir(dir)) != nullptr) {
-        std::string name = entry->d_name;
-        if (name == "." || name == "..")
-            continue;
-        std::string filePath = uri;
-        if (uri.back() != '/')
-            filePath += "/";
-        filePath += name;
-
-        // Construct full path for DELETE
-        std::string fullPath = directoryPath;
-        if (fullPath.back() != '/')
-            fullPath += "/";
-        fullPath += name;
-
-        std::stringstream ss;
-        ss << "<li>"
-        << "<a href=\"" << filePath << "\">" << name << "</a>"
-        << " <a href=\"" << filePath << "\" download=\"" << name << "\" class=\"download-btn\">Download</a>"
-        << " <form action=\"/delete\" method=\"POST\" style=\"display:inline;\">"
-        << "<input type=\"hidden\" name=\"DELETE\" value=\"" << fullPath << "\">"
-        << "<input type=\"submit\" value=\"Delete\">"
-        << "</form></li>\n";
-
-        std::string fileItem = ss.str();    
-        itemsStream << fileItem;
-    }
-    closedir(dir);
-
-    std::string itemsHtml = itemsStream.str();
-    std::string title = "Directory: " + uri;
-    replaceAll(templateHtml, "{{title}}", title);
-    replaceAll(templateHtml, "{{items}}", itemsHtml);
-
-    return templateHtml;
-}
-
-/* std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
-    std::ifstream templateFile("www/files.html");
-
-    // ↓↓↓ FALLBACK FILE IF TEMPLATE'S MISSING ↓↓↓
-    if (!templateFile) {
-        Logger::getInstance().logLevel("INFO", "No directory listing template file. Using a fallback.", 0);
+        std::cout << "FALLBACK FILE" << std::endl;
         std::ostringstream fallback;
         fallback << "<html><head><title>" << uri << "</title></head><body>"
                  << "<h1>Index of " << uri << "</h1><ul>";
@@ -188,12 +73,11 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
             filePath += "/";
         filePath += name;
 
-    // ↓↓↓ ADD DOWNLOAD AND DELETE BUTTONS TO DIRECTORY LISTING RESPONSE ↓↓↓
-    std::string fileItem = "<li>"
-                    + std::string("<a href=\"") + filePath + "\">" + name + "</a>"
-                    + " <a href=\"" + filePath + "\" download=\"" + name + "\" class=\"download-btn\">Download</a>"
-                    + " <button class='delete' data-target='/delete?file=" + name + "' data-method='DELETE'>Delete</button>"
-                    + "</li>\n";
+        // ↓↓↓ ADD DELETE BUTTON TO DIRECTORY LISTING RESPONSE ↓↓↓
+        std::string fileItem = "<li>"
+                       + std::string("<a href=\"") + filePath + "\">" + name + "</a>"
+                       + " <button class='delete' data-target='/delete?file=" + name + "' data-method='DELETE'>Delete</button>"
+                       + "</li>\n";
         itemsStream << fileItem;
     }
     closedir(dir);
@@ -204,7 +88,7 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
     replaceAll(templateHtml, "{{items}}", itemsHtml);
 
     return templateHtml;
-} */
+}
 
 std::string Methods::mGet(HttpRequest &req) {
     std::string uri = req.getUri();
@@ -280,17 +164,9 @@ std::string Methods::mGet(HttpRequest &req) {
 }
 
 std::string Methods::mPost(HttpRequest &req) {
-    const std::string deletePrefix = "DELETE=";
     std::string body = req.getBody();
     if (body.empty())
         return INTERNAL + Logger::getInstance().logLevel("ERROR", "Empty request body.", 500);
-    
-    if (body.compare(0, deletePrefix.length(), deletePrefix) == 0) {
-        std::string filePath = body.substr(deletePrefix.length());
-        std::cerr << "POST request identified as DELETE command for path: " << filePath << std::endl; // Logging
-        return mDelete(filePath);
-
-    }
 
     // // ↓↓↓ CHECK FOR EMPTY ↓↓↓
     if (body.find("text=") == 0 && body.size() == std::string("text=").size()) //changed from text_data=
@@ -383,91 +259,53 @@ std::string Methods::mPost(HttpRequest &req) {
 /**
  * @brief   Delete
  */
-// std::string Methods::mDelete(HttpRequest &req) {
-//     std::map<std::string, std::string> queryMap = req.getUriQuery();
-//     std::string fileParam;
-//     for (std::map<std::string, std::string>::const_iterator it = queryMap.begin(); it != queryMap.end(); ++it) {
-//         if (it->first == "file") {
-//             fileParam = it->second;
-//             break;
-//         }
-//     }
-//     if (fileParam.empty()) {// File parameter missing; handle error
-//         return BAD_REQ + Logger::getInstance().logLevel("ERROR", "mDELETE: missing file parameter.", 400);
-//     }
-
-//     std::string basePath = "www/uploads/";
-//     std::string filePath = basePath + fileParam;
-
-//     if (fileParam.empty()) {
-//         return BAD_REQ + Logger::getInstance().logLevel("ERROR", "mDELETE: empty file parameter", 400);
-//     }
-
-//     std::ostringstream logStream;
-//     logStream << "File to be deleted: " << filePath;
-//     Logger::getInstance().logLevel("INFO", logStream.str(), 0);
-
-//     //space is replaced as "%20" in request --> replace %20 for space
-//     size_t pos = filePath.find("%20");
-//     while (pos != std::string::npos) {
-//         filePath.replace(pos, 3, " ");
-//         pos = filePath.find("%20", pos + 1);
-//     }
-
-//     if (filePath.find("/uploads/") == std::string::npos) {
-//         return FORBIDDEN + Logger::getInstance().logLevel("ERROR", "Incorrect folder.", 403);
-//     }
-
-//     struct stat st;
-//     if (stat(filePath.c_str(), &st) != 0) { // Check if the file exists
-//         return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "File does not exist.", 404);
-//     }
-
-//     if (remove(filePath.c_str()) != 0) { // Try delete
-//         return INTERNAL + Logger::getInstance().logLevel("ERROR", "Failed to delete file.", 500);
-//     }
-
-//     std::ostringstream deleteResponse;
-//     deleteResponse << OK
-//                    << "<html><body><h1>Delete Successful</h1>"
-//                    << "<p>The file has been deleted successfully.</p></body></html>";
-//     return deleteResponse.str();
-// }
-
-/*CLEAN THIS UP!*/
-std::string Methods::mDelete(const std::string& fullPathToDelete) {
-    std::string decoded = decodeBnry1(fullPathToDelete);
-    if (std::remove(decoded.c_str()) == 0) {
-        // Successfully deleted
-        std::cerr << "Successfully deleted file: " << decoded << std::endl;
-        // Respond with 204 No Content (common for successful DELETE)
-        std::string response = "HTTP/1.1 204 No Content\r\n"
-                               "Connection: close\r\n"
-                               "\r\n"; // No body needed for 204
-        return response;
-    } else {
-        // Failed to delete
-        int errorNum = errno; // Capture errno immediately
-        std::cerr << "Error deleting file: " << decoded
-                  << " - Error (" << errorNum << "): " << strerror(errorNum)
-                  << std::endl;
-        if (errorNum == ENOENT) {
-             std::string errorBody = "{\"error\":\"File not found\"}";
-             std::string response = "HTTP/1.1 404 Not Found\r\n"
-                                    "Content-Type: application/json\r\n"
-                                    "Content-Length: " + std::to_string(errorBody.length()) + "\r\n"
-                                    "Connection: close\r\n"
-                                    "\r\n" + errorBody;
-             return response;
-        } else {
-            // Other error (permissions, etc.) -> Internal Server Error
-            std::string errorBody = "{\"error\":\"Could not delete file\"}";
-             std::string response = "HTTP/1.1 500 Internal Server Error\r\n"
-                                    "Content-Type: application/json\r\n"
-                                    "Content-Length: " + std::to_string(errorBody.length()) + "\r\n"
-                                    "Connection: close\r\n"
-                                    "\r\n" + errorBody;
-             return response;
+std::string Methods::mDelete(HttpRequest &req) {
+    std::map<std::string, std::string> queryMap = req.getUriQuery();
+    std::string fileParam;
+    for (std::map<std::string, std::string>::const_iterator it = queryMap.begin(); it != queryMap.end(); ++it) {
+        if (it->first == "file") {
+            fileParam = it->second;
+            break;
         }
     }
+    if (fileParam.empty()) {// File parameter missing; handle error
+        return BAD_REQ + Logger::getInstance().logLevel("ERROR", "mDELETE: missing file parameter.", 400);
+    }
+
+    std::string basePath = "www/uploads/";
+    std::string filePath = basePath + fileParam;
+
+    if (fileParam.empty()) {
+        return BAD_REQ + Logger::getInstance().logLevel("ERROR", "mDELETE: empty file parameter", 400);
+    }
+
+    std::ostringstream logStream;
+    logStream << "File to be deleted: " << filePath;
+    Logger::getInstance().logLevel("INFO", logStream.str(), 0);
+
+    //space is replaced as "%20" in request --> replace %20 for space
+    size_t pos = filePath.find("%20");
+    while (pos != std::string::npos) {
+        filePath.replace(pos, 3, " ");
+        pos = filePath.find("%20", pos + 1);
+    }
+
+    if (filePath.find("/uploads/") == std::string::npos) {
+        return FORBIDDEN + Logger::getInstance().logLevel("ERROR", "Incorrect folder.", 403);
+    }
+
+    struct stat st;
+    if (stat(filePath.c_str(), &st) != 0) { // Check if the file exists
+        return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "File does not exist.", 404);
+    }
+
+    if (remove(filePath.c_str()) != 0) { // Try delete
+        return INTERNAL + Logger::getInstance().logLevel("ERROR", "Failed to delete file.", 500);
+    }
+
+    std::ostringstream deleteResponse;
+    deleteResponse << OK
+                   << "<html><body><h1>Delete Successful</h1>"
+                   << "<p>The file has been deleted successfully.</p></body></html>";
+    return deleteResponse.str();
 }
