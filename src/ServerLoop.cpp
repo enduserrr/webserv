@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/10 21:34:23 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/23 18:50:08 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -238,7 +238,9 @@ void    ServerLoop::sendResponse(int clientSocket, const std::string &response) 
         Logger::getInstance().logLevel("SYSTEM", "Failed to send response to client.", 1);
         std::string errorResponse = INTERNAL + Logger::getInstance().logLevel("ERROR", "Internal Server Error", 500);
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
+        return ;
     }
+    std::cout << RED << "Response OK!" << RES << std::endl;
     return ;
 }
 
