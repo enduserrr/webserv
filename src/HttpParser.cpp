@@ -14,7 +14,7 @@
 #include "Types.hpp"
 
 // Constructor
-HttpParser::HttpParser(size_t max) : _state(0), _totalRequestSize(0), _maxBodySize(max) {}
+HttpParser::HttpParser(size_t max) : _state(0),  _chunked(false), _totalRequestSize(0), _maxBodySize(max) {}
 
 // Destructor
 HttpParser::~HttpParser() {}
@@ -43,19 +43,36 @@ bool HttpParser::requestSize(ssize_t bytes) {
 
 // Should be moved to ServerLoop as technically isn't a part of HttpParsing
 bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
-    if (!requestSize(bytes)) {
+    if (!requestSize(bytes))
         return false;
-    }
+
     if (_totalRequestSize == static_cast<size_t>(bytes) && !startsWithMethod(input))
         return false;
+
     size_t headerEnd = input.find("\r\n\r\n");
     if (headerEnd == std::string::npos)
         return false;
+
     size_t bodyStart = headerEnd + 4;
+
+    // Check if it's chunked
+    size_t tePos = input.find("Transfer-Encoding: chunked");
+    if (tePos != std::string::npos && tePos < headerEnd) {
+        _chunked = true;
+        // Chunked body ends with \r\n0\r\n\r\n
+        if (input.find("\r\n0\r\n\r\n", bodyStart) == std::string::npos)
+            return false;
+        // Full chunked request is ready
+        size_t endPos = input.find("\r\n0\r\n\r\n", bodyStart) + 7;
+        _fullRequest = input.substr(0, endPos);
+        input = input.substr(endPos);
+        return true;
+    }
+
+    // Handle Content-Length
     size_t contentLengthPos = input.find("Content-Length:");
     size_t contentLength = 0;
-
-    if (contentLengthPos != std::string::npos) {
+    if (contentLengthPos != std::string::npos && contentLengthPos < headerEnd) {
         size_t contentLengthEnd = input.find("\r\n", contentLengthPos);
         if (contentLengthEnd == std::string::npos)
             return false;
@@ -66,18 +83,21 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
                 _state = 413;
                 return false;
             }
-        } catch (const std::exception &e){
+        } catch (...) {
             _state = 400;
             return false;
         }
         if (input.size() < bodyStart + contentLength)
             return false;
-    }
-    _fullRequest = input.substr(0, bodyStart + contentLength);
-    if (bodyStart + contentLength <= input.size())
+
+        _fullRequest = input.substr(0, bodyStart + contentLength);
         input = input.substr(bodyStart + contentLength);
-    else
-        input.clear();
+        return true;
+    }
+
+    // No body: headers-only request
+    _fullRequest = input.substr(0, headerEnd + 4);
+    input = input.substr(headerEnd + 4);
     return true;
 }
 
@@ -104,7 +124,53 @@ bool HttpParser::methodAllowed(HttpRequest &req) {
     return true;
 }
 
+
+void HttpParser::unchunkBody() {
+    size_t headerEnd = _fullRequest.find("\r\n\r\n");
+    if (headerEnd == std::string::npos)
+        return;
+
+    std::string rawBody = _fullRequest.substr(headerEnd + 4);
+    std::string decoded;
+    size_t pos = 0;
+
+    while (true) {
+        size_t next = rawBody.find("\r\n", pos);
+        if (next == std::string::npos)
+            break;
+
+        std::string chunkSizeHex = rawBody.substr(pos, next - pos);
+        size_t chunkSize;
+        try {
+            chunkSize = std::stoul(chunkSizeHex, nullptr, 16);
+        } catch (...) {
+            _state = 400;
+            return;
+        }
+
+        if (chunkSize == 0)
+            break;
+
+        pos = next + 2;
+        if (pos + chunkSize > rawBody.size()) {
+            _state = 400;
+            return;
+        }
+
+        decoded.append(rawBody, pos, chunkSize);
+        pos += chunkSize + 2; // skip \r\n after data
+    }
+
+    _fullRequest = _fullRequest.substr(0, headerEnd + 4) + decoded;
+}
+
 bool HttpParser::parseRequest(ServerBlock &block) {
+    if (_chunked) {
+        unchunkBody();
+        if (_state != 0) {
+            return false; 
+        }
+    }
     std::istringstream ss(_fullRequest);
     std::string line;
     HttpRequest request;
@@ -283,6 +349,9 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
         return;
     }
     if (contentType == "application/x-www-form-urlencoded") {
+        req.setBody(body);
+    }
+    else if (contentType == "text/plain") {
         req.setBody(body);
     }
     else if (contentType.find("multipart/form-data") == 0) {

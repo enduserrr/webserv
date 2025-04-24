@@ -20,6 +20,7 @@
 class HttpParser {
 private:
     int                                 _state;
+    bool                                _chunked;
     size_t                              _totalRequestSize;
     size_t                              _maxBodySize;
     HttpRequest                         _request;
@@ -54,6 +55,7 @@ public:
     bool    createRequest(ServerBlock &block, HttpRequest &req);
     bool    parseHeader(std::string &line, HttpRequest &req);
     void    parseBody(std::string &body, HttpRequest &req);
+    void    unchunkBody();
 
     int                                 getState() const;
     std::string                         getRedirection() const;
