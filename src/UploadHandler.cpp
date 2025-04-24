@@ -98,5 +98,11 @@ std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
         ofs.write(fileContent.c_str(), fileContent.size());
         ofs.close();
     }
+    else if (contentType == "text/plain") {
+        filePath = req.getLocation().getRoot() + req.getLocation().getUploadStore() + "/upload_" + std::to_string(std::time(nullptr));
+        std::ofstream ofs(filePath.c_str(), std::ios::binary);
+        ofs.write(body.c_str(), body.size());
+        ofs.close();
+    }
     return filePath;
 }

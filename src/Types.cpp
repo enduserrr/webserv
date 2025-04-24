@@ -33,7 +33,8 @@ Types::Types() {
     };
         _contentTypes = {
         "application/x-www-form-urlencoded",
-        "multipart/form-data"
+        "multipart/form-data",
+        "text/plain"
     };
 }
 

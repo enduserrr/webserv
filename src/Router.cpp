@@ -23,7 +23,7 @@ Router::~Router() {}
 
 std::string Router::routeRequest(HttpRequest &req) {
     std::string uri = req.getUri();
-    req.display();
+    // req.display();
     // std::cout << "==== DEBUG =====" <<std::endl; 
     // std::cout << "uri: " << req.getUri() << std::endl; 
     // std::cout << "Autoindex: " << req.getLocation().getAutoIndex() << std::endl; 
