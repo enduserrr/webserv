@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Methods.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asalo <asalo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/13 13:25:23 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/24 08:43:53 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -252,7 +252,12 @@ std::string Methods::mPost(HttpRequest &req) {
     replaceAll(htmlContent, "{{file_path}}", uploadedFilePath);
 
     std::ostringstream uploadResponse;
-    uploadResponse << OK << htmlContent;
+
+     uploadResponse << "HTTP/1.1 200 OK\r\n"
+                   << "Content-Length: " << htmlContent.size() << "\r\n"
+                   << "Content-Type: " << "text/html" << "\r\n"
+                   << "\r\n" << htmlContent;
+    std::cout << REV_WHITE << uploadResponse.str() << RES << std::endl;
     return uploadResponse.str();
 }
 

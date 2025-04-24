@@ -34,3 +34,24 @@
 * Serverloop for each server block
 * DELETE handling re think
 * location for /
+
+
+## Test
+- Proper chunked req
+- Spam a lot of clients (in/out success > 99%)
+- valgrind --leak-check=full --track-fds=yes ./webserv
+- Eval sheet curl commands
+
+### WRK:
+wrk -t 2 -c 4 -d 2s http://127.0.0.1:8080/index.html (2 threads, 4 clients, 10 seconds)
+wrk -t 4 -c 100 -d 60s http://127.0.0.1:8080/empty.html > wrk_8080_log
+
+### CURL:
+- curl -v -X POST http://localhost:8080/uploads \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     --data-binary "text=Hello%20world"
+
+- curl -v -X POST http://localhost:8080/uploads \
+     -H "Transfer-Encoding: chunked" \
+     -F "file=@photo.jpg" \
+     --data-binary ""

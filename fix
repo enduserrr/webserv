@@ -30,11 +30,20 @@ Test:
 - Eval sheet curl commands
 
 WRK:
-wrk -t 2 -c 4 -d 10s http://127.0.0.1:8080/index.html (2 threads, 4 clients, 10 seconds)
+wrk -t 2 -c 4 -d 2s http://127.0.0.1:8080/index.html (2 threads, 4 clients, 10 seconds)
 wrk -t 4 -c 100 -d 60s http://127.0.0.1:8080/empty.html > wrk_8080_log
 
-- Missing content length in responses causes wrk to not count received responces as valid
-=> some content length counter that sendResponse can call for.
+CURL:
+- curl -v -X POST http://localhost:8080/uploads \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     --data-binary "text=Hello%20world"
+
+- curl -v -X POST http://localhost:8080/uploads \
+     -H "Transfer-Encoding: chunked" \
+     -F "file=@photo.jpg" \
+     --data-binary ""
+
+
 
 - When conducting load tests using the siege command be carefull it depend of your OS), it is crucial to limit the number of connections per second by specifying options such as -c (number of clients), -d (maximum wait time before a client reconnects), and -r (number of attempts). 
 The choice of these parameters is at the discretion of the evaluator, however, it is imperative to reach an agreement with the person being evaluated to ensure a fair and transparent assessment of the web server's performance.

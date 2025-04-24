@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/23 18:50:08 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/24 08:23:31 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -222,7 +222,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         _clients[clientSocket].request = parser.getPendingRequest();
         std::string response = Router::getInstance().routeRequest(_clients[clientSocket].request);
         sendResponse(clientSocket, response);
-        removeClient(clientSocket);
+        // removeClient(clientSocket);
     } else {
         int state = parser.getState();
         if (state == 301 || state == 302)
