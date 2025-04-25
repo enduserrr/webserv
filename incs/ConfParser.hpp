@@ -23,7 +23,7 @@ private:
     int                      _serverBlocks;
 
     std::vector<std::string> _fileLines;
-    std::vector<std::string> _fileData;         //for info that needs to store
+    std::vector<std::string> _fileData;
     std::vector<ServerBlock> _servers;
 
 public:
@@ -34,21 +34,18 @@ public:
     //GETTERS
     std::vector<ServerBlock>& getServers();
 
-
     //FILE VALIDATION
-    void                    fileValidation();
-    void                    fileExists();
-    void                    filePermissions();
-    void                    fileExtension(const std::string &path, const std::string &ext);
-    void                    fileSize();
-
+    void                    fileValidation(); //
+    void                    fileExists();  //
+    void                    filePermissions(); //
+    void                    fileExtension(const std::string &path, const std::string &ext); //
+    void                    fileSize(); //
 
     //FILE PARSING
     void                    parseFile();
     void                    blocks(int block);
     void                    parseLine(std::string &line, int &block, bool &hasContent);
     bool                    serverLine(std::string &line, int &block);
-
 
     //DATA PARSING
     void                    parseData();
@@ -62,8 +59,6 @@ public:
     void                    allSetted();
     void                    locationFallbacks(int si, Location &loc);
 
-    // DEBUG
-    void                    display();
 };
 
 //HELPERS

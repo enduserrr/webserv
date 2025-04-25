@@ -12,23 +12,44 @@
 
 #include "ConfParser.hpp"
 
-// Constructor
+/**
+ * @brief Constructs a ConfParser with the given configuration file name.
+ *
+ * Initializes file name, sets file size and server block counters to zero.
+ *
+ * @param filename Path to the configuration file.
+ */
+
 ConfParser::ConfParser(std::string filename) : _fileName(filename) {
     _fileSize = 0;
     _serverBlocks = 0;
 }
 
-// Destructor
+/**
+ * @brief Default destructor for ConfParser.
+ */
+
 ConfParser::~ConfParser() {}
 
-//Getters
+
+/**
+ * @brief Returns the list of parsed server blocks.
+ *
+ * @return Reference to the vector of ServerBlock objects.
+ */
+
 std::vector<ServerBlock>& ConfParser::getServers() {
     return _servers;
 }
 
-//VALIDATE FILE FUNCTIONS
 
-void ConfParser::fileValidation(){
+/**
+ * @brief Runs all file validation checks on the configuration file.
+ *
+ * Checks existence, read permissions, extension, and size.
+ */
+
+void ConfParser::fileValidation() {
     fileExists();
     filePermissions();
     fileExtension(_fileName, ".conf");
@@ -36,23 +57,56 @@ void ConfParser::fileValidation(){
     Logger::getInstance().logLevel("INFO", "File validation OK", 0);
 }
 
-void ConfParser::fileExists(){
+
+/**
+ * @brief Checks if the configuration file exists.
+ *
+ * Uses stat() to verify file existence and stores its size.
+ * Throws if file is missing.
+ */
+
+void ConfParser::fileExists() {
     struct stat buffer;
     if (stat(_fileName.c_str(), &buffer) != 0)
         throw std::runtime_error(FILE_V "File does not exist: " + _fileName);
     _fileSize = buffer.st_size;
 }
 
-void ConfParser::filePermissions(){
+
+/**
+ * @brief Checks if the configuration file has read permissions.
+ *
+ * Uses access() to confirm read access.
+ * Throws if permission is denied.
+ */
+
+void ConfParser::filePermissions() {
     if (access(_fileName.c_str(), R_OK) != 0)
         throw std::runtime_error(FILE_V "No read permissions: " + _fileName);
 }
 
 
-void ConfParser::fileExtension(const std::string &path, const std::string &ext){
+/**
+ * @brief Validates the file has the correct extension.
+ *
+ * Ensures the file name ends with the given extension (e.g., ".conf").
+ * Throws an error if the extension does not match.
+ *
+ * @param path Full path or name of the file.
+ * @param ext Expected file extension (including dot).
+ */
+
+void ConfParser::fileExtension(const std::string &path, const std::string &ext) {
     if (path.size() < ext.size() || path.substr(path.size() - ext.size()) != ext)
         throw std::runtime_error(FILE_V "Invalid file extension: " + path);
 }
+
+
+/**
+ * @brief Checks that the configuration file size is within allowed limits.
+ *
+ * Throws an error if the file is too small or exceeds the maximum size.
+ */
 
 void ConfParser::fileSize() {
     if (_fileSize > FILE_SIZE_MAX || _fileSize <= FILE_SIZE_MIN)
@@ -60,7 +114,16 @@ void ConfParser::fileSize() {
 }
 
 
-// FILE PARSING FUNCTIONS
+/**
+ * @brief Detects the start of a server block in the configuration file.
+ *
+ * If the line matches the server block start keyword, increments block counters and stores the line.
+ * Throws if a server block is already open (invalid structure).
+ *
+ * @param line Current line being parsed.
+ * @param block Reference to current block tracking variable.
+ * @return true if the line starts a server block, false otherwise.
+ */
 
 bool ConfParser::serverLine(std::string &line, int &block) {
     if (line != SERVER)
@@ -72,6 +135,16 @@ bool ConfParser::serverLine(std::string &line, int &block) {
     _fileLines.push_back(line);
     return true;
 }
+
+
+/**
+ * @brief Performs final validation checks after parsing all configuration data.
+ *
+ * Ensures each server has a '/' location, at least one port, no duplicate ports,
+ * and that root values are set at both server and location levels.
+ *
+ * @throws std::runtime_error if any required configuration is missing or invalid.
+ */
 
 void ConfParser::allSetted() {
     std::vector<int> allPorts; 
@@ -95,6 +168,17 @@ void ConfParser::allSetted() {
         }
     }
 }
+
+
+/**
+ * @brief Parses the configuration file line by line.
+ *
+ * Opens the file, removes comments, trims whitespace, and processes each line.
+ * Detects server blocks, validates configuration structure, and stores clean lines.
+ * Calls further parsing and validation routines after reading the file.
+ *
+ * @throws std::runtime_error if the file can't be opened or the structure is invalid.
+ */
 
 void ConfParser::parseFile() {
     std::ifstream file(_fileName);
@@ -126,6 +210,20 @@ void ConfParser::parseFile() {
     Logger::getInstance().logLevel("INFO", "Server configurations OK", 0);
 }
 
+
+/**
+ * @brief Validates the ending character of a configuration line and updates block state.
+ *
+ * Handles opening/closing of blocks with '{' and '}', validates semicolon usage,
+ * and checks for correct 'location' block syntax.
+ *
+ * @param line Line to validate and modify.
+ * @param block Current block level, incremented or decremented as needed.
+ * @param hasContent Indicates whether the current block contains valid content.
+ *
+ * @throws std::runtime_error on any structural or syntax error.
+ */
+
 void parseLast(std::string &line, int &block, bool hasContent) {
     char last = line.back();
     if (last == '{') {
@@ -145,6 +243,18 @@ void parseLast(std::string &line, int &block, bool hasContent) {
         throw std::runtime_error(CONF "False usage of location");
 }
 
+
+/**
+ * @brief Parses and validates a single configuration line.
+ *
+ * Trims the line, checks for unexpected characters (;, {, }), and delegates content parsing.
+ * Updates block content status via the hasContent flag.
+ *
+ * @param line Line to parse and validate.
+ * @param block Current block type indicator.
+ * @param hasContent Reference to content flag indicating valid config presence.
+ */
+
 void ConfParser::parseLine(std::string &line, int &block, bool &hasContent){
     whiteSpaceTrim(line);
     parseLast(line, block, hasContent);
@@ -157,6 +267,16 @@ void ConfParser::parseLine(std::string &line, int &block, bool &hasContent){
     hasContent = (line.find(LOCATION) == std::string::npos);
 }
 
+
+/**
+ * @brief Validates overall block structure after parsing.
+ *
+ * Ensures that at least one server block was found and all opened blocks are properly closed.
+ *
+ * @param block Final block level counter after parsing.
+ * @throws std::runtime_error if structure is incomplete or invalid.
+ */
+
 void ConfParser::blocks(int block) {
     if (_serverBlocks == 0)
         throw std::runtime_error(CONF "No server blocks detected");
@@ -164,7 +284,16 @@ void ConfParser::blocks(int block) {
         throw std::runtime_error(CONF "Unclosed curly brackects");
 }
 
-//PARSING DATA FUNCTIONS
+
+/**
+ * @brief Parses cleaned configuration lines into server and location blocks.
+ *
+ * Iterates through all stored lines, identifies server and location contexts,
+ * and delegates parsing to appropriate functions.
+ *
+ * @throws std::runtime_error if configuration structure is invalid.
+ */
+
 void ConfParser::parseData() {
     int serverIndex = -1;
     int serverLevel = 0;
@@ -189,12 +318,25 @@ void ConfParser::parseData() {
     }
 }
 
+
+/**
+ * @brief Parses and applies a single server-level directive based on the keyword.
+ *
+ * Reads the keyword from the line and dispatches to the appropriate setter on the ServerBlock.
+ * Supports both single-value and code-value directives.
+ *
+ * @param line Configuration line containing the directive.
+ * @param serverIndex Index of the current ServerBlock in the server list.
+ *
+ * @throws std::runtime_error if the keyword is unrecognized.
+ */
+
 void ConfParser::keyWordFinder(std::string line, int serverIndex) {
     std::istringstream ss(line);
     std::string key;
     ss >> key;
-    if (key == SERVER_NAME)
-        parseSingle(ss, _servers[serverIndex], &ServerBlock::setServerName);
+    // if (key == SERVER_NAME)
+    //     parseSingle(ss, _servers[serverIndex], &ServerBlock::setServerName);
     if (key == HOST)
         parseSingle(ss, _servers[serverIndex], &ServerBlock::setHost);
     else if (key == PORT)
@@ -205,13 +347,24 @@ void ConfParser::keyWordFinder(std::string line, int serverIndex) {
         parseSingle(ss, _servers[serverIndex], &ServerBlock::setRoot);
     else if (key == AUTOI)
         parseSingle(ss, _servers[serverIndex], &ServerBlock::setAutoIndex);
-    else if (key == INDEX)
-        parseSingle(ss, _servers[serverIndex], &ServerBlock::setIndex);
+    // else if (key == INDEX)
+    //     parseSingle(ss, _servers[serverIndex], &ServerBlock::setIndex);
     else if (key == ERR_PAGE)
         parseCodeValue(ss, _servers[serverIndex], &ServerBlock::setErrorPage);
     else
         throw std::runtime_error(CONF "unexpected keyword: "+key);
 }
+
+
+/**
+ * @brief Sets default values for a location block if certain fields are unset.
+ *
+ * Inherits the root from the server if not explicitly set.
+ * Adds GET, POST, and DELETE as default allowed methods if none are defined.
+ *
+ * @param si Index of the parent server in the server list.
+ * @param loc Location object to update.
+ */
 
 void ConfParser::locationFallbacks(int si, Location &loc) {
     if (loc.getRoot() == "")
@@ -222,6 +375,19 @@ void ConfParser::locationFallbacks(int si, Location &loc) {
         loc.addAllowedMethod("DELETE");
     }
 }
+
+
+/**
+ * @brief Parses a location block and sets its values into the corresponding server.
+ *
+ * Reads configuration lines starting from a 'location' block, identifies and parses each directive,
+ * and sets the parsed Location object to the specified server.
+ *
+ * @param si Index of the current server in the server list.
+ * @param i Reference to the current line index (will be incremented inside the loop).
+ *
+ * @throws std::runtime_error if an unknown keyword is found or the block structure is invalid.
+ */
 
 void ConfParser::locationBlock(int si, size_t &i) {
     Location loc;
@@ -239,8 +405,8 @@ void ConfParser::locationBlock(int si, size_t &i) {
             parseSingle(ss, loc, &Location::setRoot);
         else if (key == AUTOI)
             parseSingle(ss, loc, &Location::setAutoIndex);
-        else if (key == INDEX)
-            parseSingle(ss, loc, &Location::setIndex);
+        // else if (key == INDEX)
+        //     parseSingle(ss, loc, &Location::setIndex);
         else if (key == USTORE)
             parseSingle(ss, loc, &Location::setUploadStore);
         else if (key == REDIR)
@@ -254,6 +420,21 @@ void ConfParser::locationBlock(int si, size_t &i) {
     _servers[si].setLocation(loc);
 }
 
+
+/**
+ * @brief Parses a numeric code and associated value, then applies them using the provided setter.
+ *
+ * Reads an integer and a string from the stream and sets them on the object via the given setter.
+ * Throws if parsing fails or if extra tokens are present.
+ *
+ * @tparam T Type of the object being modified.
+ * @param ss Input stream containing the code and value.
+ * @param obj Object to modify.
+ * @param setter Member function pointer taking (int, std::string).
+ *
+ * @throws std::runtime_error on format errors or unexpected extra input.
+ */
+
 template <typename T>
 void ConfParser::parseCodeValue(std::istringstream &ss, T &obj, void (T::*setter)(int, const std::string&)) {
     int code;
@@ -264,6 +445,21 @@ void ConfParser::parseCodeValue(std::istringstream &ss, T &obj, void (T::*setter
     if (ss >> url)
         throw std::runtime_error(CONF "unexpected word: " + url);
 }
+
+
+/**
+ * @brief Parses a single-word directive and applies it using the provided setter.
+ *
+ * Extracts one word from the stream and passes it to the object's setter function.
+ * Throws if the line contains more than one word.
+ *
+ * @tparam T Type of the object being modified.
+ * @param ss Input stream containing the configuration line.
+ * @param obj Object to modify.
+ * @param setter Member function pointer used to set the value.
+ *
+ * @throws std::runtime_error if parsing fails or extra tokens are found.
+ */
 
 template <typename T>
 void ConfParser::parseSingle(std::istringstream &ss, T &obj, void (T::*setter)(const std::string&)) {
@@ -276,6 +472,19 @@ void ConfParser::parseSingle(std::istringstream &ss, T &obj, void (T::*setter)(c
         throw std::runtime_error(CONF "unexpected word: " + word);
     }
 }
+
+
+/**
+ * @brief Parses and sets allowed HTTP methods for a location block.
+ *
+ * Reads method names from the stream, checks for validity and duplicates,
+ * and adds them to the Location object.
+ *
+ * @param ss Input stream containing method names.
+ * @param loc Location object to update.
+ *
+ * @throws std::runtime_error if an invalid or duplicate method is found.
+ */
 
 void ConfParser::parseMethods(std::istringstream &ss, Location &loc) {
     std::string word;
@@ -290,7 +499,14 @@ void ConfParser::parseMethods(std::istringstream &ss, Location &loc) {
 }
 
 
-//HELPER FUNCTIONS
+/**
+ * @brief Trims leading and trailing whitespace (spaces and tabs) from a string.
+ *
+ * If the string contains only whitespace, clears it entirely.
+ *
+ * @param str String to trim (modified in-place).
+ */
+
 void whiteSpaceTrim(std::string &str) {
     size_t start = str.find_first_not_of(" \t");
     size_t end = str.find_last_not_of(" \t");
@@ -300,6 +516,16 @@ void whiteSpaceTrim(std::string &str) {
         str = str.substr(start, end - start + 1);
     }
 }
+
+
+/**
+ * @brief Removes comments from a line.
+ *
+ * Strips everything after the first '#' character, if present.
+ *
+ * @param line Input line from the configuration file.
+ * @return Line without comments.
+ */
 
 std::string removeComments(const std::string &line){
     size_t position = line.find("#");

@@ -24,9 +24,9 @@ const std::string& Location::getRoot()const {
     return _root;
 }
 
-const std::string& Location::getIndex() const {
-    return _index;
-}
+// const std::string& Location::getIndex() const {
+//     return _index;
+// }
 
 const std::string& Location::getUploadStore() const {
     return _uploadStore;
@@ -78,9 +78,9 @@ void Location::setAutoIndex(const std::string &value) {
     _autoIndex = (value == "on");
 }
 
-void Location::setIndex(const std::string &name) {
-    _index = name;
-}
+// void Location::setIndex(const std::string &name) {
+//     _index = name;
+// }
 
 void Location::setUploadStore(const std::string &path) {
     _uploadStore = path;
