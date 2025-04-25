@@ -1,0 +1,4 @@
+[2025-04-25 14:13:01][SYSTEM]: No arguments detected, using default.conf
+[2025-04-25 14:13:01][SYSTEM]: File validation OK
+[2025-04-25 14:13:01][SYSTEM]: Configuration file: error_page file is not valid: index.html
+[2025-04-25 14:13:01][SYSTEM]: Parsing failed, closing program..

@@ -1,0 +1,23 @@
+INFO:
+
+Poistin dublicate port checkin configuration parserista 
+--> subject nakojaan vaatii etta taytyy pystya toimimaan useempi block samalla portilla
+-----> serveloop ei toimi talla hetkella kun yhdella servulla jos sama portti.. korjaa jos kerkeet ennen mua
+
+
+Taytyy keksia miten kaytetaan server_namea ja missa yhteydessa. 
+--> subject vaatii etta pitaa pystya setuppaamaan ja setuppaan sen, mutten tieda kayttotarkotusta tarkalleen
+
+
+
+
+
+subject: 
+In the configuration file, you should be able to:
+ -Setup routes with one or multiple of the following rules/configuration (routes wont
+    be using regexp):
+    ◦ Set a default file to answer if the request is a directory.
+
+mun tulkinta tuohon ylempaan, etta taytyy pystya maarittamaan locationin alle: index randomfile.html; 
+joka tarjoillaan jos request on directory. 
+--> tama ei ongelma koska parsin locationin alle _index tata varten, muttei oletettavasti kayteta sita mihinkaan??
