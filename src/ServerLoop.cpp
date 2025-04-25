@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/10 21:34:23 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/25 09:57:07 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -71,7 +71,6 @@ void ServerLoop::setupServerSockets() {
             serverAddr.sin_port = htons(*portIt);
 
             serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-            // Binding to 0.0.0.0 to accept connections on all interfaces, not only localhost
             if (inet_pton(AF_INET, it->getHost().c_str(), &serverAddr.sin_addr) <= 0) {
                 Logger::getInstance().logLevel("SYSTEM", "Invalid address for port " + std::to_string(*portIt), 1);
                 close(serverSocket);
@@ -95,8 +94,8 @@ void ServerLoop::setupServerSockets() {
             _boundPorts.push_back(*portIt);
             _portToBlock[*portIt] = *it;
             std::ostringstream logStream;
-            logStream << "Server listening on port: " << *portIt;
-            Logger::getInstance().logLevel("INFO", logStream.str(), 0);
+            logStream << "Server loop started and listening on port: " << *portIt;
+            Logger::getInstance().logLevel("SYSTEM", logStream.str(), 0);
         }
     }
     if (_serverSockets.empty()) {// Meaby an exception instead
@@ -193,10 +192,10 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
             return ;
         }
-        std::ostringstream logStream;
-        logStream << "Unable to read from socket: " << clientSocket << " Error: " << strerror(errno);// Add error uploading the file page
-        Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
         removeClient(clientSocket);
+        std::ostringstream logStream;
+        logStream << "Unable to read from socket: " << clientSocket;
+        Logger::getInstance().logLevel("INFO", logStream.str(), 0);
         return ;
     }
     if (_clients.find(clientSocket) == _clients.end()) {// Check if client session exists
@@ -210,7 +209,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             } else {
                 std::ostringstream logStream;
                 logStream << "No matching ServerBlock for port: " << port;
-                Logger::getInstance().logLevel("WARNING", logStream.str(), 0);
+                Logger::getInstance().logLevel("SYSTEM", logStream.str(), 0);
             }
         }
     }
@@ -222,7 +221,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         _clients[clientSocket].request = parser.getPendingRequest();
         std::string response = Router::getInstance().routeRequest(_clients[clientSocket].request);
         sendResponse(clientSocket, response);
-        removeClient(clientSocket);
+        close(clientSocket);
     } else {
         int state = parser.getState();
         if (state == 301 || state == 302)
@@ -235,7 +234,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
 
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
-        Logger::getInstance().logLevel("SYSTEM", "Failed to send response to client.", 1);
+        Logger::getInstance().logLevel("ERROR", "Failed to send response to client.", 1);
         std::string errorResponse = INTERNAL + Logger::getInstance().logLevel("ERROR", "Internal Server Error", 500);
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
     }
@@ -280,12 +279,11 @@ void ServerLoop::startServer() {
     }
 
     _startUpTime = time(nullptr);
-    Logger::getInstance().logLevel("INFO", "Server loop started.", 0);
 
     while (_run) {
         int pollResult = poll(_pollFds.data(), _pollFds.size(), 1000);
         if (pollResult < 0) {
-            Logger::getInstance().logLevel("SYSTEM", "Error in poll()", 1);
+            Logger::getInstance().logLevel("SYSTEM", "poll() interrupted.", 0);
             _run = false;
             break ;
         }
@@ -327,7 +325,6 @@ void ServerLoop::startServer() {
             checkClientTimeouts();
         }
     }
-    Logger::getInstance().logLevel("INFO", "Server loop terminated.", 0);
     closeServer();
 }
 
@@ -351,8 +348,9 @@ void ServerLoop::removeClient(int clientFd) {
 void ServerLoop::closeServer() {
     for (std::vector<struct pollfd>::const_iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
         close(it->fd);
+        Logger::getInstance().logLevel("SYSTEM", "Server loop terminated.", 0);
     }
     _pollFds.clear();
-    Logger::getInstance().logLevel("INFO", "Server closed and resources cleaned.", 0);
+    Logger::getInstance().logLevel("SYSTEM", "Server closed and resources cleaned.", 0);
 }
 

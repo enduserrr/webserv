@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   UploadHandler.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asalo <asalo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 10:34:15 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/12 12:06:49 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/25 10:32:24 by asalo            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "UploadHandler.hpp"
 #include "Types.hpp"
@@ -50,7 +50,7 @@ std::string decodeBnry(const std::string& binaryContent) {
 
 std::string UploadHandler::uploadReturnPath(HttpRequest &req) {
     std::string body = req.getBody();
-    std::cout << RES REV_RED << "UploadHandler: " << body << RES << std::endl;
+    // std::cout << RES REV_RED << "UploadHandler: " << body << RES << std::endl;
     std::string contentType = req.getHeader("Content-Type");
     std::string filename = req.getFileName();
     if (contentType.empty()) {

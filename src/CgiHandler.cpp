@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/10 21:26:48 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/25 10:39:55 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -18,11 +18,7 @@ CgiHandler::~CgiHandler() {}
 
 std::string CgiHandler::processRequest(HttpRequest &req) {
     std::string uri = req.getUri();
-    // if (uri.size() < 4 || uri.substr(uri.size() - 4) != ".php") {
-    //     return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "CGI failed to process.", 404);
-    // }
     std::string script = req.getRoot() + req.getUri();
-    // std::cout << RES REV_RED << "src path: " << script << RES << std::endl;
     std::string cgiOutput = executeCgi(script, req);
     return cgiOutput;
 }
@@ -106,10 +102,9 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
     while ((bytes_read = read(pipe_out[0], buffer, sizeof(buffer) - 1)) > 0) {
         buffer[bytes_read] = '\0';
         cgiOutput.append(buffer);
-        // std::cout << "CGI output chunk: " << buffer << std::endl; // Debug
     }
     if (bytes_read < 0) {
-        std::cerr << "Read failed: " << strerror(errno) << std::endl;
+        Logger::getInstance().logLevel("ERROR", "Read failed for a pipe.", 0);
     }
     close(pipe_out[0]);
     int status;
@@ -118,13 +113,22 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
     if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
         for (size_t i = 0; i < envVector.size(); ++i) free(envp[i]);
         delete[] envp;
-        return INTERNAL + Logger::getInstance().logLevel("ERROR", "Issue", 500);
+        return INTERNAL + Logger::getInstance().logLevel("ERROR", "CGI script execution failed", 500);
     }
 
     for (size_t i = 0; i < envVector.size(); ++i) free(envp[i]);
     delete[] envp;
 
+    // std::ostringstream responseStream;
+    // responseStream << "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n" << cgiOutput;
+    std::string mimeType = Types::getInstance().getMimeType(cgiOutput);
     std::ostringstream responseStream;
-    responseStream << "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n" << cgiOutput;
+    responseStream << "HTTP/1.1 200 OK\r\n"
+                   << "Content-Length: " << cgiOutput.size() << "\r\n"
+                   << "Content-Type: " << "text/html" << "\r\n"
+                   << "\r\n"
+                   << cgiOutput;
+
     return responseStream.str();
 }
+

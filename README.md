@@ -1,36 +1,42 @@
 # WEBSERV
 
-## Html Status Codes
+## HTML Status Codes
 * Error:
- * 400 Bad Request              (The request is malformed or invalid)
- * 403 Forbidden                (The client lacks permission to access the resource)
- * 404 Not Found                (The reguested resource doesn't exist)
- * 405 Method Not Allowed       (The requested method isn't allowed for the resource)
- * 413 Payload Too Large        (The request body size is too large)
- * 429 Too Many Requests        (Exceeded client or per client request limit)
- * 500 Internal Server Error    (Unexpected server failure)
-
+  * 400 Bad Request              (The request is malformed or invalid)
+  * 403 Forbidden                (The client lacks permission to access the resource)
+  * 404 Not Found                (The reguested resource doesn't exist)
+  * 405 Method Not Allowed       (The requested method isn't allowed for the resource)
+  * 413 Payload Too Large        (The request body size is too large)
+  * 429 Too Many Requests        (Exceeded client or per client request limit)
+  * 500 Internal Server Error    (Unexpected server failure)
 * Success:
- * 200 OK
- * 201 Created
- * 202 Accepted
+  * 200 OK
+  * 201 Created
+  * 202 Accepted
+* Redirection:
+  * 301 Moved Permanently
+  * 302 Found
 
-* Redirection
- * 301 Moved Permanently
- * 302 Found
+## TESTING
+* Proper chunked req
+* valgrind --leak-check=full --track-fds=yes ./webserv
 
-## Todo
+### Siege:
+* siege -b -c 10 -t 10s "http://127.0.0.1:8080/empty.html"
+* siege -b -c 10 -t 5s "http://127.0.0.1:8080/cgi-bin/guestbook_display.php"
 
-* DoS protection | OK?
-* Text length limit for post | NO!
-* Text upload doesn't have white space like space or new line. | OK!
-* Delete fail page
-* _resourceMap to locate resources correctly (shouldn't set them in constructor => not dynamic)
-* remove any hardcoded locations
+### Curl:
+* curl -v -X POST http://localhost:8080/uploads \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     --data-binary "text=Hello%20world"
 
 
-## NOTE AFTER DOING AN EVAL
-* Max header size, url size etc (defined in the config file)
-* Serverloop for each server block
-* DELETE handling re think
-* location for /
+## Conciderations:
+* DELETE fail page (& success?) | OK!
+* Log file of server output | OK!
+* Logger message for closing any socket | OK!
+* Logger message for starting any server loop | OK!
+* DELETE/POST/GET to return correct headers etc info | OK! (Method & CgiHandler)
+
+* Max header(s) & url size limit
+* Random new line after CTRL+C

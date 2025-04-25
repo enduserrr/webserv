@@ -17,6 +17,7 @@
 
 class Logger {
     private:
+        std::ofstream                 _logFile;
         int                         _state;
         std::map<int, std::string>  _errorPages;
         std::map<int, std::pair<std::string, std::string>>  _responses;
@@ -34,6 +35,7 @@ class Logger {
         std::string logLevel(std::string level, const std::string &message, int code);
         std::string getErrorPage(int code);
         std::string getMessage(int code);
+        void setLogFile(const std::string &filePath);
 
 };
 

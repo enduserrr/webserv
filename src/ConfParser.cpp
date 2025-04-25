@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:43:21 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/10 14:59:22 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/25 09:43:12 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -54,7 +54,7 @@ void ConfParser::fileValidation() {
     filePermissions();
     fileExtension(_fileName, ".conf");
     fileSize();
-    Logger::getInstance().logLevel("INFO", "File validation OK", 0);
+    Logger::getInstance().logLevel("SYSTEM", "File validation OK", 0);
 }
 
 
@@ -207,7 +207,7 @@ void ConfParser::parseFile() {
     blocks(block);
     parseData();
     allSetted();
-    Logger::getInstance().logLevel("INFO", "Server configurations OK", 0);
+    Logger::getInstance().logLevel("SYSTEM", "Server configurations OK", 0);
 }
 
 

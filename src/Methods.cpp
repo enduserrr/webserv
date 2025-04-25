@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Methods.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asalo <asalo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/13 13:25:23 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/25 10:12:29 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -109,7 +109,7 @@ std::string Methods::mGet(HttpRequest &req) {
             isDirectory = true;
         } else {
             std::ostringstream logStream;
-            logStream << "Filepath: " << filePath << " exists but isn't a directory.";
+            logStream << "Filepath: " << filePath << " exists (isn't a dir).";
             Logger::getInstance().logLevel("INFO", logStream.str(), 0);
         }
     } else {
@@ -119,7 +119,7 @@ std::string Methods::mGet(HttpRequest &req) {
         // std::cerr << RED << "stat failed for " << filePath << ": " << strerror(errno) << RES << std::endl;
     }
     std::ostringstream logStream;
-    logStream << "URI before check: " << uri << "\nRoot: " << basePath;
+    logStream << "URI before check: " << uri << ", Root: " << basePath;
     Logger::getInstance().logLevel("INFO", logStream.str(), 0);
 
     // ↓↓↓ DIRECTORY REQUEST ↓↓↓
@@ -252,7 +252,12 @@ std::string Methods::mPost(HttpRequest &req) {
     replaceAll(htmlContent, "{{file_path}}", uploadedFilePath);
 
     std::ostringstream uploadResponse;
-    uploadResponse << OK << htmlContent;
+    uploadResponse << "HTTP/1.1 200 OK\r\n"
+                << "Content-Length: " << htmlContent.size() << "\r\n"
+                << "Content-Type: text/html\r\n"
+                << "Connection: keep-alive\r\n"
+                << "\r\n"
+                << htmlContent;
     return uploadResponse.str();
 }
 
@@ -303,9 +308,10 @@ std::string Methods::mDelete(HttpRequest &req) {
         return INTERNAL + Logger::getInstance().logLevel("ERROR", "Failed to delete file.", 500);
     }
 
-    std::ostringstream deleteResponse;
-    deleteResponse << OK
-                   << "<html><body><h1>Delete Successful</h1>"
-                   << "<p>The file has been deleted successfully.</p></body></html>";
-    return deleteResponse.str();
+std::ostringstream deleteResponse;
+deleteResponse << "HTTP/1.1 200 OK\r\n"
+               << "Content-Length: 0\r\n"
+               << "Content-Type: text/html\r\n"
+               << "\r\n";
+return deleteResponse.str();
 }

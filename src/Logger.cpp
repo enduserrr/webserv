@@ -83,43 +83,136 @@ std::string Logger::getCurrentTimestamp() const{
     return ss.str();
 }
 
+void Logger::setLogFile(const std::string &filePath) {
+    if (_logFile.is_open()) {
+        _logFile.close();
+    }
+    _logFile.open(filePath, std::ios::out | std::ios::app);
+    if (!_logFile.is_open()) {
+        std::cerr << "Failed to open log file: " << filePath << std::endl;
+    }
+}
+
+// std::string Logger::logLevel(std::string level, const std::string &message, int code) {
+//     if (level == "INFO") {
+//         _state = code;
+//         std::cout << GB << "[" << getCurrentTimestamp() << "]" << GREEN << "[INFO]: " << RES GREY << message << std::endl;
+//         return std::string();
+//     }
+//     else if (level == "WARNING") {
+//         _state = code;
+//         std::cout << GB << "[" << getCurrentTimestamp() << "]" << YELLOW << "[WARN]: " << RES GREY << message << std::endl;
+//         return std::string();
+//     }
+//     else if (level == "ERROR") {
+//         _state = 1;
+//         if (message.empty()) {
+//             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << getMessage(code) << std::endl;
+//             return _responses[code].first + getErrorPage(code);
+//         }
+//         else
+//             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << message << std::endl;
+//         return getErrorPage(code);
+//     }
+//     else if (level == "REDIR") {
+//         _state = 1;
+//         std::string redirPage = loadFileContent("www" + message);
+//         if (redirPage.empty()) {
+//             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << "Redir page" << getMessage(404) << std::endl;
+//             return _responses[404].first + _errorPages[404];
+//         }
+//         std::cerr << GB << "[" << getCurrentTimestamp() << "]" << YELLOW << "[REDIR]: " << RES << message  << ": " << getMessage(code) << std::endl;  
+//         return _responses[code].first + redirPage;
+//     }
+//     else if (level == "SYSTEM") {
+//         _state = code;
+//         std::cout << GB << "[" << getCurrentTimestamp() << "]" << RES F_WHITE << "[SYSTEM]: " << RES GREY << message << RES << std::endl;
+//         return std::string();
+//     }
+//     std::cerr << GB << "[" << getCurrentTimestamp() << "] " << REV_RED << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;
+//     return getErrorPage(code);
+// }
+
 std::string Logger::logLevel(std::string level, const std::string &message, int code) {
+    std::string logMessage; // To store the message for file output
+
     if (level == "INFO") {
         _state = code;
+        logMessage = "[" + getCurrentTimestamp() + "][INFO]: " + message;
         std::cout << GB << "[" << getCurrentTimestamp() << "]" << GREEN << "[INFO]: " << RES GREY << message << std::endl;
+        if (_logFile.is_open()) {
+            _logFile << logMessage << std::endl;
+            _logFile.flush();
+        }
         return std::string();
     }
     else if (level == "WARNING") {
         _state = code;
+        logMessage = "[" + getCurrentTimestamp() + "][WARN]: " + message;
         std::cout << GB << "[" << getCurrentTimestamp() << "]" << YELLOW << "[WARN]: " << RES GREY << message << std::endl;
+        if (_logFile.is_open()) {
+            _logFile << logMessage << std::endl;
+            _logFile.flush();
+        }
         return std::string();
     }
     else if (level == "ERROR") {
         _state = 1;
         if (message.empty()) {
-            std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << getMessage(code) << std::endl;
+            logMessage = "[" + getCurrentTimestamp() + "][ERROR]: " + getMessage(code);
+            std::cerr << GB << "[" << getCurrentTimestamp() + "]" << RED << "[ERROR]: " << RES << getMessage(code) << std::endl;
+            if (_logFile.is_open()) {
+                _logFile << logMessage << std::endl;
+                _logFile.flush();
+            }
             return _responses[code].first + getErrorPage(code);
         }
-        else
-            std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << message << std::endl;
-        return getErrorPage(code);
+        else {
+            logMessage = "[" + getCurrentTimestamp() + "][ERROR]: " + message;
+            std::cerr << GB << "[" << getCurrentTimestamp() + "]" << RED << "[ERROR]: " << RES << message << std::endl;
+            if (_logFile.is_open()) {
+                _logFile << logMessage << std::endl;
+                _logFile.flush();
+            }
+            return getErrorPage(code);
+        }
     }
     else if (level == "REDIR") {
         _state = 1;
         std::string redirPage = loadFileContent("www" + message);
         if (redirPage.empty()) {
-            std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << "Redir page" << getMessage(404) << std::endl;
+            logMessage = "[" + getCurrentTimestamp() + "][ERROR]: Redir page" + getMessage(404);
+            std::cerr << GB << "[" << getCurrentTimestamp() + "]" << RED << "[ERROR]: " << RES << "Redir page" << getMessage(404) << std::endl;
+            if (_logFile.is_open()) {
+                _logFile << logMessage << std::endl;
+                _logFile.flush();
+            }
             return _responses[404].first + _errorPages[404];
         }
-        std::cerr << GB << "[" << getCurrentTimestamp() << "]" << YELLOW << "[REDIR]: " << RES << message  << ": " << getMessage(code) << std::endl;  
+        logMessage = "[" + getCurrentTimestamp() + "][REDIR]: " + message + ": " + getMessage(code);
+        std::cerr << GB << "[" << getCurrentTimestamp() + "]" << YELLOW << "[REDIR]: " << RES << message << ": " << getMessage(code) << std::endl;
+        if (_logFile.is_open()) {
+            _logFile << logMessage << std::endl;
+            _logFile.flush();
+        }
         return _responses[code].first + redirPage;
     }
     else if (level == "SYSTEM") {
         _state = code;
-        std::cout << GB << "[" << getCurrentTimestamp() << "]" << RES F_WHITE << "[SYSTEM]: " << RES GREY << message << RES << std::endl;
+        logMessage = "[" + getCurrentTimestamp() + "][SYSTEM]: " + message;
+        std::cout << GB << "[" << getCurrentTimestamp() + "]" << RES F_WHITE << "[SYSTEM]: " << RES GREY << message << RES << std::endl;
+        if (_logFile.is_open()) {
+            _logFile << logMessage << std::endl;
+            _logFile.flush();
+        }
         return std::string();
     }
-    std::cerr << GB << "[" << getCurrentTimestamp() << "] " << REV_RED << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;
+    logMessage = "[" + getCurrentTimestamp() + "][MYSTERY_ERROR?]: UNKNOW ERROR";
+    std::cerr << GB << "[" << getCurrentTimestamp() + "] " << REV_RED << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;
+    if (_logFile.is_open()) {
+        _logFile << logMessage << std::endl;
+        _logFile.flush();
+    }
     return getErrorPage(code);
 }
 
@@ -140,3 +233,4 @@ std::string Logger::getMessage(int code) {
     }
     return "";
 }
+
