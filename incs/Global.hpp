@@ -45,6 +45,7 @@
 #include <cstdlib>
 #include <sys/types.h>
 #include <thread> // WHAT FOR?
+#include "Types.hpp"
 
 /* COLOR CODES FOR CONSOLE OUTPUTS */
 #define RES     "\033[0m"

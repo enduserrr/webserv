@@ -15,12 +15,9 @@
 
 /**
  * @brief Constructs a ServerBlock with default values.
- *
- * Sets autoindex to false and body size to the default limit.
  */
 
 ServerBlock::ServerBlock() : _autoIndex(false), _bodySize(DEFAULT_BODY_SIZE) {}
-
 
 /**
  * @brief Default destructor for ServerBlock.
@@ -28,49 +25,33 @@ ServerBlock::ServerBlock() : _autoIndex(false), _bodySize(DEFAULT_BODY_SIZE) {}
 
 ServerBlock::~ServerBlock() {}
 
-
-// std::string ServerBlock::getServerName() const {
-//     return _serverName;
-// }
-
-
 /**
  * @brief Returns a reference to the server's root directory path.
- *
- * @return Reference to the root string.
  */
 
 std::string& ServerBlock::getRoot() {
     return _root;
 }
 
+/**
+ * @brief Returns the configured server name.
+ */
+
+std::string ServerBlock::getServerName() const {
+    return _serverName;
+}
 
 /**
  * @brief Returns a copy of the server's configured port list.
- *
- * @return Vector of port numbers.
  */
 
 std::vector<int> ServerBlock::getPorts(){
     return _ports;
 }
 
-
-// const std::string& ServerBlock::getIndex() const {
-//     return _index;
-// }
-
-
 /**
  * @brief Returns the autoindex setting for a given location or the server default.
- *
- * If a key is provided and a matching location exists, returns that location's autoindex setting.
- * Otherwise, returns the server-wide autoindex value.
- *
- * @param key Location path to check (optional).
- * @return true if autoindex is enabled, false otherwise.
  */
-
 
 bool ServerBlock::getAutoIndex(const std::string &key) {
     if (key != "") {
@@ -80,36 +61,24 @@ bool ServerBlock::getAutoIndex(const std::string &key) {
     return _autoIndex;
 }
 
-
 /**
  * @brief Returns the maximum allowed body size for client requests.
- *
- * @return Body size limit in bytes.
  */
 
 size_t ServerBlock::getBodySize() const {
     return _bodySize;
 }
 
-
 /**
  * @brief Returns a reference to the map of all location blocks.
- *
- * @return Reference to the location map keyed by path.
  */
 
 std::map<std::string, Location>& ServerBlock::getLocations() {
     return _locations;
 }
 
-
 /**
  * @brief Retrieves a specific location block by its path key.
- *
- * @param key The path associated with the desired location block.
- * @return Reference to the matching Location object.
- *
- * @throws std::runtime_error if the key is not found in the location map.
  */
 
 Location& ServerBlock::getLocation(const std::string &key) {
@@ -119,11 +88,8 @@ Location& ServerBlock::getLocation(const std::string &key) {
     return it->second;
 }
 
-
 /**
  * @brief Returns a reference to the server's error page mappings.
- *
- * @return Map of HTTP status codes to error page file paths.
  */
 
 std::map<int, std::string>&  ServerBlock::getErrorPages() {
@@ -133,28 +99,14 @@ std::map<int, std::string>&  ServerBlock::getErrorPages() {
 
 /**
  * @brief Returns the host IP address configured for the server.
- *
- * @return Reference to the host string.
  */
 
 const std::string& ServerBlock::getHost() const {
     return _host;
 }
 
-
-// void ServerBlock::setServerName(const std::string &str) {
-//     hasForbiddenSymbols(str);
-//     _serverName = str;
-// }
-
-
 /**
  * @brief Sets the host IP address for the server.
- *
- * Validates the input as a valid IPv4 address using inet_pton.
- *
- * @param str Host address in dotted-decimal notation.
- * @throws std::runtime_error if the address format is invalid.
  */
 
 void ServerBlock::setHost(const std::string &str) {
@@ -164,15 +116,17 @@ void ServerBlock::setHost(const std::string &str) {
     _host = str;
 }
 
+/**
+ * @brief Sets the server name after validating for forbidden characters.
+ */
+
+void ServerBlock::setServerName(const std::string &str) {
+    hasForbiddenSymbols(str);
+    _serverName = str;
+}
 
 /**
  * @brief Sets the server's root directory path.
- *
- * Appends the provided relative path to the current working directory,
- * validates the resulting path as an existing directory.
- *
- * @param root Relative path to the root directory.
- * @throws std::runtime_error if the current directory can't be retrieved or the final path is invalid.
  */
 
 void ServerBlock::setRoot(const std::string& root) {
@@ -187,12 +141,6 @@ void ServerBlock::setRoot(const std::string& root) {
 
 /**
  * @brief Adds a port to the server's list of listening ports.
- *
- * Converts the input to an integer, validates it falls within the allowed range,
- * and ensures the port hasn't been added already.
- *
- * @param port Port number as a string.
- * @throws std::runtime_error if the port is out of range or already defined.
  */
 
 void ServerBlock::setPort(const std::string &port) {
@@ -204,18 +152,8 @@ void ServerBlock::setPort(const std::string &port) {
     _ports.push_back(intport);
 }
 
-// void ServerBlock::setIndex(const std::string &name) {
-//     _index = name;
-// }
-
-
 /**
  * @brief Sets the autoindex setting for the server.
- *
- * Accepts "on" or "off" to enable or disable directory listing.
- *
- * @param value String representing the autoindex state.
- * @throws std::runtime_error if the value is not "on" or "off".
  */
 
 void ServerBlock::setAutoIndex(const std::string &value) {
@@ -224,15 +162,8 @@ void ServerBlock::setAutoIndex(const std::string &value) {
     _autoIndex = (value == "on");
 }
 
-
 /**
  * @brief Sets the maximum allowed body size for client requests.
- *
- * Accepts plain numbers or values with units (k, m, g for kilobytes, megabytes, gigabytes).
- * Converts and stores the value in bytes.
- *
- * @param value Body size as a string (e.g., "10m", "5000").
- * @throws std::runtime_error if the value is invalid or negative.
  */
 
 void ServerBlock::setBodySize(const std::string &value) {
@@ -256,29 +187,41 @@ void ServerBlock::setBodySize(const std::string &value) {
     }
 }
 
-
 /**
  * @brief Adds or updates a location block in the server.
- *
- * Uses the location's path as the key in the internal map.
- *
- * @param loc Location object to store.
  */
 
 void ServerBlock::setLocation(const Location& loc){
      _locations[loc.getPath()] = loc;
 }
 
+/**
+ * @brief Sets a custom error page path for a specific HTTP status code.
+ */
+
 void ServerBlock::setErrorPage(int code, const std::string &path) {
+    std::string ext = ".html";
     if (code < 100 || code > 599)
         throw std::runtime_error(CONF "error_page code is invalid: " + std::to_string(code));
+    if (access(("www/error_pages/" + path).c_str(), R_OK) != 0)
+        throw std::runtime_error(CONF "error_page file is not valid: " + path);
+    if (path.size() < ext.size() || path.substr(path.size() - ext.size()) != ext)
+        throw std::runtime_error(CONF "error_page invalid file extension: " + path);
     _errorPages[code] = path;
 }
+
+/**
+ * @brief Checks if the given path is a valid directory.
+ */
 
 bool ServerBlock::isValidDirectory(const std::string& path) {
     struct stat info;
     return (stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode));
 }
+
+/**
+ * @brief Converts a numeric string to an integer with validation.
+ */
 
 int ServerBlock::convertToInt(const std::string &word) {
     if (!std::all_of(word.begin(), word.end(), ::isdigit)) {
@@ -291,6 +234,10 @@ int ServerBlock::convertToInt(const std::string &word) {
     }
 }
 
+/**
+ * @brief Validates that a string contains only allowed characters.
+ */
+
 void ServerBlock::hasForbiddenSymbols(const std::string &word) {
     for (size_t i = 0; i < word.length(); i++) {
         char c = word[i];
@@ -298,6 +245,10 @@ void ServerBlock::hasForbiddenSymbols(const std::string &word) {
             throw std::runtime_error(CONF "forbidden symbols in: " + word);
     }
 }
+
+/**
+ * @brief Checks if the string ends with a valid size unit (k, m, g).
+ */
 
 bool ServerBlock::hasValidUnit(const std::string &word) {
     if (word.back() == 'm' || word.back() == 'k' || word.back() == 'g' ||

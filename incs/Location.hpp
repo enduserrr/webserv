@@ -18,7 +18,7 @@
 class Location {
     private:
         std::string                 _path;
-        // std::string                 _index;
+        std::string                 _index;
         std::string                 _root;
         std::string                 _uploadStore;
         bool                        _autoIndex;
@@ -34,7 +34,7 @@ class Location {
         std::string                         getPath() const;
         const std::string&                  getRoot() const;
         bool                                getAutoIndex() const;
-        // const std::string&                  getIndex() const;
+        const std::string&                  getIndex() const;
         const std::string&                  getUploadStore() const;
         std::vector<std::string>            getAllowedMethods() const;
         const std::map<int, std::string>&   getErrorPages() const;
@@ -43,7 +43,7 @@ class Location {
         //setters
         void                        setPath(const std::string& path);
         void                        setRoot(const std::string &root);
-        // void                        setIndex(const std::string &name);
+        void                        setIndex(const std::string &name);
         void                        setUploadStore(const std::string &path);
         void                        setAutoIndex(const std::string &value);
         void                        addAllowedMethod(const std::string &method);

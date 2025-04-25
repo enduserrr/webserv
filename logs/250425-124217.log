@@ -1,0 +1,4 @@
+[2025-04-25 12:42:17][SYSTEM]: No arguments detected, using default.conf
+[2025-04-25 12:42:17][SYSTEM]: File validation OK
+[2025-04-25 12:42:17][SYSTEM]: Configuration file: error_page code is invalid: 99
+[2025-04-25 12:42:17][SYSTEM]: Parsing failed, closing program..

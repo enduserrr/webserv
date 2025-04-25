@@ -11,12 +11,17 @@
 /******************************************************************************/
 
 #include "HttpParser.hpp"
-#include "Types.hpp"
 
-// Constructor
+/**
+ * @brief Constructs an HttpParser with a specified maximum body size.
+ */
+
 HttpParser::HttpParser(size_t max) : _state(0),  _chunked(false), _totalRequestSize(0), _maxBodySize(max) {}
 
-// Destructor
+/**
+ * @brief Default destructor for HttpParser.
+ */
+
 HttpParser::~HttpParser() {}
 
 bool HttpParser::startsWithMethod(std::string &input) {
@@ -41,7 +46,6 @@ bool HttpParser::requestSize(ssize_t bytes) {
     return true;
 }
 
-// Should be moved to ServerLoop as technically isn't a part of HttpParsing
 bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
     if (!requestSize(bytes))
         return false;
@@ -55,7 +59,6 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
 
     size_t bodyStart = headerEnd + 4;
 
-    // Check if it's chunked
     size_t tePos = input.find("Transfer-Encoding: chunked");
     if (tePos != std::string::npos && tePos < headerEnd) {
         _chunked = true;
@@ -68,8 +71,6 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
         input = input.substr(endPos);
         return true;
     }
-
-    // Handle Content-Length
     size_t contentLengthPos = input.find("Content-Length:");
     size_t contentLength = 0;
     if (contentLengthPos != std::string::npos && contentLengthPos < headerEnd) {

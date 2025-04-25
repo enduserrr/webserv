@@ -1,0 +1,4 @@
+[2025-04-25 13:54:59][SYSTEM]: No arguments detected, using default.conf
+[2025-04-25 13:54:59][SYSTEM]: File validation OK
+[2025-04-25 13:54:59][SYSTEM]: Configuration file: unexpected keyword: server_name
+[2025-04-25 13:54:59][SYSTEM]: Parsing failed, closing program..
