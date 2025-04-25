@@ -173,6 +173,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096]; // For each recv
     ssize_t bytesRead;
     HttpParser parser(_clients[clientSocket]._block.getBodySize());
+    Logger::getInstance().checkErrorPages(_clients[clientSocket]._block);
 
     while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
         _clients[clientSocket].buffer.append(buffer, bytesRead);
@@ -230,6 +231,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", parser.getState()));
         removeClient(clientSocket);
     }
+    Logger::getInstance().resetErrorPages();
 }
 
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {

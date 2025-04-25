@@ -11,6 +11,7 @@
 /******************************************************************************/
 
 #include "Logger.hpp"
+#include "ServerBlock.hpp"
 
 std::string Logger::loadFileContent(const std::string &filePath) {
     std::ifstream file(filePath.c_str());
@@ -37,6 +38,7 @@ Logger::Logger() {
     _errorPages[429] = loadFileContent(baseDir + "429.html");
     _errorPages[500] = loadFileContent(baseDir + "500.html");
     _defaultErrorPage = loadFileContent(baseDir + "default.html");
+    _defaultErrorPages = _errorPages;
     _responses[301] = std::pair<std::string, std::string>(MOVED_TEMP, "Moved permanently");
     _responses[302] = std::pair<std::string, std::string>(MOVED_PERM, "Moved temporarily");
     _responses[400] = std::pair<std::string, std::string>(BAD_REQ, " Bad Request");
@@ -234,3 +236,15 @@ std::string Logger::getMessage(int code) {
     return "";
 }
 
+void        Logger::checkErrorPages(ServerBlock &block) {
+    for (std::map<int, std::string>::iterator it = block.getErrorPages().begin(); it != block.getErrorPages().end(); ++it) {
+        int code = it->first;
+        const std::string& fileName = it->second;
+        _errorPages[code] = loadFileContent("www/error_pages/" + fileName);
+        std::cout << "setted: " << code << " " << fileName << std::endl;  
+    }
+}
+
+void        Logger::resetErrorPages() {
+    _errorPages = _defaultErrorPages;
+}

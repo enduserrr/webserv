@@ -1,0 +1,208 @@
+[2025-04-25 12:13:58][SYSTEM]: No arguments detected, using default.conf
+[2025-04-25 12:13:58][SYSTEM]: File validation OK
+[2025-04-25 12:13:58][SYSTEM]: Server configurations OK
+[2025-04-25 12:13:58][SYSTEM]: Server loop started and listening on port: 8080
+[2025-04-25 12:13:58][SYSTEM]: Server loop started and listening on port: 8081
+[2025-04-25 12:14:12][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:12][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-25 12:14:12][INFO]: Empty body.
+[2025-04-25 12:14:12][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/index.html exists (isn't a dir).
+[2025-04-25 12:14:12][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:12][INFO]: Empty body.
+[2025-04-25 12:14:12][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:12][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:12][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:12][INFO]: Empty body.
+[2025-04-25 12:14:12][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/favicon.ico exists (isn't a dir).
+[2025-04-25 12:14:12][INFO]: URI before check: /favicon.ico, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:12][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:12][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:13][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:13][INFO]: Empty body.
+[2025-04-25 12:14:13][INFO]: URI before check: /uploads/, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:13][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:13][INFO]: Empty body.
+[2025-04-25 12:14:13][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:13][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:13][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:13][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:13][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:13][INFO]: Empty body.
+[2025-04-25 12:14:13][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/index.html exists (isn't a dir).
+[2025-04-25 12:14:13][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:13][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:13][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-25 12:14:13][INFO]: Empty body.
+[2025-04-25 12:14:13][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:13][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:13][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:13][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:14][INFO]: Empty body.
+[2025-04-25 12:14:14][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/guestbook.html exists (isn't a dir).
+[2025-04-25 12:14:14][INFO]: URI before check: /guestbook.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:14][INFO]: Client disconnected (fd: 7)
+[2025-04-25 12:14:14][INFO]: Unable to read from socket: 7
+[2025-04-25 12:14:14][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:14][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-25 12:14:14][INFO]: Empty body.
+[2025-04-25 12:14:14][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:14][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:15][INFO]: Empty body.
+[2025-04-25 12:14:16][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:16][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-25 12:14:16][INFO]: Empty body.
+[2025-04-25 12:14:16][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:16][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:16][INFO]: Empty body.
+[2025-04-25 12:14:16][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:16][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:16][INFO]: Client disconnected (fd: 7)
+[2025-04-25 12:14:16][INFO]: Unable to read from socket: 7
+[2025-04-25 12:14:17][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:18][INFO]: Empty body.
+[2025-04-25 12:14:18][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/guestbook.html exists (isn't a dir).
+[2025-04-25 12:14:18][INFO]: URI before check: /guestbook.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:18][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:18][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-25 12:14:18][INFO]: Empty body.
+[2025-04-25 12:14:18][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:18][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:18][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:18][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:19][INFO]: Empty body.
+[2025-04-25 12:14:19][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:19][INFO]: Empty body.
+[2025-04-25 12:14:19][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:19][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:19][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:20][INFO]: Empty body.
+[2025-04-25 12:14:20][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/guestbook.html exists (isn't a dir).
+[2025-04-25 12:14:20][INFO]: URI before check: /guestbook.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:20][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:20][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:20][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:20][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-25 12:14:20][INFO]: Empty body.
+[2025-04-25 12:14:20][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:20][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:21][INFO]: Empty body.
+[2025-04-25 12:14:21][INFO]: Client disconnected (fd: 7)
+[2025-04-25 12:14:21][INFO]: Unable to read from socket: 7
+[2025-04-25 12:14:21][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:21][INFO]: Empty body.
+[2025-04-25 12:14:21][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:21][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:21][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:21][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:21][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:21][INFO]: Empty body.
+[2025-04-25 12:14:21][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/guestbook.html exists (isn't a dir).
+[2025-04-25 12:14:21][INFO]: URI before check: /guestbook.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:21][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:21][INFO]: Empty body.
+[2025-04-25 12:14:21][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:21][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:21][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:21][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:22][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:23][INFO]: Empty body.
+[2025-04-25 12:14:23][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:23][INFO]: Empty body.
+[2025-04-25 12:14:23][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:23][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:23][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:23][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:23][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:23][INFO]: Empty body.
+[2025-04-25 12:14:23][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/guestbook.html exists (isn't a dir).
+[2025-04-25 12:14:23][INFO]: URI before check: /guestbook.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:23][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:23][INFO]: Empty body.
+[2025-04-25 12:14:23][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:23][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:23][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:23][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:24][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:24][INFO]: Empty body.
+[2025-04-25 12:14:24][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:24][INFO]: Empty body.
+[2025-04-25 12:14:24][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:24][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:24][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:24][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:25][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:25][INFO]: Empty body.
+[2025-04-25 12:14:25][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/guestbook.html exists (isn't a dir).
+[2025-04-25 12:14:25][INFO]: URI before check: /guestbook.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:25][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:25][INFO]: Empty body.
+[2025-04-25 12:14:25][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:25][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:25][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:25][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:26][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:26][INFO]: Empty body.
+[2025-04-25 12:14:26][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:26][INFO]: Empty body.
+[2025-04-25 12:14:26][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:26][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:26][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:26][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:26][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:27][INFO]: Empty body.
+[2025-04-25 12:14:27][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/index.html exists (isn't a dir).
+[2025-04-25 12:14:27][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:27][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:27][INFO]: Empty body.
+[2025-04-25 12:14:27][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:27][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:27][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:27][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:27][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:27][INFO]: Empty body.
+[2025-04-25 12:14:27][INFO]: URI before check: /uploads/, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:27][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:27][INFO]: Empty body.
+[2025-04-25 12:14:27][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:27][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:27][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:27][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:28][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:28][INFO]: Empty body.
+[2025-04-25 12:14:28][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/index.html exists (isn't a dir).
+[2025-04-25 12:14:28][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:28][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:28][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-25 12:14:28][INFO]: Empty body.
+[2025-04-25 12:14:28][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:28][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:28][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:28][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:29][INFO]: Empty body.
+[2025-04-25 12:14:29][INFO]: URI before check: /uploads/, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:29][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:29][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-25 12:14:29][INFO]: Empty body.
+[2025-04-25 12:14:29][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:29][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:30][INFO]: Empty body.
+[2025-04-25 12:14:30][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/upload.html exists (isn't a dir).
+[2025-04-25 12:14:30][INFO]: URI before check: /upload.html, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:30][INFO]: Client disconnected (fd: 7)
+[2025-04-25 12:14:30][INFO]: Unable to read from socket: 7
+[2025-04-25 12:14:30][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:30][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-25 12:14:30][INFO]: Empty body.
+[2025-04-25 12:14:30][INFO]: Filepath: /home/eleppala/Documents/projects/1web/www/style.css exists (isn't a dir).
+[2025-04-25 12:14:30][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/1web/www
+[2025-04-25 12:14:30][INFO]: Client disconnected (fd: 6)
+[2025-04-25 12:14:30][INFO]: Unable to read from socket: 6
+[2025-04-25 12:14:31][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-25 12:14:37][SYSTEM]: Signal (2)  received, stopping server...
+[2025-04-25 12:14:37][SYSTEM]: poll() interrupted.
+[2025-04-25 12:14:37][SYSTEM]: Server loop terminated.
+[2025-04-25 12:14:37][SYSTEM]: Server loop terminated.
+[2025-04-25 12:14:37][SYSTEM]: Server loop terminated.
+[2025-04-25 12:14:37][SYSTEM]: Server loop terminated.
+[2025-04-25 12:14:37][SYSTEM]: Server closed and resources cleaned.
+[2025-04-25 12:14:37][SYSTEM]: Server closed and resources cleaned.
