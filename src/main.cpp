@@ -24,6 +24,18 @@ void signalHandler(int signum) {
         g_serverLoop->stop();
 }
 
+/**
+ * @brief Validates program arguments and sets the configuration file path.
+ *
+ * Accepts zero or one argument. If one is provided, it's used as the config file path.
+ * If none, falls back to a default config file.
+ *
+ * @param ac Argument count.
+ * @param av Argument values.
+ * @param fileName Output parameter to store the config file path.
+ * @return false if too many arguments are provided, true otherwise.
+ */
+
 bool preCheckAndSet(int ac, char **av, std::string &fileName) {
     if (ac > 2) {
         std::cout << "Usage: ./webserv <configfile.conf>" << std::endl;
