@@ -3,10 +3,12 @@ INFO:
 Poistin dublicate port checkin configuration parserista 
 --> subject nakojaan vaatii etta taytyy pystya toimimaan useempi block samalla portilla
 -----> serveloop ei toimi talla hetkella kun yhdella servulla jos sama portti.. korjaa jos kerkeet ennen mua
+=>TOIMII
 
 
 Taytyy keksia miten kaytetaan server_namea ja missa yhteydessa. 
 --> subject vaatii etta pitaa pystya setuppaamaan ja setuppaan sen, mutten tieda kayttotarkotusta tarkalleen
+=> SERVU ALOTUS JA LOPETUS LOGI VIESTEIHI (alotukses on jo, sulkemises ei viel)
 
 
 

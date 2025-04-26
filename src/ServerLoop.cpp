@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/25 09:57:07 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/26 15:58:10 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -49,10 +49,6 @@ void ServerLoop::setupServerSockets() {
         const std::vector<int>& ports = it->getPorts();
 
         for (std::vector<int>::const_iterator portIt = ports.begin(); portIt != ports.end(); ++portIt) {
-            if (std::find(_boundPorts.begin(), _boundPorts.end(), *portIt) != _boundPorts.end()) {
-                continue ; // Skip duplicate port binding
-            }
-
             int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
             if (serverSocket < 0) {
                 Logger::getInstance().logLevel("SYSTEM", "Failed to create socket for port " + std::to_string(*portIt), 1);
@@ -94,7 +90,7 @@ void ServerLoop::setupServerSockets() {
             _boundPorts.push_back(*portIt);
             _portToBlock[*portIt] = *it;
             std::ostringstream logStream;
-            logStream << "Server loop started and listening on port: " << *portIt;
+            logStream << "Server loop for " << it->getServerName() << " listening on port " << *portIt << " (fd: " << serverSocket << ")";
             Logger::getInstance().logLevel("SYSTEM", logStream.str(), 0);
         }
     }
@@ -222,7 +218,8 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         _clients[clientSocket].request = parser.getPendingRequest();
         std::string response = Router::getInstance().routeRequest(_clients[clientSocket].request);
         sendResponse(clientSocket, response);
-        close(clientSocket);
+        // close(clientSocket);
+        removeClient(clientSocket);
     } else {
         int state = parser.getState();
         if (state == 301 || state == 302)
@@ -350,9 +347,52 @@ void ServerLoop::removeClient(int clientFd) {
 void ServerLoop::closeServer() {
     for (std::vector<struct pollfd>::const_iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
         close(it->fd);
-        Logger::getInstance().logLevel("SYSTEM", "Server loop terminated.", 0);
+        
     }
     _pollFds.clear();
-    Logger::getInstance().logLevel("SYSTEM", "Server closed and resources cleaned.", 0);
+    Logger::getInstance().logLevel("SYSTEM", "Server loop closed and resources cleaned.", 0);
 }
 
+// Draft to output server name upon exit
+/* void ServerLoop::closeServer() {
+    for (std::vector<struct pollfd>::const_iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
+        // Determine the ServerBlock for this FD
+        std::string serverName = "unknown";
+        int fd = it->fd;
+        int port = -1;
+
+        // Check if FD is a server socket
+        for (std::vector<int>::const_iterator sockIt = _serverSockets.begin(); sockIt != _serverSockets.end(); ++sockIt) {
+            if (*sockIt == fd) {
+                // Find the port for this server socket
+                for (std::map<int, ServerBlock>::const_iterator portIt = _portToBlock.begin(); portIt != _portToBlock.end(); ++portIt) {
+                    if (std::find(portIt->second.getPorts().begin(), portIt->second.getPorts().end(), portIt->first) != portIt->second.getPorts().end()) {
+                        port = portIt->first;
+                        serverName = portIt->second.getServerName();
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        // If not a server socket, check if it's a client socket
+        if (port == -1) {
+            std::map<int, ClientSession>::const_iterator clientIt = _clients.find(fd);
+            if (clientIt != _clients.end()) {
+                port = clientIt->second._block.getPort(); // Assume ServerBlock has getPort()
+                serverName = clientIt->second._block.getServerName();
+            }
+        }
+
+        // Print the server name
+        std::cout << "terminating server loop (" << serverName << ")" << std::endl;
+
+        // Close the FD (existing behavior)
+        close(fd);
+    }
+
+    // Clear _pollFds and log cleanup (existing behavior)
+    _pollFds.clear();
+    Logger::getInstance().logLevel("SYSTEM", "Server loop closed and resources cleaned.", 0);
+} */
