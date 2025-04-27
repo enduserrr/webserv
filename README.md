@@ -23,13 +23,13 @@
 * `valgrind --leak-check=full --track-fds=yes ./webserv`
 
 ### Siege:
-* `siege -b -c 10 -t 10s "http://127.0.0.1:8080/empty.html"`
-* `siege -b -c 10 -t 5s "http://127.0.0.1:8080/cgi-bin/guestbook_display.php"`
+* siege -b -c 10 -t 10s "http://127.0.0.1:8080/empty.html"
+* siege -b -c 10 -t 5s "http://127.0.0.1:8080/cgi-bin/guestbook_display.php"
 
 ### Curl:
-* `curl -v -X POST http://localhost:8080/uploads \
+* curl -v -X POST http://localhost:8080/uploads \
         -H "Content-Type: application/x-www-form-urlencoded" \
-        --data-binary "text=Hello%20world"`
+        --data-binary "text=Hello%20world"
 
 ## Conciderations:
 * DELETE fail page (& success?) | OK!
@@ -43,6 +43,9 @@
 
 * Use case for server name (_name) => Add to each server loop so server loop closing message can use it
 * Set a file to answer if directory requests (what should it be called in config file)
+
+* Check for open fd's
+* Briefs for ServerLoop, CgiHandler & Methods funcs
 * Max header(s) & url size limit
 
 ## _pollFds

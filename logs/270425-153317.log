@@ -1,0 +1,13 @@
+[2025-04-27 15:33:17][SYSTEM]: No arguments detected, using default.conf
+[2025-04-27 15:33:17][SYSTEM]: File validation OK
+[2025-04-27 15:33:17][SYSTEM]: Server configurations OK
+[2025-04-27 15:33:17][SYSTEM]: Server loop started (example1.com), listening on port 8080 (fd: 4)
+[2025-04-27 15:33:17][SYSTEM]: Server loop started (example2.com), listening on port 8080 (fd: 5)
+[2025-04-27 15:33:39][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-27 15:33:39][INFO]: Client disconnected (fd: 6)
+[2025-04-27 15:33:47][SYSTEM]: Signal (2)  received, stopping server...
+[2025-04-27 15:33:47][SYSTEM]: poll() interrupted.
+[2025-04-27 15:33:47][SYSTEM]: Terminating server loop (example1.com)
+[2025-04-27 15:33:47][SYSTEM]: Terminating server loop (example2.com)
+[2025-04-27 15:33:47][SYSTEM]: Resources cleaned.
+[2025-04-27 15:33:47][SYSTEM]: Resources cleaned.

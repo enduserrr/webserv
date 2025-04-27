@@ -6,13 +6,15 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 12:18:32 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:27:54 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/27 15:33:06 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "ClientSession.hpp"
 
-ClientSession::ClientSession() : _requestCount(0), _lastRequestTime(time(nullptr)), fd(-1) {}
+ClientSession::ClientSession() : _requestCount(0), _lastRequestTime(time(nullptr)), fd(-1) {
+    _serverName = "unknown";
+}
 
 ClientSession::ClientSession(int clientFd) : _requestCount(0), _lastRequestTime(time(nullptr)), fd(clientFd) {}
 
@@ -37,4 +39,12 @@ void ClientSession::removeClient() {
     if (fd != -1) {
         close(fd);
     }
+}
+
+void ClientSession::setServerName(std::string name) {
+    _serverName = name;
+}
+
+std::string ClientSession::getServerName() {
+    return _serverName;
 }
