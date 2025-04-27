@@ -1,18 +1,17 @@
 INFO:
 
+=>TOIMII
 Poistin dublicate port checkin configuration parserista 
 --> subject nakojaan vaatii etta taytyy pystya toimimaan useempi block samalla portilla
 -----> serveloop ei toimi talla hetkella kun yhdella servulla jos sama portti.. korjaa jos kerkeet ennen mua
+
 =>TOIMII
-
-
 Taytyy keksia miten kaytetaan server_namea ja missa yhteydessa. 
 --> subject vaatii etta pitaa pystya setuppaamaan ja setuppaan sen, mutten tieda kayttotarkotusta tarkalleen
-=> SERVU ALOTUS JA LOPETUS LOGI VIESTEIHI (alotukses on jo, sulkemises ei viel)
+=> SERVU ALOTUS JA LOPETUS LOGI VIESTEIHI (saatavil myos client sessionis ny. Kato README Considerations kohta)
 
 
-
-
+Request jolla on 100 000 merkkia pitka header TOIMII ja 0 leakkia, mutta header pituus ois hyva rajottaa vaik 2-5K merkkiin
 
 subject: 
 In the configuration file, you should be able to:

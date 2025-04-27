@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 12:18:51 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/01 11:09:10 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/27 15:22:14 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -23,6 +23,7 @@ class ClientSession {
     private:
         size_t _requestCount;
         time_t _lastRequestTime;
+        std::string _serverName;
 
     public:
         int fd;
@@ -34,8 +35,10 @@ class ClientSession {
         ClientSession(int clientFd);
         ~ClientSession();
 
-    void removeClient();
-    bool requestLimiter();
+    void        removeClient();
+    bool        requestLimiter();
+    void        setServerName(std::string name);
+    std::string getServerName();
 };
 
 #endif

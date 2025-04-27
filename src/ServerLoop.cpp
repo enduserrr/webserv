@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/26 15:58:10 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/27 17:11:28 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -90,7 +90,7 @@ void ServerLoop::setupServerSockets() {
             _boundPorts.push_back(*portIt);
             _portToBlock[*portIt] = *it;
             std::ostringstream logStream;
-            logStream << "Server loop for " << it->getServerName() << " listening on port " << *portIt << " (fd: " << serverSocket << ")";
+            logStream << "Server loop started (" << it->getServerName() << "), listening on port " << *portIt << " (fd: " << serverSocket << ")";
             Logger::getInstance().logLevel("SYSTEM", logStream.str(), 0);
         }
     }
@@ -99,6 +99,7 @@ void ServerLoop::setupServerSockets() {
         _run = false;
     }
 }
+
 
 bool ServerLoop::serverFull() {
      if (_clients.size() >= MAX_CLIENTS) {
@@ -144,27 +145,28 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
         return ;
     }
 
-    ClientSession session(clientFd);// Create and store the client session with the correct ServerBlock.
-    session._block = _portToBlock[localPort]; //Assign correct ServerBlock
+    ClientSession session(clientFd); // Create and store the client session with the correct ServerBlock.
+    session._block = _portToBlock[localPort]; // Assign correct ServerBlock
+    session.setServerName(_portToBlock[localPort].getServerName()); // Set the server_name
     _clients[clientFd] = session;
+    // std::cout << REV_WHITE << session.getServerName() << RES << std::endl;
 
-    struct pollfd pfd;// Add the new client to the poll vector.
+    struct pollfd pfd; // Add the new client to the poll vector.
     pfd.fd = clientFd;
     pfd.events = POLLIN;
     _pollFds.push_back(pfd);
-    _clientLastActivity[clientFd] = time(nullptr); //Client activity for time-outs
+    _clientLastActivity[clientFd] = time(nullptr); // Client activity for time-outs
 
     std::ostringstream logStream;
     char clientIp[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
-    logStream << "New client connected from " << clientIp << " on port " << localPort  << " (fd: " << clientFd << ")";
+    logStream << "New client connected from " << clientIp << " on port " << localPort << " (fd: " << clientFd << ")";
     Logger::getInstance().logLevel("INFO", logStream.str(), 0);
 }
 
 /**
  * @brief   Reads data from a client and sends incoming requests for parsing and processing.
  */
-
 void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096]; // For each recv
     ssize_t bytesRead;
@@ -345,54 +347,41 @@ void ServerLoop::removeClient(int clientFd) {
 }
 
 void ServerLoop::closeServer() {
-    for (std::vector<struct pollfd>::const_iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
-        close(it->fd);
-        
-    }
-    _pollFds.clear();
-    Logger::getInstance().logLevel("SYSTEM", "Server loop closed and resources cleaned.", 0);
-}
-
-// Draft to output server name upon exit
-/* void ServerLoop::closeServer() {
-    for (std::vector<struct pollfd>::const_iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
-        // Determine the ServerBlock for this FD
-        std::string serverName = "unknown";
-        int fd = it->fd;
-        int port = -1;
-
-        // Check if FD is a server socket
-        for (std::vector<int>::const_iterator sockIt = _serverSockets.begin(); sockIt != _serverSockets.end(); ++sockIt) {
-            if (*sockIt == fd) {
-                // Find the port for this server socket
-                for (std::map<int, ServerBlock>::const_iterator portIt = _portToBlock.begin(); portIt != _portToBlock.end(); ++portIt) {
-                    if (std::find(portIt->second.getPorts().begin(), portIt->second.getPorts().end(), portIt->first) != portIt->second.getPorts().end()) {
-                        port = portIt->first;
-                        serverName = portIt->second.getServerName();
-                        break;
-                    }
-                }
-                break;
+    // Map of fd's to ServerBlock for server sockets
+    std::map<int, ServerBlock> fdToBlock;
+    size_t socketIndex = 0; // Track pos in _serverSockets & _boundPorts
+    for (std::vector<ServerBlock>::iterator blockIt = _serverBlocks.begin(); blockIt != _serverBlocks.end(); ++blockIt) {
+        const std::vector<int>& ports = blockIt->getPorts();
+        for (std::vector<int>::const_iterator portIt = ports.begin(); portIt != ports.end(); ++portIt) {
+            if (socketIndex < _serverSockets.size() && socketIndex < _boundPorts.size() && _boundPorts[socketIndex] == *portIt) {
+                fdToBlock[_serverSockets[socketIndex]] = *blockIt;
+                ++socketIndex;
             }
         }
+    }
 
-        // If not a server socket, check if it's a client socket
-        if (port == -1) {
+    // Iterate through _pollFds & close close them
+    for (std::vector<struct pollfd>::const_iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
+        std::string serverName = "unknown";
+        int fd = it->fd;
+
+        // Is it a server socket?
+        std::map<int, ServerBlock>::const_iterator fdIt = fdToBlock.find(fd);
+        if (fdIt != fdToBlock.end()) {
+            serverName = fdIt->second.getServerName();
+        } else {
+            // Is it a client socket?
             std::map<int, ClientSession>::const_iterator clientIt = _clients.find(fd);
             if (clientIt != _clients.end()) {
-                port = clientIt->second._block.getPort(); // Assume ServerBlock has getPort()
                 serverName = clientIt->second._block.getServerName();
             }
         }
 
-        // Print the server name
-        std::cout << "terminating server loop (" << serverName << ")" << std::endl;
-
-        // Close the FD (existing behavior)
+        std::ostringstream responseStream;
+        responseStream << "Terminating server loop (" << serverName << ")";
+        Logger::getInstance().logLevel("SYSTEM", responseStream.str(), 0);
         close(fd);
     }
-
-    // Clear _pollFds and log cleanup (existing behavior)
     _pollFds.clear();
-    Logger::getInstance().logLevel("SYSTEM", "Server loop closed and resources cleaned.", 0);
-} */
+    Logger::getInstance().logLevel("SYSTEM", "Resources cleaned.", 0);
+}

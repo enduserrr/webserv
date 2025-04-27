@@ -17,19 +17,25 @@
   * 301 Moved Permanently
   * 302 Found
 
+## About fd's
+* Fd0: Standard input (stdin).
+* Fd1: Standard output (stdout).
+* Fd2: Standard error (stderr).
+
 ## TESTING
 
-### Open fd's:
-* `valgrind --leak-check=full --track-fds=yes ./webserv`
+### Open fd's: (0, 1 & 2 should be left open)
+* valgrind --leak-check=full --track-fds=yes ./webserv
 
 ### Siege:
-* `siege -b -c 10 -t 10s "http://127.0.0.1:8080/empty.html"`
-* `siege -b -c 10 -t 5s "http://127.0.0.1:8080/cgi-bin/guestbook_display.php"`
+* siege -b -c 10 -t 10s "http://127.0.0.1:8080/empty.html"
+* siege -b -c 10 -t 5s "http://127.0.0.1:8080/cgi-bin/guestbook_display.php"
 
 ### Curl:
-* `curl -v -X POST http://localhost:8080/uploads \
+* curl -v -H "Host: $(printf 'a%.0s' {1..100000}).testiservu1.com" http://127.0.0.1:8080/empty.html
+* curl -v -X POST http://localhost:8080/uploads \
         -H "Content-Type: application/x-www-form-urlencoded" \
-        --data-binary "text=Hello%20world"`
+        --data-binary "text=Hello%20world"
 
 ## Conciderations:
 * DELETE fail page (& success?) | OK!
@@ -40,13 +46,13 @@
 * Multiple server loops to work on the same port | OK!
 * Random new line after CTRL+C | OK!
 * "Serverloop terminated" message x4 when exiting during child process with CTRL+C | OK!
+* Check for open fd's |OK!
+* Max header(s) & url size limit (can handle atleast 100K chars but should be limited imo) OK!
 
-* Use case for server name (_name) => Add to each server loop so server loop closing message can use it
+* Briefs for ServerLoop, CgiHandler & Methods funcs
 * Set a file to answer if directory requests (what should it be called in config file)
-* Max header(s) & url size limit
+* Server name to be used to access the site instead of ip (name-based virtual hosting)
 
-## _pollFds
-* Fd0: Standard input (stdin).
-* Fd1: Standard output (stdout).
-* Fd2: Standard error (stderr).
+
+
 
