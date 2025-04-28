@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/25 10:12:29 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/28 12:16:53 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -116,7 +116,6 @@ std::string Methods::mGet(HttpRequest &req) {
         std::ostringstream logStream;
         logStream << "Stat failed on: " << filePath;
         Logger::getInstance().logLevel("ERROR", logStream.str(), 1);
-        // std::cerr << RED << "stat failed for " << filePath << ": " << strerror(errno) << RES << std::endl;
     }
     std::ostringstream logStream;
     logStream << "URI before check: " << uri << ", Root: " << basePath;
@@ -124,7 +123,13 @@ std::string Methods::mGet(HttpRequest &req) {
 
     // ↓↓↓ DIRECTORY REQUEST ↓↓↓
     if (!uri.empty() && uri.back() == '/') {
-        if (isDirectory && req.getLocation().getAutoIndex() == true && uri.length() >= 2) {
+        std::string locIndex = req.getLocation().getIndex();
+        // std::cout << RES REV_RED << "Location index: " << locIndex << RES << std::endl;
+        if (!locIndex.empty() && uri.length() > 1) {
+            filePath = basePath + "/" + locIndex;
+            Logger::getInstance().logLevel("INFO", "Returning predefined index page", 0);
+            // std::cout << RES REV_RED << "New filePath: " << filePath << RES << std::endl;
+        } else if (isDirectory && req.getLocation().getAutoIndex() == true && uri.length() >= 2) {
             std::string listing = generateDirectoryListing(filePath, uri);
             if (!listing.empty()) {
                 std::ostringstream responseStream;
@@ -133,7 +138,7 @@ std::string Methods::mGet(HttpRequest &req) {
                             << "Content-Type: text/html\r\n"
                             << "\r\n"
                             << listing;
-                // Logger::getInstance().logLevel("INFO", "Returning directory listing response", 0);
+                Logger::getInstance().logLevel("INFO", "Returning directory listing", 0);
                 return responseStream.str();
             } else {
                 return INTERNAL + Logger::getInstance().logLevel("ERROR", "Directory listing is empty", 500);

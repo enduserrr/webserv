@@ -18,24 +18,38 @@
   * 302 Found
 
 ## About fd's
-* Fd0: Standard input (stdin).
-* Fd1: Standard output (stdout).
-* Fd2: Standard error (stderr).
+* Fd0: Standard input (stdin)
+* Fd1: Standard output (stdout)
+* Fd2: Standard error (stderr)
 
-## TESTING
+## About virtual name based hosting
+Virtual name based hosting works on the server side (back end). How ever due to not having sudo permissions and being unable to modify "/etc/hosts" or DNS setting, accessing testing webstie via a browser using just the server name is not possible.
 
-### Open fd's: (0, 1 & 2 should be left open)
+## Testing
+
+### FD'S:
+(0, 1 & 2 should be left open)
 * valgrind --leak-check=full --track-fds=yes ./webserv
 
-### Siege:
+### SIEGE:
+Stress testing with multiple clients
 * siege -b -c 10 -t 10s "http://127.0.0.1:8080/empty.html"
 * siege -b -c 10 -t 5s "http://127.0.0.1:8080/cgi-bin/guestbook_display.php"
 
-### Curl:
-* curl -v -H "Host: $(printf 'a%.0s' {1..100000}).testiservu1.com" http://127.0.0.1:8080/empty.html
-* curl -v -X POST http://localhost:8080/uploads \
+### CURL:
+* Simple GET:
+  * curl http://127.0.0.1:8080/empty.html
+
+* Simple POST:
+  * curl -v -X POST http://localhost:8080/uploads \
         -H "Content-Type: application/x-www-form-urlencoded" \
         --data-binary "text=Hello%20world"
+
+* Name based hosting:
+  * curl --resolve testiservu1.com:8080:127.0.0.1 http://testiservu1.com:8080
+
+* Excessive header size:
+  * curl -v -H "Host: $(printf 'a%.0s' {1..100000}).testiservu1.com" http://127.0.0.1:8080/empty.html
 
 ## Conciderations:
 * DELETE fail page (& success?) | OK!
@@ -50,8 +64,14 @@
 * Max header(s) & url size limit (can handle atleast 100K chars but should be limited imo) OK!
 
 * Briefs for ServerLoop, CgiHandler & Methods funcs
+
 * Set a file to answer if directory requests (what should it be called in config file)
-* Server name to be used to access the site instead of ip (name-based virtual hosting)
+* Logger message after setting custom error page
+
+* Name based virtual hosting | OK! ()
+  * setupServerSockets
+  * acceptNewConnection
+  * handleClientRequest
 
 
 

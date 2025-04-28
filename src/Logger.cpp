@@ -241,7 +241,6 @@ void        Logger::checkErrorPages(ServerBlock &block) {
         int code = it->first;
         const std::string& fileName = it->second;
         _errorPages[code] = loadFileContent("www/error_pages/" + fileName);
-        std::cout << "setted: " << code << " " << fileName << std::endl;  
     }
 }
 
