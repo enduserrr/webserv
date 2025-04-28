@@ -22,3 +22,10 @@ In the configuration file, you should be able to:
 mun tulkinta tuohon ylempaan, etta taytyy pystya maarittamaan locationin alle: index randomfile.html; 
 joka tarjoillaan jos request on directory. 
 --> tama ei ongelma koska parsin locationin alle _index tata varten, muttei oletettavasti kayteta sita mihinkaan??
+
+
+
+NEW INFO: 
+- cliensocketit solmussa? 
+- aiemmin --> HttpParser parser(_clients[clientSocket]._block.getBodySize()); antoi oikean bodysize
+---> ei enaa, joten maxbodysize ei toimi. --> oletettavasti ei muutkaan serverkohtaisen ominaisuudet? 

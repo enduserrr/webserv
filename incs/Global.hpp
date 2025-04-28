@@ -102,6 +102,6 @@
 #define USTORE          "upload_store"
 
 /* HTTP PARSER LIMITS */
-#define MAX_REQ_SIZE    16384 //1KB
+#define MAX_HEADERS_SIZE    16384 //1KB
 
 #endif

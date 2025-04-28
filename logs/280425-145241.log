@@ -1,0 +1,34 @@
+[2025-04-28 14:52:41][SYSTEM]: No arguments detected, using default.conf
+[2025-04-28 14:52:41][SYSTEM]: File validation OK
+[2025-04-28 14:52:41][SYSTEM]: Server configurations OK
+[2025-04-28 14:52:41][SYSTEM]: Server loop started (testiservu1.com), listening on port 8080 (fd: 4)
+[2025-04-28 14:52:41][SYSTEM]: Server loop started (testiservu2.com), listening on port 8080 (fd: 5)
+[2025-04-28 14:52:45][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 14:52:45][ERROR]:  Method Not Allowed
+[2025-04-28 14:52:45][INFO]: Client disconnected (fd: 6)
+[2025-04-28 14:52:57][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 14:52:59][INFO]: Empty body.
+[2025-04-28 14:52:59][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/index.html exists (isn't a dir).
+[2025-04-28 14:52:59][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 14:52:59][INFO]: Client disconnected (fd: 6)
+[2025-04-28 14:52:59][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 14:52:59][INFO]: Empty body.
+[2025-04-28 14:52:59][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/style.css exists (isn't a dir).
+[2025-04-28 14:52:59][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 14:52:59][INFO]: Client disconnected (fd: 6)
+[2025-04-28 14:53:00][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 14:53:00][INFO]: Empty body.
+[2025-04-28 14:53:00][INFO]: URI before check: /uploads/, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 14:53:00][INFO]: Returning directory listing
+[2025-04-28 14:53:00][INFO]: Client disconnected (fd: 6)
+[2025-04-28 14:53:00][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 14:53:00][INFO]: Empty body.
+[2025-04-28 14:53:00][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/style.css exists (isn't a dir).
+[2025-04-28 14:53:00][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 14:53:00][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:01:50][SYSTEM]: Signal (2)  received, stopping server...
+[2025-04-28 15:01:50][SYSTEM]: poll() interrupted.
+[2025-04-28 15:01:50][SYSTEM]: Terminating server loop (testiservu1.com)
+[2025-04-28 15:01:50][SYSTEM]: Terminating server loop (testiservu2.com)
+[2025-04-28 15:01:50][SYSTEM]: Resources cleaned.
+[2025-04-28 15:01:50][SYSTEM]: Resources cleaned.

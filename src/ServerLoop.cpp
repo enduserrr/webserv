@@ -162,7 +162,7 @@ void ServerLoop::setupServerSockets() {
         Logger::getInstance().logLevel("ERROR", "No server sockets were successfully set up. Exiting.", 1);
         _run = false;
     }
-}
+} */
 
 bool ServerLoop::serverFull() {
      if (_clients.size() >= MAX_CLIENTS) {
@@ -171,7 +171,7 @@ bool ServerLoop::serverFull() {
         return true;
      }
     return false;
-} */
+} 
 
 /**
  * @brief   Accepts a new client connection on a listening socket and sets it up (non blocking, session info).
@@ -474,7 +474,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         removeClient(clientSocket);
     }
 }
-
+*/
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
         Logger::getInstance().logLevel("ERROR", "Failed to send response to client.", 1);
@@ -482,7 +482,7 @@ void    ServerLoop::sendResponse(int clientSocket, const std::string &response) 
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
     }
     return ;
-} */
+} 
 
 void ServerLoop::checkClientTimeouts() {
     time_t currentTime = time(nullptr);
