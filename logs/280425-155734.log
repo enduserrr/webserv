@@ -1,0 +1,85 @@
+[2025-04-28 15:57:34][SYSTEM]: No arguments detected, using default.conf
+[2025-04-28 15:57:34][SYSTEM]: File validation OK
+[2025-04-28 15:57:34][SYSTEM]: Server configurations OK
+[2025-04-28 15:57:34][SYSTEM]: Server loop started (testiservu1.com), listening on port 8080 (fd: 4)
+[2025-04-28 15:57:34][SYSTEM]: Server loop started (testiservu2.com), listening on port 8080 (fd: 5)
+[2025-04-28 15:57:39][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:57:39][ERROR]:  Method Not Allowed
+[2025-04-28 15:57:39][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:57:41][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:57:41][INFO]: Empty body.
+[2025-04-28 15:57:41][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/upload.html exists (isn't a dir).
+[2025-04-28 15:57:41][INFO]: URI before check: /upload.html, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:57:41][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:57:41][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:57:41][INFO]: Empty body.
+[2025-04-28 15:57:41][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/style.css exists (isn't a dir).
+[2025-04-28 15:57:41][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:57:41][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:57:49][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:57:49][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-28 15:57:49][ERROR]: Payload Too large
+[2025-04-28 15:57:49][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:57:51][INFO]: Empty body.
+[2025-04-28 15:57:51][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/index.html exists (isn't a dir).
+[2025-04-28 15:57:51][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:57:51][INFO]: Client disconnected (fd: 7)
+[2025-04-28 15:57:51][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:57:51][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-28 15:57:51][INFO]: Empty body.
+[2025-04-28 15:57:51][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/style.css exists (isn't a dir).
+[2025-04-28 15:57:51][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:57:51][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:58:04][INFO]: Empty body.
+[2025-04-28 15:58:04][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/upload.html exists (isn't a dir).
+[2025-04-28 15:58:04][INFO]: URI before check: /upload.html, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:58:04][INFO]: Client disconnected (fd: 7)
+[2025-04-28 15:58:04][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:58:04][INFO]: Empty body.
+[2025-04-28 15:58:04][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/style.css exists (isn't a dir).
+[2025-04-28 15:58:04][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:58:04][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:58:10][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:58:10][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-28 15:58:10][ERROR]: Payload Too large
+[2025-04-28 15:58:10][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:58:24][INFO]: Empty body.
+[2025-04-28 15:58:24][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/index.html exists (isn't a dir).
+[2025-04-28 15:58:24][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:58:24][INFO]: Client disconnected (fd: 7)
+[2025-04-28 15:58:24][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:58:24][INFO]: Empty body.
+[2025-04-28 15:58:24][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/style.css exists (isn't a dir).
+[2025-04-28 15:58:24][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:58:24][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:58:25][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:58:25][INFO]: Empty body.
+[2025-04-28 15:58:25][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/upload.html exists (isn't a dir).
+[2025-04-28 15:58:25][INFO]: URI before check: /upload.html, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:58:25][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:58:25][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:58:25][INFO]: Empty body.
+[2025-04-28 15:58:25][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/style.css exists (isn't a dir).
+[2025-04-28 15:58:25][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:58:25][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:58:30][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:58:30][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-28 15:58:30][ERROR]: Payload Too large
+[2025-04-28 15:58:30][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:59:12][INFO]: Empty body.
+[2025-04-28 15:59:12][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/index.html exists (isn't a dir).
+[2025-04-28 15:59:12][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:59:12][INFO]: Client disconnected (fd: 7)
+[2025-04-28 15:59:12][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 15:59:12][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-28 15:59:12][INFO]: Empty body.
+[2025-04-28 15:59:12][INFO]: Filepath: /home/eleppala/Documents/projects/4web/www/style.css exists (isn't a dir).
+[2025-04-28 15:59:12][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/4web/www
+[2025-04-28 15:59:12][INFO]: Client disconnected (fd: 6)
+[2025-04-28 15:59:42][SYSTEM]: Signal (2)  received, stopping server...
+[2025-04-28 15:59:42][SYSTEM]: poll() interrupted.
+[2025-04-28 15:59:42][SYSTEM]: Terminating server loop (testiservu1.com)
+[2025-04-28 15:59:42][SYSTEM]: Terminating server loop (testiservu2.com)
+[2025-04-28 15:59:42][SYSTEM]: Terminating server loop (testiservu2.com)
+[2025-04-28 15:59:42][SYSTEM]: Resources cleaned.
+[2025-04-28 15:59:42][SYSTEM]: Resources cleaned.

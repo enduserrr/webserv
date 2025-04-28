@@ -24,6 +24,11 @@ HttpParser::HttpParser(size_t max) : _state(0),  _chunked(false), _totalRequestS
 
 HttpParser::~HttpParser() {}
 
+
+/**
+ * @brief   Checks if the request starts with a valid HTTP method.
+ */
+
 bool HttpParser::startsWithMethod(std::string &input) {
     size_t firstSpace = input.find(' ');
     if (firstSpace == std::string::npos) {
@@ -37,35 +42,60 @@ bool HttpParser::startsWithMethod(std::string &input) {
     return false;
 }
 
-bool HttpParser::requestSize(ssize_t bytes) {
+/**
+ * @brief   Tracks total request size and detects if headers are complete.
+ */
+
+bool HttpParser::requestSize(ssize_t bytes, size_t &headerEnd, const std::string &input) {
     _totalRequestSize += bytes;
-    if (_totalRequestSize > (_maxBodySize + MAX_REQ_SIZE)) {
+    if (_totalRequestSize > (_maxBodySize + MAX_HEADERS_SIZE)) {
         _state = 413;
+        return false;
+    }
+    headerEnd = input.find("\r\n\r\n");
+    if (headerEnd == std::string::npos) {
+        if (_totalRequestSize > MAX_HEADERS_SIZE)
+            _state = 413;
         return false;
     }
     return true;
 }
 
+/**
+ * @brief   Parses Content-Length and checks if it exceeds client max body size.
+ */
+
+bool HttpParser::convertLength(size_t &contentLength, std::string contentlengthStr) {
+    try {
+        contentLength = std::stoi(contentlengthStr);
+        if (contentLength > _maxBodySize) {
+            _state = 413;
+            return false;
+        }
+    } catch (...) {
+        _state = 400;
+        return false;
+    }
+    return true; 
+}
+
+
+/**
+ * @brief   Checks if a complete HTTP request has been received.
+ */
+
 bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
-    if (!requestSize(bytes))
+    size_t headerEnd;
+    if (!requestSize(bytes, headerEnd, input))
         return false;
-
-    if (_totalRequestSize == static_cast<size_t>(bytes) && !startsWithMethod(input))
-        return false;
-
-    size_t headerEnd = input.find("\r\n\r\n");
-    if (headerEnd == std::string::npos)
-        return false;
-
     size_t bodyStart = headerEnd + 4;
-
+    if (_totalRequestSize == static_cast<size_t>(bytes) && !startsWithMethod(input))
+        return false; 
     size_t tePos = input.find("Transfer-Encoding: chunked");
     if (tePos != std::string::npos && tePos < headerEnd) {
         _chunked = true;
-        // Chunked body ends with \r\n0\r\n\r\n
         if (input.find("\r\n0\r\n\r\n", bodyStart) == std::string::npos)
             return false;
-        // Full chunked request is ready
         size_t endPos = input.find("\r\n0\r\n\r\n", bodyStart) + 7;
         _fullRequest = input.substr(0, endPos);
         input = input.substr(endPos);
@@ -77,17 +107,9 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
         size_t contentLengthEnd = input.find("\r\n", contentLengthPos);
         if (contentLengthEnd == std::string::npos)
             return false;
-        std::string contentLengthValue = input.substr(contentLengthPos + 15, contentLengthEnd - (contentLengthPos + 15));
-        try {
-            contentLength = std::stoi(contentLengthValue);
-            if (contentLength > _maxBodySize) {
-                _state = 413;
-                return false;
-            }
-        } catch (...) {
-            _state = 400;
-            return false;
-        }
+        std::string contentLengthStr = input.substr(contentLengthPos + 15, contentLengthEnd - (contentLengthPos + 15));
+        if (!convertLength(contentLength, contentLengthStr))
+            return false; 
         if (input.size() < bodyStart + contentLength)
             return false;
 
@@ -96,11 +118,14 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
         return true;
     }
 
-    // No body: headers-only request
     _fullRequest = input.substr(0, headerEnd + 4);
     input = input.substr(headerEnd + 4);
     return true;
 }
+
+/**
+ * @brief   Matches the request URI to the best-fitting location block.
+ */
 
 void HttpParser::matchRoute(ServerBlock &b, HttpRequest &req) {
     std::string uri = req.getUri(); 
@@ -116,6 +141,11 @@ void HttpParser::matchRoute(ServerBlock &b, HttpRequest &req) {
     req.setLocation(locations.at(bestMatch)); 
 }
 
+/**
+ * @brief   Checks if the HTTP method is allowed for the requested location.
+ */
+
+
 bool HttpParser::methodAllowed(HttpRequest &req) {
     const std::vector<std::string>& allowed = req.getLocation().getAllowedMethods();
     if (std::find(allowed.begin(), allowed.end(), req.getMethod()) == allowed.end()) {
@@ -125,6 +155,9 @@ bool HttpParser::methodAllowed(HttpRequest &req) {
     return true;
 }
 
+/**
+ * @brief   Decodes a chunked transfer-encoded body into a normal body.
+ */
 
 void HttpParser::unchunkBody() {
     size_t headerEnd = _fullRequest.find("\r\n\r\n");
@@ -165,6 +198,11 @@ void HttpParser::unchunkBody() {
     _fullRequest = _fullRequest.substr(0, headerEnd + 4) + decoded;
 }
 
+
+/**
+ * @brief   Parses the full HTTP request into a structured HttpRequest object.
+ */
+
 bool HttpParser::parseRequest(ServerBlock &block) {
     if (_chunked) {
         unchunkBody();
@@ -199,6 +237,10 @@ bool HttpParser::parseRequest(ServerBlock &block) {
     return true;
 }
 
+/**
+ * @brief   Parses and validates the HTTP version from the request line.
+ */
+
 bool HttpParser::parseVersion(std::istringstream &ss, HttpRequest &req) {
     std::string word;
     if (!(ss >> word)) {
@@ -213,7 +255,10 @@ bool HttpParser::parseVersion(std::istringstream &ss, HttpRequest &req) {
     return true;
 }
 
-// STARTLINE SYNTAX: [method] [URI] [HTTP_VERSION]
+/**
+ * @brief   Parses the start-line (method, URI, version) of the HTTP request.
+ */
+
 bool HttpParser::parseStartLine(std::string &line, HttpRequest &req) {
     std::istringstream ss(line);
     if (!parseMethod(ss, req))
@@ -224,6 +269,10 @@ bool HttpParser::parseStartLine(std::string &line, HttpRequest &req) {
         return false;
     return true;
 }
+
+/**
+ * @brief   Parses and validates the HTTP method from the request line.
+ */
 
 bool HttpParser::parseMethod(std::istringstream &ss, HttpRequest &req) {
     std::string word;
@@ -239,8 +288,10 @@ bool HttpParser::parseMethod(std::istringstream &ss, HttpRequest &req) {
     return true;
 }
 
+/**
+ * @brief   Parses the URI and decodes any URL-encoded characters.
+ */
 
-// Valid syntax: /dir/subdir?query=string  -- /dir/subdir?color=red&size=large
 bool HttpParser::parseUri(std::istringstream &ss, HttpRequest &req) {
     std::string word;
     std::string temp;
@@ -271,6 +322,10 @@ bool HttpParser::parseUri(std::istringstream &ss, HttpRequest &req) {
     return true;
 }
 
+/**
+ * @brief   Decodes percent-encoded characters in a URI string.
+ */
+
 std::string decodePercentEncoding(const std::string &str) {
     std::string decoded;
     for (size_t i = 0; i < str.length(); ++i) {
@@ -287,6 +342,11 @@ std::string decodePercentEncoding(const std::string &str) {
     }
     return decoded;
 }
+
+/**
+ * @brief   Parses URI query parameters into key-value pairs.
+ */
+
 
 bool HttpParser::parseUriQuery(const std::string &query, HttpRequest &req) {
     if (query.empty())
@@ -310,6 +370,11 @@ bool HttpParser::parseUriQuery(const std::string &query, HttpRequest &req) {
     return true;
 }
 
+/**
+ * @brief   Validates the URI format and checks for invalid characters.
+ */
+
+
 bool HttpParser::isValidUri(std::string& uri) {
     if (uri.empty() || uri[0] != '/') {
         _state = 400; //BADREQ
@@ -325,6 +390,10 @@ bool HttpParser::isValidUri(std::string& uri) {
     return true;
 }
 
+/**
+ * @brief   Parses a single HTTP header line into key-value format.
+ */
+
 bool HttpParser::parseHeader(std::string &line, HttpRequest &req) {
     size_t pos = line.find(':');
     if (pos == std::string::npos) {
@@ -339,9 +408,12 @@ bool HttpParser::parseHeader(std::string &line, HttpRequest &req) {
     return true;
 }
 
+/**
+ * @brief   Parses the HTTP request body based on Content-Type.
+ */
+
 void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     std::string contentType = req.getHeader("Content-Type");
-    // std::cout << RED << contentType << RES << std::endl;
     std::string emptyBody = "";
 
     if (contentType.empty()) {
@@ -349,30 +421,23 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
         req.setBody(emptyBody);
         return;
     }
-    if (contentType == "application/x-www-form-urlencoded") {
+    if (contentType == "application/x-www-form-urlencoded" || contentType == "text/plain")
         req.setBody(body);
-    }
-    else if (contentType == "text/plain") {
-        req.setBody(body);
-    }
     else if (contentType.find("multipart/form-data") == 0) {
         size_t boundaryPos = contentType.find("boundary=");
-        if (boundaryPos != std::string::npos) {
-            std::string boundary = "--" + contentType.substr(boundaryPos + 9);
-            // std::cout << GC << "Extracted boundary: " << boundary << RES << std::endl;
-        } else {
-            std::cerr << RED << "Error: Missing boundary in Content-Type: " << RES << contentType << std::endl;
+        if (boundaryPos == std::string::npos) {
+            _state = 400;
+            return ;
         }
         std::string boundary = "--" + contentType.substr(boundaryPos + 9);
         size_t dispositionPos = body.find("Content-Disposition: form-data;");
         if (dispositionPos == std::string::npos) {
-            std::cerr << RED << "Error: Missing Content-Disposition header" << RES << std::endl;
-            req.setBody(emptyBody);
+            _state = 400;
             return;
-        }// ↓↓↓ EXTRACT FILENAME ↓↓↓
+        }
         size_t filenamePos = body.find("filename=\"", dispositionPos);
         if (filenamePos != std::string::npos) {
-            filenamePos += 10; // Move past "filename=\""
+            filenamePos += 10; 
             size_t endPos = body.find("\"", filenamePos);
             if (endPos != std::string::npos) {
                 std::string filename = body.substr(filenamePos, endPos - filenamePos);
@@ -381,9 +446,9 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
                     _state = 415;
                     return ;
                 }
-                req.setFileName(filename); // Store filename
+                req.setFileName(filename);
             }
-        }// ↓↓↓ Extract file content ↓↓↓
+        }
         size_t contentStart = body.find("\r\n\r\n", dispositionPos);
         if (contentStart != std::string::npos) {
             contentStart += 4;
@@ -402,10 +467,13 @@ void HttpParser::parseBody(std::string &body, HttpRequest &req) {
     }
     else {
         Logger::getInstance().logLevel("WARN", "Unsupported content-type. Setting empty body", 0);
-        // std::cerr << "Error: Unsupported Content-Type: " << contentType << std::endl;
         req.setBody(emptyBody);
     }
 }
+
+/**
+ * @brief   Finalizes the HttpRequest by setting root, autoindex, and redirects.
+ */
 
 bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     req.setAutoIndex(block.getAutoIndex(req.getUri()));

@@ -43,7 +43,7 @@ public:
     void    matchRoute(ServerBlock &b, HttpRequest &req);
     bool    methodAllowed(HttpRequest &req);
     bool    startsWithMethod(std::string &input);
-    bool    requestSize(ssize_t bytes);
+    bool    requestSize(ssize_t bytes, size_t &headerEnd, const std::string &input);
     bool    isFullRequest(std::string &input, ssize_t bytes);
     bool    parseRequest(ServerBlock &block);
     bool    parseStartLine(std::string &line, HttpRequest &req);
@@ -56,6 +56,7 @@ public:
     bool    parseHeader(std::string &line, HttpRequest &req);
     void    parseBody(std::string &body, HttpRequest &req);
     void    unchunkBody();
+    bool    convertLength(size_t &contentLength, std::string contentlengthStr);
 
     int                                 getState() const;
     std::string                         getRedirection() const;
