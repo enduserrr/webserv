@@ -1,0 +1,63 @@
+[2025-04-28 13:16:13][SYSTEM]: No arguments detected, using default.conf
+[2025-04-28 13:16:13][SYSTEM]: File validation OK
+[2025-04-28 13:16:13][SYSTEM]: Server configurations OK
+[2025-04-28 13:16:13][SYSTEM]: Server loop started (testiservu1.com), listening on port 8080 (fd: 4)
+[2025-04-28 13:16:13][SYSTEM]: Server loop started (testiservu2.com), listening on port 8080 (fd: 5)
+[2025-04-28 13:16:17][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 13:16:17][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-28 13:16:17][INFO]: Empty body.
+[2025-04-28 13:16:17][INFO]: Filepath: /home/asalo/enduserrr/c++/webserv/www/empty.html exists (isn't a dir).
+[2025-04-28 13:16:17][INFO]: URI before check: /empty.html, Root: /home/asalo/enduserrr/c++/webserv/www
+[2025-04-28 13:16:17][INFO]: Client disconnected (fd: 6)
+[2025-04-28 13:16:33][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][ERROR]: Header too big
+[2025-04-28 13:16:33][INFO]: Client disconnected (fd: 6)
+[2025-04-28 13:16:33][INFO]: Unable to read from socket: 6
+[2025-04-28 13:17:20][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 13:17:20][INFO]: No ServerBlock found for Host: localhost:8080
+[2025-04-28 13:17:20][INFO]: Client disconnected (fd: 6)
+[2025-04-28 13:17:43][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 13:17:43][INFO]: No ServerBlock found for Host: localhost:8080
+[2025-04-28 13:17:58][INFO]: Client disconnected (fd: 6)
+[2025-04-28 13:19:06][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 13:19:06][INFO]: No ServerBlock found for Host: localhost:8080
+[2025-04-28 13:19:06][INFO]: Client disconnected (fd: 6)
+[2025-04-28 13:19:25][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 13:19:25][INFO]: No ServerBlock found for Host: localhost:8080
+[2025-04-28 13:19:25][INFO]: Client disconnected (fd: 6)
+[2025-04-28 13:20:45][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 13:20:45][INFO]: No ServerBlock found for Host: localhost:8080
+[2025-04-28 13:20:45][INFO]: Client disconnected (fd: 6)
+[2025-04-28 13:21:17][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 13:21:17][INFO]: No ServerBlock found for Host: localhost:8080
+[2025-04-28 13:21:17][INFO]: Client disconnected (fd: 6)
+[2025-04-28 13:23:19][SYSTEM]: Signal (2)  received, stopping server...
+[2025-04-28 13:23:19][SYSTEM]: poll() interrupted.
+[2025-04-28 13:23:19][SYSTEM]: Terminating server loop (testiservu1.com)
+[2025-04-28 13:23:19][SYSTEM]: Terminating server loop (testiservu2.com)
+[2025-04-28 13:23:19][SYSTEM]: Resources cleaned.
+[2025-04-28 13:23:19][SYSTEM]: Resources cleaned.
