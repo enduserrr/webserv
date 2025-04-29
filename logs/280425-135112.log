@@ -18,3 +18,9 @@
 [2025-04-28 13:52:07][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
 [2025-04-28 13:52:07][INFO]: No ServerBlock found for Host: localhost:8080
 [2025-04-28 13:52:07][INFO]: Client disconnected (fd: 6)
+[2025-04-28 13:54:54][SYSTEM]: Signal (2)  received, stopping server...
+[2025-04-28 13:54:54][SYSTEM]: poll() interrupted.
+[2025-04-28 13:54:54][SYSTEM]: Terminating server loop (testiservu1.com)
+[2025-04-28 13:54:54][SYSTEM]: Terminating server loop (testiservu2.com)
+[2025-04-28 13:54:54][SYSTEM]: Resources cleaned.
+[2025-04-28 13:54:54][SYSTEM]: Resources cleaned.

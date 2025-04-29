@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/28 13:51:07 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/28 17:18:46 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -44,7 +44,7 @@ bool ServerLoop::hasTimedOut() {
  * @brief   Initializes and configs listening sockets for each port in the ServerBlocks
  *          and adds them to the poll structure.
  */
-void ServerLoop::setupServerSockets() {
+/* void ServerLoop::setupServerSockets() {
     for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
         const std::vector<int>& ports = it->getPorts();
         for (std::vector<int>::const_iterator portIt = ports.begin(); portIt != ports.end(); ++portIt) {
@@ -97,11 +97,11 @@ void ServerLoop::setupServerSockets() {
         Logger::getInstance().logLevel("ERROR", "No server sockets were successfully set up. Exiting.", 1);
         _run = false;
     }
-}
+} */
 
 
 
-/* void ServerLoop::setupServerSockets() {
+void ServerLoop::setupServerSockets() {
     for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
         const std::vector<int>& ports = it->getPorts();
 
@@ -171,65 +171,65 @@ bool ServerLoop::serverFull() {
         return true;
      }
     return false;
-} */
+}
 
 /**
  * @brief   Accepts a new client connection on a listening socket and sets it up (non blocking, session info).
  */
+// void ServerLoop::acceptNewConnection(int serverSocket) {
+//     if (serverFull())
+//         return ;
+//     struct sockaddr_in clientAddr;
+//     socklen_t addrLen = sizeof(clientAddr);
+//     int clientFd = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
+//     if (clientFd < 0) {
+//         Logger::getInstance().logLevel("SYSTEM", "Failed to accept client connection.", 1);
+//         return ;
+//     }
+
+//     if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
+//         Logger::getInstance().logLevel("SYSTEM", "Failed to set client socket non-blocking", 1);
+//         close(clientFd);
+//         return ;
+//     }
+//     struct sockaddr_in localAddr; // Retrieve the local (server) port for the accepted connection.
+//     socklen_t localLen = sizeof(localAddr);
+//     if (getsockname(clientFd, (struct sockaddr*)&localAddr, &localLen) < 0) {
+//         Logger::getInstance().logLevel("SYSTEM", "Failed to get local address for client connection.", 1);
+//         close(clientFd);
+//         return ;
+//     }
+//     int localPort = ntohs(localAddr.sin_port);
+//     if (_portToBlock.find(localPort) == _portToBlock.end()) {// Find ServerBlock for this port
+//         std::ostringstream logStream;
+//         logStream << "No ServerBlock found for port: " << localPort;
+//         Logger::getInstance().logLevel("WARNING", logStream.str(), 1);
+//         close(clientFd);
+//         return ;
+//     }
+
+//     ClientSession session(clientFd); // Create and store the client session with the correct ServerBlock.
+//     session._block = _portToBlock[localPort]; // Assign correct ServerBlock
+//     session.setServerName(_portToBlock[localPort].getServerName()); // Set the server_name
+//     _clients[clientFd] = session;
+//     // std::cout << REV_WHITE << session.getServerName() << RES << std::endl;
+
+//     struct pollfd pfd; // Add the new client to the poll vector.
+//     pfd.fd = clientFd;
+//     pfd.events = POLLIN;
+//     _pollFds.push_back(pfd);
+//     _clientLastActivity[clientFd] = time(nullptr); // Client activity for time-outs
+
+//     std::ostringstream logStream;
+//     char clientIp[INET_ADDRSTRLEN];
+//     inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
+//     logStream << "New client connected from " << clientIp << " on port " << localPort << " (fd: " << clientFd << ")";
+//     Logger::getInstance().logLevel("INFO", logStream.str(), 0);
+// }
+
+
+
 void ServerLoop::acceptNewConnection(int serverSocket) {
-    if (serverFull())
-        return ;
-    struct sockaddr_in clientAddr;
-    socklen_t addrLen = sizeof(clientAddr);
-    int clientFd = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
-    if (clientFd < 0) {
-        Logger::getInstance().logLevel("SYSTEM", "Failed to accept client connection.", 1);
-        return ;
-    }
-
-    if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
-        Logger::getInstance().logLevel("SYSTEM", "Failed to set client socket non-blocking", 1);
-        close(clientFd);
-        return ;
-    }
-    struct sockaddr_in localAddr; // Retrieve the local (server) port for the accepted connection.
-    socklen_t localLen = sizeof(localAddr);
-    if (getsockname(clientFd, (struct sockaddr*)&localAddr, &localLen) < 0) {
-        Logger::getInstance().logLevel("SYSTEM", "Failed to get local address for client connection.", 1);
-        close(clientFd);
-        return ;
-    }
-    int localPort = ntohs(localAddr.sin_port);
-    if (_portToBlock.find(localPort) == _portToBlock.end()) {// Find ServerBlock for this port
-        std::ostringstream logStream;
-        logStream << "No ServerBlock found for port: " << localPort;
-        Logger::getInstance().logLevel("WARNING", logStream.str(), 1);
-        close(clientFd);
-        return ;
-    }
-
-    ClientSession session(clientFd); // Create and store the client session with the correct ServerBlock.
-    session._block = _portToBlock[localPort]; // Assign correct ServerBlock
-    session.setServerName(_portToBlock[localPort].getServerName()); // Set the server_name
-    _clients[clientFd] = session;
-    // std::cout << REV_WHITE << session.getServerName() << RES << std::endl;
-
-    struct pollfd pfd; // Add the new client to the poll vector.
-    pfd.fd = clientFd;
-    pfd.events = POLLIN;
-    _pollFds.push_back(pfd);
-    _clientLastActivity[clientFd] = time(nullptr); // Client activity for time-outs
-
-    std::ostringstream logStream;
-    char clientIp[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
-    logStream << "New client connected from " << clientIp << " on port " << localPort << " (fd: " << clientFd << ")";
-    Logger::getInstance().logLevel("INFO", logStream.str(), 0);
-}
-
-
-
-/* void ServerLoop::acceptNewConnection(int serverSocket) {
     if (serverFull())
         return;
     struct sockaddr_in clientAddr;
@@ -296,80 +296,80 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
     logStream << "New client connected from " << clientIp << " on port " << localPort << " (fd: " << clientFd << ")";
     Logger::getInstance().logLevel("INFO", logStream.str(), 0);
-} */
+}
 
 /**
  * @brief   Reads data from a client and sends incoming requests for parsing and processing.
  */
+// void ServerLoop::handleClientRequest(int clientSocket) {
+//     char buffer[4096]; // For each recv
+//     ssize_t bytesRead;
+//     HttpParser parser(_clients[clientSocket]._block.getBodySize());
+//     Logger::getInstance().checkErrorPages(_clients[clientSocket]._block);
+
+//     while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
+//         _clients[clientSocket].buffer.append(buffer, bytesRead);
+//         if (parser.isFullRequest(_clients[clientSocket].buffer, bytesRead))
+//             break ;
+//         if (parser.getState() != 0) {
+//             _clients[clientSocket].buffer.clear();
+//             sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", parser.getState()));
+//             removeClient(clientSocket);
+//             return ;
+//         }
+//     }
+//     if (bytesRead == 0) {
+//         removeClient(clientSocket);
+//         return ;
+//     } else if (bytesRead < 0) {
+//         if (errno == EAGAIN || errno == EWOULDBLOCK) {
+//             return ;
+//         }
+//         removeClient(clientSocket);
+//         std::ostringstream logStream;
+//         logStream << "Unable to read from socket: " << clientSocket;
+//         Logger::getInstance().logLevel("INFO", logStream.str(), 0);
+//         return ;
+//     }
+//     if (_clients.find(clientSocket) == _clients.end()) {// Check if client session exists
+//         _clients[clientSocket] = ClientSession(clientSocket);
+//         struct sockaddr_in addr;
+//         socklen_t addrLen = sizeof(addr);
+//         if (getsockname(clientSocket, (struct sockaddr*)&addr, &addrLen) == 0) {
+//             int port = ntohs(addr.sin_port);
+//             if (_portToBlock.find(port) != _portToBlock.end()) {
+//                 _clients[clientSocket]._block = _portToBlock[port];
+//             } else {
+//                 std::ostringstream logStream;
+//                 logStream << "No matching ServerBlock for port: " << port;
+//                 Logger::getInstance().logLevel("SYSTEM", logStream.str(), 0);
+//             }
+//         }
+//     }
+//     if (_clients[clientSocket].requestLimiter()) {
+//         sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", 429));
+//         return ;
+//     }
+//     if (parser.parseRequest(_clients[clientSocket]._block)) {
+//         _clients[clientSocket].request = parser.getPendingRequest();
+//         std::string response = Router::getInstance().routeRequest(_clients[clientSocket].request);
+//         sendResponse(clientSocket, response);
+//         // close(clientSocket);
+//         removeClient(clientSocket);
+//     } else {
+//         int state = parser.getState();
+//         if (state == 301 || state == 302)
+//             sendResponse(clientSocket, Logger::getInstance().logLevel("REDIR", parser.getRedirection(), parser.getState()));
+//         else
+//             sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", parser.getState()));
+//         removeClient(clientSocket);
+//     }
+//     Logger::getInstance().resetErrorPages();
+
+// }
+
+
 void ServerLoop::handleClientRequest(int clientSocket) {
-    char buffer[4096]; // For each recv
-    ssize_t bytesRead;
-    HttpParser parser(_clients[clientSocket]._block.getBodySize());
-    Logger::getInstance().checkErrorPages(_clients[clientSocket]._block);
-
-    while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
-        _clients[clientSocket].buffer.append(buffer, bytesRead);
-        if (parser.isFullRequest(_clients[clientSocket].buffer, bytesRead))
-            break ;
-        if (parser.getState() != 0) {
-            _clients[clientSocket].buffer.clear();
-            sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", parser.getState()));
-            removeClient(clientSocket);
-            return ;
-        }
-    }
-    if (bytesRead == 0) {
-        removeClient(clientSocket);
-        return ;
-    } else if (bytesRead < 0) {
-        if (errno == EAGAIN || errno == EWOULDBLOCK) {
-            return ;
-        }
-        removeClient(clientSocket);
-        std::ostringstream logStream;
-        logStream << "Unable to read from socket: " << clientSocket;
-        Logger::getInstance().logLevel("INFO", logStream.str(), 0);
-        return ;
-    }
-    if (_clients.find(clientSocket) == _clients.end()) {// Check if client session exists
-        _clients[clientSocket] = ClientSession(clientSocket);
-        struct sockaddr_in addr;
-        socklen_t addrLen = sizeof(addr);
-        if (getsockname(clientSocket, (struct sockaddr*)&addr, &addrLen) == 0) {
-            int port = ntohs(addr.sin_port);
-            if (_portToBlock.find(port) != _portToBlock.end()) {
-                _clients[clientSocket]._block = _portToBlock[port];
-            } else {
-                std::ostringstream logStream;
-                logStream << "No matching ServerBlock for port: " << port;
-                Logger::getInstance().logLevel("SYSTEM", logStream.str(), 0);
-            }
-        }
-    }
-    if (_clients[clientSocket].requestLimiter()) {
-        sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", 429));
-        return ;
-    }
-    if (parser.parseRequest(_clients[clientSocket]._block)) {
-        _clients[clientSocket].request = parser.getPendingRequest();
-        std::string response = Router::getInstance().routeRequest(_clients[clientSocket].request);
-        sendResponse(clientSocket, response);
-        // close(clientSocket);
-        removeClient(clientSocket);
-    } else {
-        int state = parser.getState();
-        if (state == 301 || state == 302)
-            sendResponse(clientSocket, Logger::getInstance().logLevel("REDIR", parser.getRedirection(), parser.getState()));
-        else
-            sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", parser.getState()));
-        removeClient(clientSocket);
-    }
-    Logger::getInstance().resetErrorPages();
-
-}
-
-
-/* void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096];
     ssize_t bytesRead;
     HttpParser parser(_clients[clientSocket]._block.getBodySize());
@@ -482,7 +482,7 @@ void    ServerLoop::sendResponse(int clientSocket, const std::string &response) 
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
     }
     return ;
-} */
+}
 
 void ServerLoop::checkClientTimeouts() {
     time_t currentTime = time(nullptr);

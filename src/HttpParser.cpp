@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/10 21:28:04 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/28 17:27:35 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -118,6 +118,9 @@ void HttpParser::matchRoute(ServerBlock &b, HttpRequest &req) {
 
 bool HttpParser::methodAllowed(HttpRequest &req) {
     const std::vector<std::string>& allowed = req.getLocation().getAllowedMethods();
+    for (size_t i = 0; i < allowed.size();) {
+        std::cout << allowed.at(i++) << std::endl;
+    }
     if (std::find(allowed.begin(), allowed.end(), req.getMethod()) == allowed.end()) {
         _state = 405;
         return false;
@@ -176,11 +179,14 @@ bool HttpParser::parseRequest(ServerBlock &block) {
     std::string line;
     HttpRequest request;
     std::getline(ss, line);
+    // std::cout << "In parseRequest before parseStartLine" << std::endl;
     if (!parseStartLine(line, request))
         return false;
     matchRoute(block, request);
+    // std::cout << "In parseRequest before methodsAllowed" << std::endl;
     if (!methodAllowed(request))
-        return false; 
+        return false;
+    // std::cout << "In parseRequest before parseHeader while loop" << std::endl;
     while (getline(ss, line, '\r') && ss.get() == '\n' && !line.empty()) {
         if (!parseHeader(line, request))
             return false;
@@ -195,7 +201,7 @@ bool HttpParser::parseRequest(ServerBlock &block) {
     }
     createRequest(block, request);
     if (_state != 0)
-        return false; 
+        return false;
     return true;
 }
 

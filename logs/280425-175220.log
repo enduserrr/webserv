@@ -1,0 +1,24 @@
+[2025-04-28 17:52:20][SYSTEM]: No arguments detected, using default.conf
+[2025-04-28 17:52:20][SYSTEM]: File validation OK
+[2025-04-28 17:52:20][SYSTEM]: Server configurations OK
+[2025-04-28 17:52:20][SYSTEM]: Server loop started (testiservu1.com), listening on port 8080 (fd: 4)
+[2025-04-28 17:52:20][SYSTEM]: Server loop started (testiservu2.com), listening on port 8080 (fd: 5)
+[2025-04-28 17:52:21][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 17:52:22][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-28 17:52:22][INFO]: Empty body.
+[2025-04-28 17:52:22][INFO]: File to be deleted: /home/asalo/enduserrr/c++/webserv/www/uploads/upload_1745851855
+[2025-04-28 17:52:22][INFO]: Client disconnected (fd: 6)
+[2025-04-28 17:52:22][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 17:52:22][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-28 17:52:22][INFO]: Empty body.
+[2025-04-28 17:52:22][INFO]: URI before check: /uploads/, Root: /home/asalo/enduserrr/c++/webserv/www
+[2025-04-28 17:52:22][INFO]: Returning directory listing
+[2025-04-28 17:52:22][INFO]: Client disconnected (fd: 6)
+[2025-04-28 17:52:22][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 17:52:22][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-28 17:52:22][INFO]: Empty body.
+[2025-04-28 17:52:22][INFO]: Filepath: /home/asalo/enduserrr/c++/webserv/www/style.css exists (isn't a dir).
+[2025-04-28 17:52:22][INFO]: URI before check: /style.css, Root: /home/asalo/enduserrr/c++/webserv/www
+[2025-04-28 17:52:22][INFO]: Client disconnected (fd: 6)
+[2025-04-28 17:52:22][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 17:52:27][INFO]: Client disconnected (fd: 6)

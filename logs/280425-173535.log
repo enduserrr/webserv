@@ -1,0 +1,31 @@
+[2025-04-28 17:35:35][SYSTEM]: No arguments detected, using default.conf
+[2025-04-28 17:35:35][SYSTEM]: File validation OK
+[2025-04-28 17:35:35][SYSTEM]: Server configurations OK
+[2025-04-28 17:35:35][SYSTEM]: Server loop started (testiservu1.com), listening on port 8080 (fd: 4)
+[2025-04-28 17:35:35][SYSTEM]: Server loop started (testiservu2.com), listening on port 8080 (fd: 5)
+[2025-04-28 17:35:37][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 17:35:40][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-28 17:35:40][INFO]: Empty body.
+[2025-04-28 17:35:40][INFO]: URI before check: /uploads/, Root: /home/asalo/enduserrr/c++/webserv/www
+[2025-04-28 17:35:40][INFO]: Returning directory listing
+[2025-04-28 17:35:40][INFO]: Client disconnected (fd: 6)
+[2025-04-28 17:35:40][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 17:35:40][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-28 17:35:40][INFO]: Empty body.
+[2025-04-28 17:35:40][INFO]: Filepath: /home/asalo/enduserrr/c++/webserv/www/style.css exists (isn't a dir).
+[2025-04-28 17:35:40][INFO]: URI before check: /style.css, Root: /home/asalo/enduserrr/c++/webserv/www
+[2025-04-28 17:35:40][INFO]: Client disconnected (fd: 6)
+[2025-04-28 17:35:41][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 17:35:42][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-28 17:35:42][ERROR]:  Method Not Allowed
+[2025-04-28 17:35:42][INFO]: Client disconnected (fd: 6)
+[2025-04-28 17:35:44][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 17:35:44][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-28 17:35:44][ERROR]:  Method Not Allowed
+[2025-04-28 17:35:44][INFO]: Client disconnected (fd: 6)
+[2025-04-28 17:36:01][SYSTEM]: Signal (2)  received, stopping server...
+[2025-04-28 17:36:01][SYSTEM]: poll() interrupted.
+[2025-04-28 17:36:01][SYSTEM]: Terminating server loop (testiservu1.com)
+[2025-04-28 17:36:01][SYSTEM]: Terminating server loop (testiservu2.com)
+[2025-04-28 17:36:01][SYSTEM]: Resources cleaned.
+[2025-04-28 17:36:01][SYSTEM]: Resources cleaned.

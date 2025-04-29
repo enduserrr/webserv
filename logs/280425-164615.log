@@ -1,0 +1,14 @@
+[2025-04-28 16:46:15][SYSTEM]: No arguments detected, using default.conf
+[2025-04-28 16:46:15][SYSTEM]: File validation OK
+[2025-04-28 16:46:15][SYSTEM]: Server configurations OK
+[2025-04-28 16:46:15][SYSTEM]: Server loop started (testiservu1.com), listening on port 8080 (fd: 4)
+[2025-04-28 16:46:15][SYSTEM]: Server loop started (testiservu2.com), listening on port 8080 (fd: 5)
+[2025-04-28 16:46:26][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-28 16:46:26][ERROR]:  Method Not Allowed
+[2025-04-28 16:46:26][INFO]: Client disconnected (fd: 6)
+[2025-04-28 16:46:44][SYSTEM]: Signal (2)  received, stopping server...
+[2025-04-28 16:46:44][SYSTEM]: poll() interrupted.
+[2025-04-28 16:46:44][SYSTEM]: Terminating server loop (testiservu1.com)
+[2025-04-28 16:46:44][SYSTEM]: Terminating server loop (testiservu2.com)
+[2025-04-28 16:46:44][SYSTEM]: Resources cleaned.
+[2025-04-28 16:46:44][SYSTEM]: Resources cleaned.
