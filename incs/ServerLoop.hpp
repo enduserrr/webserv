@@ -46,6 +46,7 @@ class ServerLoop {
         void    handleClientRequest(int clientSocket);
         void    sendResponse(int clientSocket, const std::string &response);
         void    checkClientTimeouts();
+        bool    MatchBlockToRequest(const std::string &host, int clientSocket, HttpParser &parser);
 
     public:
         ServerLoop();

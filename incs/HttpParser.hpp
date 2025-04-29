@@ -25,6 +25,7 @@ private:
     size_t                              _maxBodySize;
     HttpRequest                         _request;
     std::string                         _fullRequest;
+    std::string                         _headerHost; 
     std::string                         _pendingData;
     std::string                         _method;
     std::string                         _uri;
@@ -37,7 +38,7 @@ private:
 
 
 public:
-    HttpParser(size_t max);
+    HttpParser();
     ~HttpParser();
 
     void    matchRoute(ServerBlock &b, HttpRequest &req);
@@ -59,6 +60,9 @@ public:
     bool    convertLength(size_t &contentLength, std::string contentlengthStr);
 
     int                                 getState() const;
+    std::string                         getHeaderHost() {
+        return _headerHost; 
+    }
     std::string                         getRedirection() const;
     std::string                         getMethod() const;
     std::string                         getBody() const;
@@ -66,6 +70,11 @@ public:
     std::string                         getRoot() const;
     const HttpRequest&                  getPendingRequest() const;
     std::map<std::string, std::string>  getQueryString() const;
+
+    void                                setBodySizeLimit(size_t size) {
+        _maxBodySize = size; 
+    } 
+
 };
 
 #endif

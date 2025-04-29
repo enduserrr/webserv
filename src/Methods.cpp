@@ -25,7 +25,7 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
 
     // ↓↓↓ FALLBACK FILE IF TEMPLATE'S MISSING ↓↓↓
     if (!templateFile) {
-        std::cout << "FALLBACK FILE" << std::endl;
+        // std::cout << "FALLBACK FILE" << std::endl;
         std::ostringstream fallback;
         fallback << "<html><head><title>" << uri << "</title></head><body>"
                  << "<h1>Index of " << uri << "</h1><ul>";
@@ -121,7 +121,7 @@ std::string Methods::mGet(HttpRequest &req) {
     if (!uri.empty() && uri.back() == '/') {
         std::string locIndex = req.getLocation().getIndex();
         // std::cout << RES REV_RED << "Uri method get: " << uri << RES << std::endl;
-        req.display();
+        // req.display();
         // std::cout << RES REV_RED << "Location index: " << locIndex << RES << std::endl;
         if (!locIndex.empty() && uri.length() > 1) {
             filePath = basePath + "/" + locIndex;
@@ -282,7 +282,7 @@ std::string Methods::mDelete(HttpRequest &req) {
 
     std::string basePath = req.getRoot() + req.getLocation().getUploadStore();
     std::string filePath = basePath + fileParam;
-    std::cout << RED << filePath << RES << std::endl;
+    // std::cout << RED << filePath << RES << std::endl;
     
 
     if (fileParam.empty()) {

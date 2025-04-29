@@ -1,0 +1,184 @@
+[2025-04-29 09:35:12][SYSTEM]: No arguments detected, using default.conf
+[2025-04-29 09:35:12][SYSTEM]: File validation OK
+[2025-04-29 09:35:12][SYSTEM]: Server configurations OK
+[2025-04-29 09:35:12][SYSTEM]: Server loop started (testiservu1.com), listening on port 8080 (fd: 4)
+[2025-04-29 09:35:12][SYSTEM]: Server loop started (testiservu2.com), listening on port 8080 (fd: 5)
+[2025-04-29 09:35:16][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:35:16][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:35:16][INFO]: Empty body.
+[2025-04-29 09:35:16][INFO]: URI before check: /, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:35:16][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:35:16][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:35:16][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-29 09:35:16][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:35:16][INFO]: Empty body.
+[2025-04-29 09:35:16][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:35:16][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:35:16][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:35:16][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:35:16][INFO]: Empty body.
+[2025-04-29 09:35:16][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/favicon.ico exists (isn't a dir).
+[2025-04-29 09:35:16][INFO]: URI before check: /favicon.ico, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:35:16][INFO]: Client disconnected (fd: 7)
+[2025-04-29 09:35:25][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:35:25][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-29 09:35:25][INFO]: Empty body.
+[2025-04-29 09:35:25][INFO]: URI before check: /, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:35:25][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:35:25][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:35:25][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-29 09:35:25][INFO]: Empty body.
+[2025-04-29 09:35:25][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:35:25][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:35:25][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:35:25][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:35:25][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-29 09:35:25][INFO]: Empty body.
+[2025-04-29 09:35:25][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/favicon.ico exists (isn't a dir).
+[2025-04-29 09:35:25][INFO]: URI before check: /favicon.ico, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:35:25][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:41:09][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:41:09][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:41:09][INFO]: Empty body.
+[2025-04-29 09:41:09][INFO]: URI before check: /, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:41:09][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:41:09][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:41:09][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-29 09:41:09][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:41:09][INFO]: Empty body.
+[2025-04-29 09:41:09][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:41:09][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:41:09][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:41:46][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:41:46][INFO]: Empty body.
+[2025-04-29 09:41:46][INFO]: URI before check: /uploads/, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:41:46][INFO]: Returning directory listing
+[2025-04-29 09:41:46][INFO]: Client disconnected (fd: 7)
+[2025-04-29 09:41:46][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:41:46][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:41:46][INFO]: Empty body.
+[2025-04-29 09:41:46][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:41:46][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:41:46][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:42:08][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:42:08][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:42:08][INFO]: Empty body.
+[2025-04-29 09:42:08][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/index.html exists (isn't a dir).
+[2025-04-29 09:42:08][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:42:08][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:42:08][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:42:08][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-29 09:42:08][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:42:08][INFO]: Empty body.
+[2025-04-29 09:42:08][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:42:08][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:42:08][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:42:15][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:42:15][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-29 09:42:15][INFO]: Empty body.
+[2025-04-29 09:42:15][INFO]: URI before check: /, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:42:15][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:42:15][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:42:15][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 8)
+[2025-04-29 09:42:15][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-29 09:42:15][INFO]: Empty body.
+[2025-04-29 09:42:15][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:42:15][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:42:15][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:42:15][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-29 09:42:15][INFO]: Empty body.
+[2025-04-29 09:42:15][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/favicon.ico exists (isn't a dir).
+[2025-04-29 09:42:15][INFO]: URI before check: /favicon.ico, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:42:15][INFO]: Client disconnected (fd: 8)
+[2025-04-29 09:42:38][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:42:38][INFO]: Empty body.
+[2025-04-29 09:42:38][INFO]: URI before check: /, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:42:38][INFO]: Client disconnected (fd: 7)
+[2025-04-29 09:42:38][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:42:38][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:42:38][INFO]: Empty body.
+[2025-04-29 09:42:38][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:42:38][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:42:38][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:42:38][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:42:38][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:42:38][INFO]: Empty body.
+[2025-04-29 09:42:38][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/favicon.ico exists (isn't a dir).
+[2025-04-29 09:42:38][INFO]: URI before check: /favicon.ico, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:42:38][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:43:01][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:43:01][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:43:01][INFO]: Empty body.
+[2025-04-29 09:43:01][INFO]: URI before check: /, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:01][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:43:01][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:43:01][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-29 09:43:01][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:43:01][INFO]: Empty body.
+[2025-04-29 09:43:01][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:43:01][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:01][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:43:01][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:43:01][INFO]: Empty body.
+[2025-04-29 09:43:01][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/favicon.ico exists (isn't a dir).
+[2025-04-29 09:43:01][INFO]: URI before check: /favicon.ico, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:01][INFO]: Client disconnected (fd: 7)
+[2025-04-29 09:43:29][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:43:29][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-29 09:43:29][INFO]: Empty body.
+[2025-04-29 09:43:29][INFO]: URI before check: /, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:29][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:43:29][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:43:29][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-29 09:43:29][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-29 09:43:29][INFO]: Empty body.
+[2025-04-29 09:43:29][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:43:29][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:29][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:43:29][INFO]: No ServerBlock found for Host: 127.0.0.2:8080
+[2025-04-29 09:43:29][INFO]: Empty body.
+[2025-04-29 09:43:29][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/favicon.ico exists (isn't a dir).
+[2025-04-29 09:43:29][INFO]: URI before check: /favicon.ico, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:29][INFO]: Client disconnected (fd: 7)
+[2025-04-29 09:43:38][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:43:38][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:43:38][INFO]: Empty body.
+[2025-04-29 09:43:38][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/index.html exists (isn't a dir).
+[2025-04-29 09:43:38][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:38][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:43:38][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:43:38][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:43:38][INFO]: Empty body.
+[2025-04-29 09:43:38][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:43:38][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:38][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:43:38][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:43:38][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:43:38][INFO]: Empty body.
+[2025-04-29 09:43:38][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/favicon.ico exists (isn't a dir).
+[2025-04-29 09:43:38][INFO]: URI before check: /favicon.ico, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:38][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:43:55][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:43:55][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:43:55][INFO]: Empty body.
+[2025-04-29 09:43:55][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/index.html exists (isn't a dir).
+[2025-04-29 09:43:55][INFO]: URI before check: /index.html, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:55][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:43:55][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 6)
+[2025-04-29 09:43:55][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 7)
+[2025-04-29 09:43:55][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:43:55][INFO]: Empty body.
+[2025-04-29 09:43:55][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/style.css exists (isn't a dir).
+[2025-04-29 09:43:55][INFO]: URI before check: /style.css, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:55][INFO]: Client disconnected (fd: 6)
+[2025-04-29 09:43:55][INFO]: No ServerBlock found for Host: 127.0.0.1:8080
+[2025-04-29 09:43:55][INFO]: Empty body.
+[2025-04-29 09:43:55][INFO]: Filepath: /home/eleppala/Documents/projects/5web/www/favicon.ico exists (isn't a dir).
+[2025-04-29 09:43:55][INFO]: URI before check: /favicon.ico, Root: /home/eleppala/Documents/projects/5web/www
+[2025-04-29 09:43:55][INFO]: Client disconnected (fd: 7)
+[2025-04-29 09:56:42][SYSTEM]: Signal (2)  received, stopping server...
+[2025-04-29 09:56:42][SYSTEM]: poll() interrupted.
+[2025-04-29 09:56:42][SYSTEM]: Terminating server loop (testiservu1.com)
+[2025-04-29 09:56:42][SYSTEM]: Terminating server loop (testiservu2.com)
+[2025-04-29 09:56:42][SYSTEM]: Resources cleaned.
+[2025-04-29 09:56:42][SYSTEM]: Resources cleaned.

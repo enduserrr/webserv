@@ -16,7 +16,7 @@
  * @brief Constructs an HttpParser with a specified maximum body size.
  */
 
-HttpParser::HttpParser(size_t max) : _state(0),  _chunked(false), _totalRequestSize(0), _maxBodySize(max) {}
+HttpParser::HttpParser() : _state(0),  _chunked(false), _totalRequestSize(0), _maxBodySize(DEFAULT_BODY_SIZE) {}
 
 /**
  * @brief Default destructor for HttpParser.
@@ -79,7 +79,6 @@ bool HttpParser::convertLength(size_t &contentLength, std::string contentlengthS
     return true; 
 }
 
-
 /**
  * @brief   Checks if a complete HTTP request has been received.
  */
@@ -91,6 +90,16 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
     size_t bodyStart = headerEnd + 4;
     if (_totalRequestSize == static_cast<size_t>(bytes) && !startsWithMethod(input))
         return false; 
+
+
+    size_t hostPos = input.find("Host: ");
+    if (hostPos != std::string::npos && hostPos < headerEnd) {
+        size_t hostEnd = input.find(":", hostPos + 6);
+        if (hostEnd != std::string::npos) {
+            std::string hostStr = input.substr(hostPos + 6, hostEnd - (hostPos + 6));
+            _headerHost = hostStr;
+        }
+    }
     size_t tePos = input.find("Transfer-Encoding: chunked");
     if (tePos != std::string::npos && tePos < headerEnd) {
         _chunked = true;
@@ -148,6 +157,7 @@ void HttpParser::matchRoute(ServerBlock &b, HttpRequest &req) {
 
 bool HttpParser::methodAllowed(HttpRequest &req) {
     const std::vector<std::string>& allowed = req.getLocation().getAllowedMethods();
+    std::cout << "methodAllowed host: "<< _headerHost <<  "end" <<std::endl;
     if (std::find(allowed.begin(), allowed.end(), req.getMethod()) == allowed.end()) {
         _state = 405;
         return false;

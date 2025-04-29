@@ -1,0 +1,11 @@
+[2025-04-29 12:44:27][SYSTEM]: No arguments detected, using default.conf
+[2025-04-29 12:44:27][SYSTEM]: File validation OK
+[2025-04-29 12:44:27][SYSTEM]: Server configurations OK
+[2025-04-29 12:44:27][SYSTEM]: Server loop started (testiservu1.com), listening on port 8080 (fd: 4)
+[2025-04-29 12:44:27][SYSTEM]: Server loop started (testiservu2.com), listening on port 8080 (fd: 5)
+[2025-04-29 12:44:30][SYSTEM]: Signal (2)  received, stopping server...
+[2025-04-29 12:44:30][SYSTEM]: poll() interrupted.
+[2025-04-29 12:44:30][SYSTEM]: Terminating server loop (testiservu1.com)
+[2025-04-29 12:44:30][SYSTEM]: Terminating server loop (testiservu2.com)
+[2025-04-29 12:44:30][SYSTEM]: Resources cleaned.
+[2025-04-29 12:44:30][SYSTEM]: Resources cleaned.
