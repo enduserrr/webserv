@@ -24,7 +24,7 @@ Post it with this command:
 
 curl -v http://localhost:8080/uploads \
   -H "Transfer-Encoding: chunked" \
-  --data-binary "@big.txt"
+  --data-binary "@test.txt"
 
 -------------------------------------------------------------------------
 

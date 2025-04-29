@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:43:21 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/25 09:43:12 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/29 09:12:27 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -290,7 +290,7 @@ void ConfParser::locationFallbacks(int si, Location &loc) {
     if (loc.getAllowedMethods().empty()) {
         loc.addAllowedMethod("GET");
         loc.addAllowedMethod("POST");
-        loc.addAllowedMethod("DELETE");
+        // loc.addAllowedMethod("DELETE");
     }
 }
 

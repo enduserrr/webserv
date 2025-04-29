@@ -6,15 +6,11 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/28 12:16:53 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/29 09:29:18 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "Methods.hpp"
-
-Methods::Methods() {}
-
-Methods::~Methods() {}
 
 static void replaceAll(std::string &str, const std::string &from, const std::string &to) {
     size_t startPos = 0;
@@ -124,6 +120,8 @@ std::string Methods::mGet(HttpRequest &req) {
     // ↓↓↓ DIRECTORY REQUEST ↓↓↓
     if (!uri.empty() && uri.back() == '/') {
         std::string locIndex = req.getLocation().getIndex();
+        // std::cout << RES REV_RED << "Uri method get: " << uri << RES << std::endl;
+        req.display();
         // std::cout << RES REV_RED << "Location index: " << locIndex << RES << std::endl;
         if (!locIndex.empty() && uri.length() > 1) {
             filePath = basePath + "/" + locIndex;
@@ -278,12 +276,14 @@ std::string Methods::mDelete(HttpRequest &req) {
             break;
         }
     }
-    if (fileParam.empty()) {// File parameter missing; handle error
+    if (fileParam.empty()) {
         return BAD_REQ + Logger::getInstance().logLevel("ERROR", "mDELETE: missing file parameter.", 400);
     }
 
-    std::string basePath = "www/uploads/";
+    std::string basePath = req.getRoot() + req.getLocation().getUploadStore();
     std::string filePath = basePath + fileParam;
+    std::cout << RED << filePath << RES << std::endl;
+    
 
     if (fileParam.empty()) {
         return BAD_REQ + Logger::getInstance().logLevel("ERROR", "mDELETE: empty file parameter", 400);
@@ -300,7 +300,7 @@ std::string Methods::mDelete(HttpRequest &req) {
         pos = filePath.find("%20", pos + 1);
     }
 
-    if (filePath.find("/uploads/") == std::string::npos) {
+    if (filePath.find(basePath) == std::string::npos) {
         return FORBIDDEN + Logger::getInstance().logLevel("ERROR", "Incorrect folder.", 403);
     }
 

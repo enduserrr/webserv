@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/28 13:51:07 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/29 09:02:14 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -40,11 +40,8 @@ bool ServerLoop::hasTimedOut() {
     return (currentTime - _startUpTime) >= 1800;
 }
 
-/**
- * @brief   Initializes and configs listening sockets for each port in the ServerBlocks
- *          and adds them to the poll structure.
- */
-void ServerLoop::setupServerSockets() {
+// Alt setupServerSockets
+/* void ServerLoop::setupServerSockets() {
     for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
         const std::vector<int>& ports = it->getPorts();
         for (std::vector<int>::const_iterator portIt = ports.begin(); portIt != ports.end(); ++portIt) {
@@ -97,11 +94,14 @@ void ServerLoop::setupServerSockets() {
         Logger::getInstance().logLevel("ERROR", "No server sockets were successfully set up. Exiting.", 1);
         _run = false;
     }
-}
+} */
 
 
-
-/* void ServerLoop::setupServerSockets() {
+/**
+ * @brief   Initializes and configs listening sockets for each port in the ServerBlocks
+ *          and adds them to the poll structure.
+ */
+void ServerLoop::setupServerSockets() {
     for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
         const std::vector<int>& ports = it->getPorts();
 
@@ -162,7 +162,7 @@ void ServerLoop::setupServerSockets() {
         Logger::getInstance().logLevel("ERROR", "No server sockets were successfully set up. Exiting.", 1);
         _run = false;
     }
-} */
+}
 
 bool ServerLoop::serverFull() {
      if (_clients.size() >= MAX_CLIENTS) {
@@ -171,12 +171,10 @@ bool ServerLoop::serverFull() {
         return true;
      }
     return false;
-} 
+}
 
-/**
- * @brief   Accepts a new client connection on a listening socket and sets it up (non blocking, session info).
- */
-void ServerLoop::acceptNewConnection(int serverSocket) {
+// Alt acceptNewConnection
+/* void ServerLoop::acceptNewConnection(int serverSocket) {
     if (serverFull())
         return ;
     struct sockaddr_in clientAddr;
@@ -225,11 +223,13 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
     logStream << "New client connected from " << clientIp << " on port " << localPort << " (fd: " << clientFd << ")";
     Logger::getInstance().logLevel("INFO", logStream.str(), 0);
-}
+} */
 
 
-
-/* void ServerLoop::acceptNewConnection(int serverSocket) {
+/**
+ * @brief   Accepts a new client connection on a listening socket and sets it up (non blocking, session info).
+ */
+void ServerLoop::acceptNewConnection(int serverSocket) {
     if (serverFull())
         return;
     struct sockaddr_in clientAddr;
@@ -296,12 +296,10 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     inet_ntop(AF_INET, &clientAddr.sin_addr, clientIp, INET_ADDRSTRLEN);
     logStream << "New client connected from " << clientIp << " on port " << localPort << " (fd: " << clientFd << ")";
     Logger::getInstance().logLevel("INFO", logStream.str(), 0);
-} */
+}
 
-/**
- * @brief   Reads data from a client and sends incoming requests for parsing and processing.
- */
-void ServerLoop::handleClientRequest(int clientSocket) {
+// Alt handleClientRequest
+/* void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096]; // For each recv
     ssize_t bytesRead;
     HttpParser parser(_clients[clientSocket]._block.getBodySize());
@@ -366,10 +364,12 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     }
     Logger::getInstance().resetErrorPages();
 
-}
+} */
 
-
-/* void ServerLoop::handleClientRequest(int clientSocket) {
+/**
+ * @brief   Reads data from a client and sends incoming requests for parsing and processing.
+ */
+void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096];
     ssize_t bytesRead;
     HttpParser parser(_clients[clientSocket]._block.getBodySize());
@@ -474,7 +474,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         removeClient(clientSocket);
     }
 }
-*/
+
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
         Logger::getInstance().logLevel("ERROR", "Failed to send response to client.", 1);
@@ -482,7 +482,7 @@ void    ServerLoop::sendResponse(int clientSocket, const std::string &response) 
         send(clientSocket, errorResponse.c_str(), errorResponse.size(), 0);
     }
     return ;
-} 
+}
 
 void ServerLoop::checkClientTimeouts() {
     time_t currentTime = time(nullptr);

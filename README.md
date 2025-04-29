@@ -25,31 +25,57 @@
 ## About virtual name based hosting
 Virtual name based hosting works on the server side (back end). How ever due to not having sudo permissions and being unable to modify "/etc/hosts" or DNS setting, accessing testing webstie via a browser using just the server name is not possible.
 
-## Testing
+## TESTS
+### Curl:
+* GET:
+  * curl http://127.0.0.1:8080/empty.html
+* POST:
+  * curl -v -X POST http://localhost:8080/uploads \
+          -H "Content-Type: application/x-www-form-urlencoded" \
+          --data-binary "text=Hello%20world"
 
-### FD'S:
+* CHUNKED BINARY FILE: (head -c 100000 /dev/urandom > big.txt)
+  * curl -v http://localhost:8080/uploads \
+          -H "Transfer-Encoding: chunked" \
+          --data-binary "@big.txt"
+
+* CHUNKED TEXT FILE: (yes "this is a line of text" | head -n 5000 > big.txt)
+  * curl -v http://localhost:8080/uploads \
+          -H "Transfer-Encoding: chunked" \
+          --data-binary "@test.txt"
+
+* CHUNKED TEXT/PLAIN:
+  * curl -v http://localhost:8080/uploads \
+          -H "Content-Type: text/plain" \
+          -H "Transfer-Encoding: chunked" \
+          --data-binary "hello again from plain text"
+
+* CHUNKED FORM FIELD:
+  * curl -v http://localhost:8080/uploads \
+          -H "Content-Type: application/x-www-form-urlencoded" \
+          -H "Transfer-Encoding: chunked" \
+          --data-binary "username=tester&message=chunked%20rocks"
+
+* CHUNKED MULTIPART/FORM-DATA:
+  * curl -v http://localhost:8080/uploads \
+          -H "Transfer-Encoding: chunked" \
+          -F "file=@test.txt"
+
+* VIRTUAL NAME BASED HOSTING:
+  * curl --resolve testiservu1.com:8080:127.0.0.1 http://testiservu1.com:8080
+
+* BIG HEADER:
+  * curl -v -H "Host: $(printf 'a%.0s' {1..100000}).testiservu1.com" http://127.0.0.1:8080/empty.html
+
+
+### Fd's:
 (0, 1 & 2 should be left open)
 * valgrind --leak-check=full --track-fds=yes ./webserv
 
-### SIEGE:
+### Siege:
 Stress testing with multiple clients
 * siege -b -c 10 -t 10s "http://127.0.0.1:8080/empty.html"
 * siege -b -c 10 -t 5s "http://127.0.0.1:8080/cgi-bin/guestbook_display.php"
-
-### CURL:
-* Simple GET:
-  * curl http://127.0.0.1:8080/empty.html
-
-* Simple POST:
-  * curl -v -X POST http://localhost:8080/uploads \
-        -H "Content-Type: application/x-www-form-urlencoded" \
-        --data-binary "text=Hello%20world"
-
-* Name based hosting:
-  * curl --resolve testiservu1.com:8080:127.0.0.1 http://testiservu1.com:8080
-
-* Excessive header size:
-  * curl -v -H "Host: $(printf 'a%.0s' {1..100000}).testiservu1.com" http://127.0.0.1:8080/empty.html
 
 ## Conciderations:
 * DELETE fail page (& success?) | OK!
@@ -62,17 +88,11 @@ Stress testing with multiple clients
 * "Serverloop terminated" message x4 when exiting during child process with CTRL+C | OK!
 * Check for open fd's |OK!
 * Max header(s) & url size limit (can handle atleast 100K chars but should be limited imo) OK!
+* Name based virtual hosting | OK!
+* Set a file to answer if directory requests | OK!
 
 * Briefs for ServerLoop, CgiHandler & Methods funcs
-
-* Set a file to answer if directory requests (what should it be called in config file)
 * Logger message after setting custom error page
-
-* Name based virtual hosting | OK! ()
-  * setupServerSockets
-  * acceptNewConnection
-  * handleClientRequest
-
 
 
 
