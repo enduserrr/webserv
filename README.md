@@ -95,4 +95,9 @@ Stress testing with multiple clients
 * Logger message after setting custom error page
 
 
+* Location match issue likely stems from how Location object is connected to ServerBlock object
+* Should client be preserved after req processing (clear socket or socket buffer instead of removeClient()?)
+
+
+
 

@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/29 09:29:18 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/29 09:40:09 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -282,8 +282,11 @@ std::string Methods::mDelete(HttpRequest &req) {
 
     std::string basePath = req.getRoot() + req.getLocation().getUploadStore();
     std::string filePath = basePath + fileParam;
+
     std::cout << RED << filePath << RES << std::endl;
-    
+    std::vector<std::string> aM = req.getLocation().getAllowedMethods();
+    std::cout << req.getLocation().getPath() << std::endl;
+    for (size_t i = 0; i < aM.size(); i++) { std::cout << BLUE << aM[i] << RES << std::endl; }
 
     if (fileParam.empty()) {
         return BAD_REQ + Logger::getInstance().logLevel("ERROR", "mDELETE: empty file parameter", 400);

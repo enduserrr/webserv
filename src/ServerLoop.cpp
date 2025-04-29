@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/29 09:02:14 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/29 09:53:05 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -379,11 +379,6 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) { //parse host header and reselect ServerBlock
         _clients[clientSocket].buffer.append(buffer, bytesRead);
         size_t headerEnd = _clients[clientSocket].buffer.find("\r\n\r\n");
-        // if (headerEnd > 16000) {
-        //     sendResponse(clientSocket, BAD_REQ + Logger::getInstance().logLevel("ERROR", "Header too big", 400));
-        //     removeClient(clientSocket);
-        //     return ;
-        // }
         if (headerEnd != std::string::npos) {
             std::string headers = _clients[clientSocket].buffer.substr(0, headerEnd);
             size_t hostPos = headers.find("Host: ");
@@ -422,12 +417,14 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     }
     if (bytesRead == 0) {
         removeClient(clientSocket);
+        //  _clients[clientSocket].buffer.clear();
         return;
     } else if (bytesRead < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
             return;
         }
         removeClient(clientSocket);
+        //  _clients[clientSocket].buffer.clear();
         std::ostringstream logStream;
         logStream << "Unable to read from socket: " << clientSocket;
         Logger::getInstance().logLevel("INFO", logStream.str(), 0);
@@ -469,7 +466,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         }
         Logger::getInstance().resetErrorPages();
     } else if (parser.getState() != 0) {
-        _clients[clientSocket].buffer.clear();
+        // _clients[clientSocket].buffer.clear();
         sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", parser.getState()));
         removeClient(clientSocket);
     }
