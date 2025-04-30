@@ -45,9 +45,9 @@ Logger::Logger() {
     _responses[403] = std::pair<std::string, std::string>(FORBIDDEN, " Forbidden");
     _responses[404] = std::pair<std::string, std::string>(NOT_FOUND, " Not Found");
     _responses[405] = std::pair<std::string, std::string>(NOT_ALLOWED, " Method Not Allowed");
-    _responses[408] = std::pair<std::string, std::string>(REQ_TIMEOUT, "Request Timeout");
-    _responses[415] = std::pair<std::string, std::string>(UNSUPPORTED, " Unsupported media Type");
+    _responses[408] = std::pair<std::string, std::string>(REQ_TIMEOUT, " Request Timeout");
     _responses[413] = std::pair<std::string, std::string>(TOO_LARGE, "Payload Too large");
+    _responses[415] = std::pair<std::string, std::string>(UNSUPPORTED, " Unsupported media Type");
     _responses[429] = std::pair<std::string, std::string>(REQ_LIMIT, "Too Many requests");
     _responses[500] = std::pair<std::string, std::string>(INTERNAL, "Internal Server Error");
 

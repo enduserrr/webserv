@@ -32,6 +32,7 @@ clean:
 
 fclean: clean
 	$(RM) $(NAME)
+	$(RM) .logs/*.log
 
 re: fclean all
 

@@ -33,19 +33,25 @@ void signalHandler(int signum) {
  * @return The full path to the created log file (e.g., logs/250425-143022.log).
  */
 std::string createLogFile() {
-    // Create logs/ directory if it doesn't exist
-    const std::string logDir = "logs";
-    if (mkdir(logDir.c_str(), 0755) != 0 && errno != EEXIST) {
-        Logger::getInstance().logLevel("SYSTEM", "Failed to create logs directory: " + std::string(strerror(errno)), 0);
+    const std::string logDir = ".logs";
+
+    struct stat info;
+    if (stat(logDir.c_str(), &info) != 0) {
+        if (mkdir(logDir.c_str(), 0755) != 0) {
+            Logger::getInstance().logLevel("SYSTEM", "Failed to create logs directory.", 0);
+            return "";
+        }
+    } else if (!(info.st_mode & S_IFDIR)) {
+        Logger::getInstance().logLevel("SYSTEM", "logs exists but is not a directory.", 0);
         return "";
     }
 
-    // Generate timestamp-based filename (ddmmyy-hhmmss.log)
     std::time_t now = std::time(nullptr);
     std::stringstream ss;
     ss << logDir << "/" << std::put_time(std::localtime(&now), "%d%m%y-%H%M%S.log");
     return ss.str();
 }
+
 
 /**
  * @brief Validates program arguments and sets the configuration file path.
