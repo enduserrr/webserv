@@ -113,20 +113,27 @@ bool ConfParser::serverLine(std::string &line, int &block) {
  */
 
 void ConfParser::allSetted() {
-    std::vector<int> allPorts; 
+    std::vector<std::pair<std::string, int>> usedHostPorts; 
+    std::pair<std::string, int> hostPort;
     for (size_t i = 0; i < _servers.size(); ++i) {
+        const std::vector<int>& ports = _servers[i].getPorts();
+        const std::string& host = _servers[i].getHost();
+        if (host.empty())
+            throw std::runtime_error(CONF "Missing host");  
+        if (ports.empty())
+            throw std::runtime_error(CONF "Missing port");   
         if (_servers[i].getLocations().count("/") == 0)
             throw std::runtime_error(CONF "Missing '/' location block");
-        if (_servers[i].getPorts().empty())
-            throw std::runtime_error(CONF "You need to set atleast one port per server");
-        // const std::vector<int>& ports = _servers[i].getPorts();
-        // for (size_t j = 0; j < ports.size(); ++j) {
-        //     if (std::find(allPorts.begin(), allPorts.end(), ports[j]) != allPorts.end())
-        //         throw std::runtime_error(CONF "Duplicate port used in multiple servers");
-        //     allPorts.push_back(ports[j]);
-        // }
         if (_servers[i].getRoot().empty())
             throw std::runtime_error(CONF "Root not setted (Global level)");
+
+        for (size_t j = 0; j < ports.size(); ++j) {
+            std::pair<std::string, int> combo = std::make_pair(host, ports[j]);
+            if (std::find(usedHostPorts.begin(), usedHostPorts.end(), combo) != usedHostPorts.end())
+                throw std::runtime_error(CONF "Duplicate host:port combination");
+            usedHostPorts.push_back(combo);
+        }
+
         for (std::map<std::string, Location>::iterator it = _servers[i].getLocations().begin();
                 it != _servers[i].getLocations().end(); ++it) {
             if (it->second.getRoot().empty())

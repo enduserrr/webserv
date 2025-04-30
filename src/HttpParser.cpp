@@ -503,6 +503,10 @@ const HttpRequest& HttpParser::getPendingRequest() const {
     return _request;
 }
 
+std::string HttpParser::getHeaderHost() {
+    return _headerHost; 
+}
+
 std::string HttpParser::getRedirection() const {
     return _redirTo;
 }
