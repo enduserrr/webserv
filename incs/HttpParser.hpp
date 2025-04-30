@@ -60,9 +60,7 @@ public:
     bool    convertLength(size_t &contentLength, std::string contentlengthStr);
 
     int                                 getState() const;
-    std::string                         getHeaderHost() {
-        return _headerHost; 
-    }
+    std::string                         getHeaderHost();
     std::string                         getRedirection() const;
     std::string                         getMethod() const;
     std::string                         getBody() const;
