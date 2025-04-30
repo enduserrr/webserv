@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/29 09:02:14 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/30 12:03:39 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -40,7 +40,11 @@ bool ServerLoop::hasTimedOut() {
     return (currentTime - _startUpTime) >= 1800;
 }
 
-// Alt setupServerSockets
+/**
+ * @brief   Iterates through server blocks to create, bind and set sockets to listen for each.
+ *          Maps ports to their respective server blocks.
+ *          Adds these server sockets to the polling mechanism.
+ */
 void ServerLoop::setupServerSockets() {
     for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
         const std::vector<int>& ports = it->getPorts();
@@ -90,7 +94,7 @@ void ServerLoop::setupServerSockets() {
             Logger::getInstance().logLevel("SYSTEM", logStream.str(), 0);
         }
     }
-    if (_serverSockets.empty()) {// Meaby an exception instead
+    if (_serverSockets.empty()) {
         Logger::getInstance().logLevel("ERROR", "No server sockets were successfully set up. Exiting.", 1);
         _run = false;
     }
@@ -110,7 +114,11 @@ bool ServerLoop::serverFull() {
     return false;
 }
 
-// Alt acceptNewConnection
+/**
+ * @brief   Accepts incoming client connection on a given socket,
+ *          matches it to the correct server config based on the port,
+ *          creates a client session object, and adds the socket to the polling mechanism for monitoring.
+ */
 void ServerLoop::acceptNewConnection(int serverSocket) {
     if (serverFull())
         return ;
@@ -147,7 +155,6 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
     session._block = _portToBlock[localPort]; // Assign correct ServerBlock
     session.setServerName(_portToBlock[localPort].getServerName()); // Set the server_name
     _clients[clientFd] = session;
-    // std::cout << REV_WHITE << session.getServerName() << RES << std::endl;
 
     struct pollfd pfd; // Add the new client to the poll vector.
     pfd.fd = clientFd;
@@ -168,9 +175,9 @@ void ServerLoop::acceptNewConnection(int serverSocket) {
  */
 bool ServerLoop::MatchBlockToRequest(const std::string &host, int clientSocket, HttpParser &parser) {
     for (std::vector<ServerBlock>::iterator it = _serverBlocks.begin(); it != _serverBlocks.end(); ++it) {
-        std::cout << it->getHost() << "|" << host << std::endl; 
+        // std::cout << it->getHost() << "|" << host << std::endl;
         if (it->getHost() == host) {
-            std::cout << "HOST MATCHED!!\n\n" << std::endl;
+            // std::cout << "HOST MATCHED!!\n\n" << std::endl;
             _clients[clientSocket]._block = *it; 
             Logger::getInstance().checkErrorPages(_clients[clientSocket]._block);
             parser.setBodySizeLimit(_clients[clientSocket]._block.getBodySize());
@@ -180,7 +187,11 @@ bool ServerLoop::MatchBlockToRequest(const std::string &host, int clientSocket, 
     return false; 
 }
 
-// Alt handleClientRequest
+/**
+ * @brief   Reads data from a client socket, buffers it, and sends it to be parsed and provessed as a HttpRequest.
+ *          Handles partial reads, matches the request to a server block (if needed), applies rate limiting, processes the valid request via a router,
+ *          sends the corresponding response (or an error/redirection), and cleans up the client connection.
+ */
 void ServerLoop::handleClientRequest(int clientSocket) {
     char buffer[4096]; // For each recv
     ssize_t bytesRead;
@@ -231,6 +242,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         }
     }
     if (_clients[clientSocket].requestLimiter()) {
+        std::cout << RES REV_RED << "REQUEST LIMIT, RM CLIENT" << RES << std::endl;
         sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", 429));
         removeClient(clientSocket);
         return ;
@@ -241,6 +253,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         std::string response = Router::getInstance().routeRequest(_clients[clientSocket].request);
         sendResponse(clientSocket, response);
         removeClient(clientSocket);
+
     } else {
         int state = parser.getState();
         if (state == 301 || state == 302)
@@ -250,13 +263,11 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         removeClient(clientSocket);
     }
     Logger::getInstance().resetErrorPages();
-
 }
 
 /**
  * @brief   Reads data from a client and sends incoming requests for parsing and processing.
  */
-
 void    ServerLoop::sendResponse(int clientSocket, const std::string &response) {
     if (send(clientSocket, response.c_str(), response.size(), 0) < 0) {
         Logger::getInstance().logLevel("ERROR", "Failed to send response to client.", 1);

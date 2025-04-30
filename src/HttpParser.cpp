@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/10 21:28:04 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/30 10:37:57 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -157,7 +157,6 @@ void HttpParser::matchRoute(ServerBlock &b, HttpRequest &req) {
 
 bool HttpParser::methodAllowed(HttpRequest &req) {
     const std::vector<std::string>& allowed = req.getLocation().getAllowedMethods();
-    std::cout << "methodAllowed host: "<< _headerHost <<  "end" <<std::endl;
     if (std::find(allowed.begin(), allowed.end(), req.getMethod()) == allowed.end()) {
         _state = 405;
         return false;

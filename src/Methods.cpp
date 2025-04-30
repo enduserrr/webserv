@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/29 09:29:18 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/30 11:48:36 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -20,12 +20,16 @@ static void replaceAll(std::string &str, const std::string &from, const std::str
     }
 }
 
+/**
+ * @brief   Generates a directory listing using a template file or a fallback
+ *          if template isn't available.
+ */
 std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
     std::ifstream templateFile("www/files.html");
 
     // ↓↓↓ FALLBACK FILE IF TEMPLATE'S MISSING ↓↓↓
     if (!templateFile) {
-        // std::cout << "FALLBACK FILE" << std::endl;
+        Logger::getInstance().logLevel("INFO", "Dir listing template file not found, trying to use fallback", 0);
         std::ostringstream fallback;
         fallback << "<html><head><title>" << uri << "</title></head><body>"
                  << "<h1>Index of " << uri << "</h1><ul>";
@@ -86,6 +90,10 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
     return templateHtml;
 }
 
+/**
+ * @brief   Process GET request, identify directory listing requests,
+ *          permissions and potential preset file to return instead of dir listing.
+ */
 std::string Methods::mGet(HttpRequest &req) {
     std::string uri = req.getUri();
     if (uri.length() >= 4 && uri.substr(uri.length() - 4) == ".ico") {
@@ -105,7 +113,7 @@ std::string Methods::mGet(HttpRequest &req) {
             isDirectory = true;
         } else {
             std::ostringstream logStream;
-            logStream << "Filepath: " << filePath << " exists (isn't a dir).";
+            logStream << "Filepath: " << filePath << " exists (not a dir)";
             Logger::getInstance().logLevel("INFO", logStream.str(), 0);
         }
     } else {
@@ -166,6 +174,10 @@ std::string Methods::mGet(HttpRequest &req) {
     return responseStream.str();
 }
 
+/**
+ * @brief   POST request handling using uploadReturnPath. In case of a file adds a index number
+ *          to the upload filename avoid dups.
+ */
 std::string Methods::mPost(HttpRequest &req) {
     std::string body = req.getBody();
     if (body.empty())
@@ -265,7 +277,7 @@ std::string Methods::mPost(HttpRequest &req) {
 }
 
 /**
- * @brief   Delete
+ * @brief   DELETE request handling.
  */
 std::string Methods::mDelete(HttpRequest &req) {
     std::map<std::string, std::string> queryMap = req.getUriQuery();
@@ -313,10 +325,10 @@ std::string Methods::mDelete(HttpRequest &req) {
         return INTERNAL + Logger::getInstance().logLevel("ERROR", "Failed to delete file.", 500);
     }
 
-std::ostringstream deleteResponse;
-deleteResponse << "HTTP/1.1 200 OK\r\n"
-               << "Content-Length: 0\r\n"
-               << "Content-Type: text/html\r\n"
-               << "\r\n";
-return deleteResponse.str();
+    std::ostringstream deleteResponse;
+    deleteResponse << "HTTP/1.1 200 OK\r\n"
+                << "Content-Length: 0\r\n"
+                << "Content-Type: text/html\r\n"
+                << "\r\n";
+    return deleteResponse.str();
 }

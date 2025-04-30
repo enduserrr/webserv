@@ -63,6 +63,7 @@ Virtual name based hosting works on the server side (back end). How ever due to 
 
 * VIRTUAL NAME BASED HOSTING:
   * curl --resolve testiservu1.com:8080:127.0.0.1 http://testiservu1.com:8080
+  * curl --resolve testiservu1.com:8080:127.0.0.1 http://testiservu1.com:8080/cgi-bin/guestbook_display.php
 
 * BIG HEADER:
   * curl -v -H "Host: $(printf 'a%.0s' {1..100000}).testiservu1.com" http://127.0.0.1:8080/empty.html
@@ -90,9 +91,7 @@ Stress testing with multiple clients
 * Max header(s) & url size limit (can handle atleast 100K chars but should be limited imo) OK!
 * Name based virtual hosting | OK!
 * Set a file to answer if directory requests | OK!
-
-* Briefs for ServerLoop, CgiHandler & Methods funcs
-* Logger message after setting custom error page
+* Briefs for ServerLoop, CgiHandler & Methods funcs | OK!
 
 
 

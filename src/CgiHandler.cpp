@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/25 10:39:55 by asalo            ###   ########.fr       */
+/*   Updated: 2025/04/30 11:56:22 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -16,6 +16,10 @@ CgiHandler::CgiHandler() {}
 
 CgiHandler::~CgiHandler() {}
 
+/**
+ * @brief   Entry point that gets the script path
+ *          and calls executeCgi to handle the request.
+ */
 std::string CgiHandler::processRequest(HttpRequest &req) {
     std::string uri = req.getUri();
     std::string script = req.getRoot() + req.getUri();
@@ -23,6 +27,11 @@ std::string CgiHandler::processRequest(HttpRequest &req) {
     return cgiOutput;
 }
 
+/**
+ * @brief   Creates a vector of standard CGI environment
+ *          variable strings based on the HttpRequest.
+ *          ENV's used to pass request info to the script processing
+ */
 std::vector<std::string> CgiHandler::buildCgiEnvironment(HttpRequest &req) {
     std::vector<std::string> env;
     env.push_back("REQUEST_METHOD=" + req.getMethod());
@@ -35,6 +44,10 @@ std::vector<std::string> CgiHandler::buildCgiEnvironment(HttpRequest &req) {
     return env;
 }
 
+/**
+ * @brief   Converts the C++ vector of environment strings to
+ *          the char array format as required by execve.
+ */
 char **CgiHandler::convertEnvVectorToArray(const std::vector<std::string> &env) {
     char **envp = new char*[env.size() + 1];
     for (size_t i = 0; i < env.size(); ++i) {
@@ -44,13 +57,17 @@ char **CgiHandler::convertEnvVectorToArray(const std::vector<std::string> &env) 
     return envp;
 }
 
+/**
+ * @brief   Executes the script using fork/execve and pipes.
+ *          Manages environment/POST data, reads the script's output,
+ *          and builds the full HTTP response.
+ */
 std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &req) {
     std::vector<std::string> envVector = buildCgiEnvironment(req);
     envVector[1] = "SCRIPT_FILENAME=" + scriptPath;
     char **envp = convertEnvVectorToArray(envVector);
 
     std::string phpExecutable = "/usr/bin/php-cgi";
-    // std::cout << "PHP executable: " << phpExecutable << std::endl;
     if (access(phpExecutable.c_str(), X_OK) != 0) {
         for (size_t i = 0; i < envVector.size(); ++i) free(envp[i]);
         delete[] envp;
@@ -88,7 +105,6 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
     close(pipe_in[0]);
     close(pipe_out[1]);
     if (req.getMethod() == "POST" && !req.getBody().empty()) {
-        // std::cout << "Writing POST body: " << req.getBody() << std::endl;
         ssize_t bytes_written = write(pipe_in[1], req.getBody().c_str(), req.getBody().size());
         if (bytes_written == -1) {
             Logger::getInstance().logLevel("ERROR", "ExecuteCgi: write failed (bytes_written == -1)", 0);
@@ -119,8 +135,6 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
     for (size_t i = 0; i < envVector.size(); ++i) free(envp[i]);
     delete[] envp;
 
-    // std::ostringstream responseStream;
-    // responseStream << "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n" << cgiOutput;
     std::string mimeType = Types::getInstance().getMimeType(cgiOutput);
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 200 OK\r\n"
