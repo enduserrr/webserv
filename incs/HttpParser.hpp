@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:45:10 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/10 21:29:14 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/01 16:07:46 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -69,9 +69,7 @@ public:
     const HttpRequest&                  getPendingRequest() const;
     std::map<std::string, std::string>  getQueryString() const;
 
-    void                                setBodySizeLimit(size_t size) {
-        _maxBodySize = size; 
-    } 
+    void                                setBodySizeLimit(size_t size);
 
 };
 

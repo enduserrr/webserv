@@ -19,3 +19,6 @@
 
 ## About virtual name based hosting
 Virtual name based hosting works on the server side (back end). How ever, due to not having sudo permissions modifying "/etc/hosts" or DNS setting isn't possible, and therefore accessing website via a browser using just the server name is not possible.
+
+# About restrictions
+As per requirements the program isn't allowed to check errno after any read or write operations. This is of course rather contradictory and highly unusual compared to standard practice for robust error handling.

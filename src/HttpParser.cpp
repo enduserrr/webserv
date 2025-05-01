@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/30 10:37:57 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/01 16:07:35 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -498,6 +498,10 @@ bool HttpParser::createRequest(ServerBlock &block, HttpRequest &req) {
     _request = req;
     return true;
 }
+
+void HttpParser::setBodySizeLimit(size_t size) {
+    _maxBodySize = size; 
+} 
 
 const HttpRequest& HttpParser::getPendingRequest() const {
     return _request;

@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/30 12:03:39 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/01 16:30:49 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -214,15 +214,27 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             return ;
         }
     }
+/*     if (bytesRead <= 0) { // Logger output when recv returns 0 or -1
+        int current_errno = (bytesRead < 0) ? errno : 0; // Get errno *immediately* if bytesRead < 0
+        std::cerr << "DEBUG: recv returned: " << bytesRead;
+        if (current_errno != 0) {
+            std::cerr << ", errno=" << current_errno << " (" << strerror(current_errno) << ")";
+        }
+        std::cerr << " for socket: " << clientSocket << std::endl;
+   } */
 
-    if (bytesRead == 0) {
+   /**
+    * @brief    Not checking EAGAIN or EWOULDBLOCK ("no data right now")
+    *           due to errno checks after read/write are forbidden.
+    *
+    *           poll() handles read errors, if recv return < 0 as per non blocking requirement
+    *           control is returned back to server loop.
+    */
+   if (bytesRead == 0) {
         removeClient(clientSocket);
         return ;
-    } else if (bytesRead < 0) {
-        std::ostringstream logStream;
-        logStream << "Unable to read from socket: " << clientSocket;
-        Logger::getInstance().logLevel("INFO", logStream.str(), 0);
-        removeClient(clientSocket);
+    }
+    else if (bytesRead < 0) {
         return ;
     }
 
