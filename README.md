@@ -22,3 +22,6 @@ Virtual name based hosting works on the server side (back end). How ever, due to
 
 # About restrictions
 As per requirements the program isn't allowed to check errno after any read or write operations. This is of course rather contradictory and highly unusual compared to standard practice for robust error handling.
+
+## Last fixes:
+* CGI timeout in child process

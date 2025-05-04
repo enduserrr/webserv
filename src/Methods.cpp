@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/30 11:48:36 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/04 14:25:06 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -280,6 +280,7 @@ std::string Methods::mPost(HttpRequest &req) {
  * @brief   DELETE request handling.
  */
 std::string Methods::mDelete(HttpRequest &req) {
+    // req.display();
     std::map<std::string, std::string> queryMap = req.getUriQuery();
     std::string fileParam;
     for (std::map<std::string, std::string>::const_iterator it = queryMap.begin(); it != queryMap.end(); ++it) {

@@ -1,0 +1,1 @@
+<?php trigger_error("Fatal Error", E_USER_ERROR);

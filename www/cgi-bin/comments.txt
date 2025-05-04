@@ -7,3 +7,4 @@ asd: asd
 df: asd
 ee: ee
 d: sd
+TestUser: Hello from curl
