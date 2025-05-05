@@ -13,6 +13,9 @@
 #include "Logger.hpp"
 #include "ServerBlock.hpp"
 
+/**
+ * @brief   Load content from a file.
+ */
 std::string Logger::loadFileContent(const std::string &filePath) {
     std::ifstream file(filePath.c_str());
     if (!file) {
@@ -24,6 +27,10 @@ std::string Logger::loadFileContent(const std::string &filePath) {
     return ss.str();
 }
 
+/**
+ * @brief   Logger consructor. Sets error pages to matching files or
+ *          to defaults if not found.
+ */
 Logger::Logger() {
     _state = 0;
     std::string baseDir = "www/error_pages/";
@@ -73,6 +80,9 @@ Logger::Logger() {
         _defaultErrorPage = "<html><body><h1>Error</h1><p>An error occurred.</p></body></html>";
 }
 
+/**
+ * @brief   Singleton class instance getter.
+ */
 Logger &Logger::getInstance() {
     static Logger instance;
     return instance;
@@ -84,11 +94,13 @@ std::string Logger::getCurrentTimestamp() const{
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
-    // Use std::gmtime for UTC or std::localtime for local time
     ss << std::put_time(std::localtime(&now_c), "%Y-%m-%d %H:%M:%S");
     return ss.str();
 }
 
+/**
+ * @brief Set the file used for saving logger output.
+ */
 void Logger::setLogFile(const std::string &filePath) {
     if (_logFile.is_open()) {
         _logFile.close();
@@ -99,46 +111,9 @@ void Logger::setLogFile(const std::string &filePath) {
     }
 }
 
-// std::string Logger::logLevel(std::string level, const std::string &message, int code) {
-//     if (level == "INFO") {
-//         _state = code;
-//         std::cout << GB << "[" << getCurrentTimestamp() << "]" << GREEN << "[INFO]: " << RES GREY << message << std::endl;
-//         return std::string();
-//     }
-//     else if (level == "WARNING") {
-//         _state = code;
-//         std::cout << GB << "[" << getCurrentTimestamp() << "]" << YELLOW << "[WARN]: " << RES GREY << message << std::endl;
-//         return std::string();
-//     }
-//     else if (level == "ERROR") {
-//         _state = 1;
-//         if (message.empty()) {
-//             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << getMessage(code) << std::endl;
-//             return _responses[code].first + getErrorPage(code);
-//         }
-//         else
-//             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << message << std::endl;
-//         return getErrorPage(code);
-//     }
-//     else if (level == "REDIR") {
-//         _state = 1;
-//         std::string redirPage = loadFileContent("www" + message);
-//         if (redirPage.empty()) {
-//             std::cerr << GB << "[" << getCurrentTimestamp() << "]" << RED << "[ERROR]: " << RES << "Redir page" << getMessage(404) << std::endl;
-//             return _responses[404].first + _errorPages[404];
-//         }
-//         std::cerr << GB << "[" << getCurrentTimestamp() << "]" << YELLOW << "[REDIR]: " << RES << message  << ": " << getMessage(code) << std::endl;  
-//         return _responses[code].first + redirPage;
-//     }
-//     else if (level == "SYSTEM") {
-//         _state = code;
-//         std::cout << GB << "[" << getCurrentTimestamp() << "]" << RES F_WHITE << "[SYSTEM]: " << RES GREY << message << RES << std::endl;
-//         return std::string();
-//     }
-//     std::cerr << GB << "[" << getCurrentTimestamp() << "] " << REV_RED << "[MYSTERY_ERROR?]: " << RES << "UNKNOW ERROR" << std::endl;
-//     return getErrorPage(code);
-// }
-
+/**
+ * @brief   Output a timestamped log message to cout/cerr & log file based on the given log level.
+ */
 std::string Logger::logLevel(std::string level, const std::string &message, int code) {
     std::string logMessage; // To store the message for file output
 
@@ -222,6 +197,9 @@ std::string Logger::logLevel(std::string level, const std::string &message, int 
     return getErrorPage(code);
 }
 
+/**
+ * @brief   Return a page matching to the int given as a parameter and default if no match.
+ */
 std::string Logger::getErrorPage(int code) {
     if (_errorPages.find(code) != _errorPages.end()) {
         return _errorPages[code];
@@ -229,10 +207,16 @@ std::string Logger::getErrorPage(int code) {
     return _defaultErrorPage;
 }
 
+/**
+ * @brief   Set new page content for error paged specified by code.
+ */
 void Logger::setCustomErrorPage(int code, const std::string &pageContent) {
     _errorPages[code] = pageContent;
 }
 
+/**
+ * @brief   Gets the message assigned to a given HTML status.
+ */
 std::string Logger::getMessage(int code) {
     if (_responses.find(code) != _responses.end()) {
         return _responses[code].second;
@@ -240,7 +224,7 @@ std::string Logger::getMessage(int code) {
     return "";
 }
 
-void        Logger::checkErrorPages(ServerBlock &block) {
+void Logger::checkErrorPages(ServerBlock &block) {
     for (std::map<int, std::string>::iterator it = block.getErrorPages().begin(); it != block.getErrorPages().end(); ++it) {
         int code = it->first;
         const std::string& fileName = it->second;
@@ -248,6 +232,9 @@ void        Logger::checkErrorPages(ServerBlock &block) {
     }
 }
 
-void        Logger::resetErrorPages() {
+/**
+ * @brief   Sets error pages back to defaults.
+ */
+void Logger::resetErrorPages() {
     _errorPages = _defaultErrorPages;
 }

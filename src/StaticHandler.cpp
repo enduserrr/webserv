@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   StaticHandler.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asalo <asalo@student.42.fr>                +#+  +:+       +#+        */
+/*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 11:41:08 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/13 13:26:34 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:09:56 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -16,6 +16,9 @@ StaticHandler::StaticHandler() {};
 
 StaticHandler::~StaticHandler() {};
 
+/**
+ * @brief   Calls for correct function to handle the static request being processed.
+ */
 std::string StaticHandler::processRequest(HttpRequest &req) {
     std::string uri = req.getUri();
     std::string method = req.getMethod();

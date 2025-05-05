@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/05/05 12:56:15 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:34:52 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -98,7 +98,7 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
         dup2(pipe_in[0], STDIN_FILENO); dup2(pipe_out[1], STDOUT_FILENO);
         close(pipe_in[1]); close(pipe_out[0]); close(pipe_in[0]); close(pipe_out[1]);
         execve(phpExecutable.c_str(), const_cast<char* const*>(args.data()), envp);
-        std::cerr << "CGI execve failed for " << scriptPath << std::endl;
+        Logger::getInstance().logLevel("ERROR", "CGI execve failed for " + scriptPath, 500);
         exit(EXIT_FAILURE);
     }
 
@@ -112,7 +112,7 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
              bytes_written = write(pipe_in[1], body_ptr + total_written, body_size - total_written);
              if (bytes_written <= 0) {
                  if (bytes_written < 0) Logger::getInstance().logLevel("ERROR", "CGI write to pipe_in failed", 0);
-                 break;
+                 break ;
              }
              total_written += bytes_written;
         }
@@ -129,22 +129,22 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
     time_t startTime = time(nullptr);
     const time_t cgiTimeoutSeconds = 5;
 
-    // Loop combining reading and checking child status/timeout
+     // ↓↓↓ READ & CHECK CHILD STATUS/TIMEOUT ↓↓↓
     while (true) {
-        // 1. Check overall timeout
+        // 1. Overall timeout
         if (!timedOut && (time(nullptr) - startTime >= cgiTimeoutSeconds)) {
             Logger::getInstance().logLevel("WARNING", "CGI script timed out", 504);
             kill(pid, SIGKILL); // Kill the child process forcefully
             timedOut = true;
         }
-        // 2. Check if child has exited (non-blocking)
+        // 2. Has child has exited (non-blocking)
         int wait_ret = waitpid(pid, &status, WNOHANG);
         if (wait_ret == pid) {
             childExited = true;
-            break;
-        } else if (wait_ret < 0 && errno != ECHILD) {
-            Logger::getInstance().logLevel("ERROR", "waitpid(WNOHANG) failed during CGI loop", 500);
-            break ; // errno not after read/write 
+            break ;
+        } else if (wait_ret < 0) {
+            Logger::getInstance().logLevel("ERROR", "Error during CGI loop", 500);
+            break ;
         }
         // 3. Poll the read pipe with short timeout
         struct pollfd pfd; pfd.fd = pipe_out[0]; pfd.events = POLLIN;

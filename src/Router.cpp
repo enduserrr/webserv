@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:02:16 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/30 11:59:34 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:07:59 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -21,6 +21,9 @@ Router& Router::getInstance() {
 
 Router::~Router() {}
 
+/**
+ * @brief   Routes the request being processed to either cgi or static handler
+ */
 std::string Router::routeRequest(HttpRequest &req) {
     std::string uri = req.getUri();
 /*     std::cout << "==== DEBUG =====" <<std::endl; 
@@ -31,7 +34,6 @@ std::string Router::routeRequest(HttpRequest &req) {
     std::cout << "Allowed Methods: " << req.getLocation().getAllowedMethods()[0] << " "<< req.getLocation().getAllowedMethods()[1] << std::endl;
     std::cout << "==== DEBUG END=====" <<std::endl; */
 
-    // Handle CGI or static request
     if (uri.find("/cgi-bin/") == 0 || (uri.size() >= 4 && uri.substr(uri.size() - 4) == ".php")) {
         CgiHandler cgiHandler;
         return cgiHandler.processRequest(req);

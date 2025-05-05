@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:19:46 by asalo             #+#    #+#             */
-/*   Updated: 2025/05/01 16:30:49 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:31:42 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -108,7 +108,7 @@ void ServerLoop::setupServerSockets() {
 bool ServerLoop::serverFull() {
      if (_clients.size() >= MAX_CLIENTS) {
         Logger::getInstance().logLevel("INFO", "Server if full! Rejecting new clients", 0);
-        std::cerr << GC "clients: " << _clients.size() << RES << std::endl;
+        // std::cerr << GC "clients: " << _clients.size() << RES << std::endl;
         return true;
      }
     return false;
@@ -200,7 +200,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
     while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
         _clients[clientSocket].buffer.append(buffer, bytesRead);
         if (parser.isFullRequest(_clients[clientSocket].buffer, bytesRead)) {
-            std::cout << parser.getHeaderHost() << " " << matched << std::endl; 
+            // std::cout << parser.getHeaderHost() << " " << matched << std::endl;
             if (!matched && !parser.getHeaderHost().empty())
                 matched = MatchBlockToRequest(parser.getHeaderHost(), clientSocket, parser);
             break ;
@@ -214,15 +214,6 @@ void ServerLoop::handleClientRequest(int clientSocket) {
             return ;
         }
     }
-/*     if (bytesRead <= 0) { // Logger output when recv returns 0 or -1
-        int current_errno = (bytesRead < 0) ? errno : 0; // Get errno *immediately* if bytesRead < 0
-        std::cerr << "DEBUG: recv returned: " << bytesRead;
-        if (current_errno != 0) {
-            std::cerr << ", errno=" << current_errno << " (" << strerror(current_errno) << ")";
-        }
-        std::cerr << " for socket: " << clientSocket << std::endl;
-   } */
-
    /**
     * @brief    Not checking EAGAIN or EWOULDBLOCK ("no data right now")
     *           due to errno checks after read/write are forbidden.
@@ -254,7 +245,7 @@ void ServerLoop::handleClientRequest(int clientSocket) {
         }
     }
     if (_clients[clientSocket].requestLimiter()) {
-        std::cout << RES REV_RED << "REQUEST LIMIT, RM CLIENT" << RES << std::endl;
+        // std::cout << RES REV_RED << "REQUEST LIMIT, RM CLIENT" << RES << std::endl;
         sendResponse(clientSocket, Logger::getInstance().logLevel("ERROR", "", 429));
         removeClient(clientSocket);
         return ;

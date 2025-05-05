@@ -6,12 +6,15 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/05/04 14:25:06 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:04:21 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "Methods.hpp"
 
+/**
+ * @brief   Replaces all occurrences of a substr in a str with another substr.
+ */
 static void replaceAll(std::string &str, const std::string &from, const std::string &to) {
     size_t startPos = 0;
     while ((startPos = str.find(from, startPos)) != std::string::npos) {
@@ -21,8 +24,8 @@ static void replaceAll(std::string &str, const std::string &from, const std::str
 }
 
 /**
- * @brief   Generates a directory listing using a template file or a fallback
- *          if template isn't available.
+ * @brief   Creates an HTML directory listing page, using a template or fallback.
+ *          (Del buttons for testing purposes)
  */
 std::string Methods::generateDirectoryListing(const std::string &directoryPath, const std::string &uri) {
     std::ifstream templateFile("www/files.html");
@@ -34,9 +37,8 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
         fallback << "<html><head><title>" << uri << "</title></head><body>"
                  << "<h1>Index of " << uri << "</h1><ul>";
         DIR *dir = opendir(directoryPath.c_str());
-        if (!dir) {
+        if (!dir)
             return "";
-        }
         struct dirent *entry;
         while ((entry = readdir(dir)) != nullptr) {
             std::string name = entry->d_name;
@@ -60,9 +62,8 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
     // ↓↓↓ GENERATE DIR LISTING FROM THE DIR CONTENTS ↓↓↓
     std::ostringstream itemsStream;
     DIR *dir = opendir(directoryPath.c_str());
-    if (!dir) {
+    if (!dir)
         return "";
-    }
     struct dirent *entry;
     while ((entry = readdir(dir)) != nullptr) {
         std::string name = entry->d_name;
@@ -91,22 +92,22 @@ std::string Methods::generateDirectoryListing(const std::string &directoryPath, 
 }
 
 /**
- * @brief   Process GET request, identify directory listing requests,
- *          permissions and potential preset file to return instead of dir listing.
+ * @brief   Process GET requests by serving files or a dir listing of a directory
+ *          based on requested resource and configuration settings. (Or error page)
  */
 std::string Methods::mGet(HttpRequest &req) {
     std::string uri = req.getUri();
     if (uri.length() >= 4 && uri.substr(uri.length() - 4) == ".ico") {
         std::string newUri = req.getHeader("Referer");
-        if (newUri.find("/uploads/") != std::string::npos) {
+        if (newUri.find("/uploads/") != std::string::npos)
             uri = "/uploads/";
-        }
     }
 
     std::string basePath = req.getLocation().getRoot();
     std::string filePath = basePath + uri;
     struct stat st;
     bool isDirectory = false;
+    
     // ↓↓↓ CHECK IF IT'S A DIRECTORY ↓↓↓
     if (stat(filePath.c_str(), &st) == 0) {
         if (S_ISDIR(st.st_mode)) {
@@ -128,13 +129,9 @@ std::string Methods::mGet(HttpRequest &req) {
     // ↓↓↓ DIRECTORY REQUEST ↓↓↓
     if (!uri.empty() && uri.back() == '/') {
         std::string locIndex = req.getLocation().getIndex();
-        // std::cout << RES REV_RED << "Uri method get: " << uri << RES << std::endl;
-        // req.display();
-        // std::cout << RES REV_RED << "Location index: " << locIndex << RES << std::endl;
         if (!locIndex.empty() && uri.length() > 1) {
             filePath = basePath + "/" + locIndex;
             Logger::getInstance().logLevel("INFO", "Returning predefined index page", 0);
-            // std::cout << RES REV_RED << "New filePath: " << filePath << RES << std::endl;
         } else if (isDirectory && req.getLocation().getAutoIndex() == true && uri.length() >= 2) {
             std::string listing = generateDirectoryListing(filePath, uri);
             if (!listing.empty()) {
@@ -175,8 +172,8 @@ std::string Methods::mGet(HttpRequest &req) {
 }
 
 /**
- * @brief   POST request handling using uploadReturnPath. In case of a file adds a index number
- *          to the upload filename avoid dups.
+ * @brief   Handles POST requests, manages file uploads via UploadHandler,
+ *          checks for and resolves duplicate filenames, and returns a success page.
  */
 std::string Methods::mPost(HttpRequest &req) {
     std::string body = req.getBody();
@@ -199,16 +196,14 @@ std::string Methods::mPost(HttpRequest &req) {
         std::string fullPath = uploadDir + fileName;
         bool fileExists = false;
         DIR* dir = opendir(uploadDir.c_str());
-        if (!dir) {
+        if (!dir)
             return INTERNAL + Logger::getInstance().logLevel("ERROR", "mPOST: failed to open directory.", 500);
-        }
         struct dirent* entry;
         // ↓↓↓ SKIP IF STARTS WITH '.' & '..' ↓↓↓
         while ((entry = readdir(dir)) != nullptr) {
             std::string entryName = entry->d_name;
-            if (entryName == "." || entryName == "..") {
+            if (entryName == "." || entryName == "..")
                 continue ;
-            }
             if (entryName == fileName) {
                 fileExists = true;
                 break ;
@@ -231,9 +226,8 @@ std::string Methods::mPost(HttpRequest &req) {
                 // Check if new name has duplicates
                 fileExists = false;
                 dir = opendir(uploadDir.c_str());
-                if (!dir) {
+                if (!dir)
                     return INTERNAL + Logger::getInstance().logLevel("ERROR", "Failed to reopen directory", 500);
-                }
                 while ((entry = readdir(dir)) != nullptr) {
                     if (std::string(entry->d_name) == newFileName) {
                         fileExists = true;
@@ -249,9 +243,8 @@ std::string Methods::mPost(HttpRequest &req) {
                     newFullPath = uploadDir + newFileName;
                 }
             }
-            if (rename(uploadedFilePath.c_str(), newFullPath.c_str()) != 0) {
+            if (rename(uploadedFilePath.c_str(), newFullPath.c_str()) != 0)
                 return INTERNAL + Logger::getInstance().logLevel("ERROR", "Failed to rename file.", 500);
-            }
             uploadedFilePath = newFullPath;
         }
     }
@@ -277,10 +270,10 @@ std::string Methods::mPost(HttpRequest &req) {
 }
 
 /**
- * @brief   DELETE request handling.
+ * @brief   Processes DELETE requests, extracts filename from query,
+ *          validates path, removes the file, and returns a response.
  */
 std::string Methods::mDelete(HttpRequest &req) {
-    // req.display();
     std::map<std::string, std::string> queryMap = req.getUriQuery();
     std::string fileParam;
     for (std::map<std::string, std::string>::const_iterator it = queryMap.begin(); it != queryMap.end(); ++it) {
@@ -289,18 +282,14 @@ std::string Methods::mDelete(HttpRequest &req) {
             break;
         }
     }
-    if (fileParam.empty()) {
+    if (fileParam.empty())
         return BAD_REQ + Logger::getInstance().logLevel("ERROR", "mDELETE: missing file parameter.", 400);
-    }
 
     std::string basePath = req.getRoot() + req.getLocation().getUploadStore();
     std::string filePath = basePath + fileParam;
-    // std::cout << RED << filePath << RES << std::endl;
-    
 
-    if (fileParam.empty()) {
+    if (fileParam.empty())
         return BAD_REQ + Logger::getInstance().logLevel("ERROR", "mDELETE: empty file parameter", 400);
-    }
 
     std::ostringstream logStream;
     logStream << "File to be deleted: " << filePath;
@@ -313,18 +302,15 @@ std::string Methods::mDelete(HttpRequest &req) {
         pos = filePath.find("%20", pos + 1);
     }
 
-    if (filePath.find(basePath) == std::string::npos) {
+    if (filePath.find(basePath) == std::string::npos)
         return FORBIDDEN + Logger::getInstance().logLevel("ERROR", "Incorrect folder.", 403);
-    }
 
     struct stat st;
-    if (stat(filePath.c_str(), &st) != 0) { // Check if the file exists
+    if (stat(filePath.c_str(), &st) != 0) // Check if the file exists
         return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "File does not exist.", 404);
-    }
 
-    if (remove(filePath.c_str()) != 0) { // Try delete
+    if (remove(filePath.c_str()) != 0) // Try delete
         return INTERNAL + Logger::getInstance().logLevel("ERROR", "Failed to delete file.", 500);
-    }
 
     std::ostringstream deleteResponse;
     deleteResponse << "HTTP/1.1 200 OK\r\n"
