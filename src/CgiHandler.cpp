@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/05/04 14:24:40 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/05 12:56:15 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -57,26 +57,22 @@ char **CgiHandler::convertEnvVectorToArray(const std::vector<std::string> &env) 
     return envp;
 }
 
-/**
- * @brief   Executes the script using fork/execve and pipes.
- *          Manages environment/POST data, reads the script's output,
- *          and builds the full HTTP response.
- */
 std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &req) {
     std::vector<std::string> envVector = buildCgiEnvironment(req);
+    size_t queryPos = req.getUri().find('?');
+    envVector[2] = (queryPos != std::string::npos) ? ("QUERY_STRING=" + req.getUri().substr(queryPos + 1)) : "QUERY_STRING=";
     envVector[1] = "SCRIPT_FILENAME=" + scriptPath;
     char **envp = convertEnvVectorToArray(envVector);
-
-    std::string phpExecutable = "/usr/bin/php-cgi";
+    std::string phpExecutable = "/usr/bin/php-cgi"; // Consider making configurable
     if (access(phpExecutable.c_str(), X_OK) != 0) {
-        for (size_t i = 0; i < envVector.size(); ++i) free(envp[i]);
+        for (size_t i = 0; envp[i] != nullptr; ++i) free(envp[i]);
         delete[] envp;
-        return INTERNAL + Logger::getInstance().logLevel("ERROR", "Access issue", 500);
+        return INTERNAL + Logger::getInstance().logLevel("ERROR", "CGI executable access issue", 500);
     }
-    if (access(scriptPath.c_str(), F_OK) != 0) {
-        for (size_t i = 0; i < envVector.size(); ++i) free(envp[i]);
+    if (access(scriptPath.c_str(), R_OK) != 0) {
+        for (size_t i = 0; envp[i] != nullptr; ++i) free(envp[i]);
         delete[] envp;
-        return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "Script path", 404);
+        return NOT_FOUND + Logger::getInstance().logLevel("ERROR", "Script path not found or unreadable", 404);
     }
 
     std::vector<const char*> args;
@@ -86,63 +82,141 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
 
     int pipe_in[2], pipe_out[2];
     if (pipe(pipe_in) == -1 || pipe(pipe_out) == -1) {
-        for (size_t i = 0; i < envVector.size(); ++i) free(envp[i]);
+        for (size_t i = 0; envp[i] != nullptr; ++i) free(envp[i]);
         delete[] envp;
-        return INTERNAL + Logger::getInstance().logLevel("ERROR", "Pipe", 500);
+        return INTERNAL + Logger::getInstance().logLevel("ERROR", "Pipe creation failed", 500);
     }
 
     pid_t pid = fork();
-    if (pid == 0) {
-        dup2(pipe_in[0], STDIN_FILENO);
-        dup2(pipe_out[1], STDOUT_FILENO);
-        close(pipe_in[1]); close(pipe_out[0]);
-        close(pipe_in[0]); close(pipe_out[1]);
-        execve(phpExecutable.c_str(), const_cast<char* const*>(args.data()), envp);
-        std::cerr << "execve failed: " << strerror(errno) << std::endl;
-        exit(1);
+    if (pid == -1) { // Fork failed check
+        close(pipe_in[0]); close(pipe_in[1]); close(pipe_out[0]); close(pipe_out[1]);
+        for (size_t i = 0; envp[i] != nullptr; ++i) free(envp[i]); delete[] envp;
+        return INTERNAL + Logger::getInstance().logLevel("ERROR", "Fork failed", 500);
     }
 
-    close(pipe_in[0]);
-    close(pipe_out[1]);
+    if (pid == 0) { // Child
+        dup2(pipe_in[0], STDIN_FILENO); dup2(pipe_out[1], STDOUT_FILENO);
+        close(pipe_in[1]); close(pipe_out[0]); close(pipe_in[0]); close(pipe_out[1]);
+        execve(phpExecutable.c_str(), const_cast<char* const*>(args.data()), envp);
+        std::cerr << "CGI execve failed for " << scriptPath << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    // Parent
+    close(pipe_in[0]); close(pipe_out[1]);
+
     if (req.getMethod() == "POST" && !req.getBody().empty()) {
-        ssize_t bytes_written = write(pipe_in[1], req.getBody().c_str(), req.getBody().size());
-        if (bytes_written == -1) {
-            Logger::getInstance().logLevel("ERROR", "ExecuteCgi: write failed (bytes_written == -1)", 0);
+        ssize_t total_written = 0; ssize_t bytes_written;
+        const char* body_ptr = req.getBody().c_str(); size_t body_size = req.getBody().size();
+        while (total_written < (ssize_t)body_size) {
+             bytes_written = write(pipe_in[1], body_ptr + total_written, body_size - total_written);
+             if (bytes_written <= 0) {
+                 if (bytes_written < 0) Logger::getInstance().logLevel("ERROR", "CGI write to pipe_in failed", 0);
+                 break;
+             }
+             total_written += bytes_written;
         }
     }
     close(pipe_in[1]);
 
     std::string cgiOutput;
-    char buffer[1024];
+    char buffer[4096];
     ssize_t bytes_read;
-    while ((bytes_read = read(pipe_out[0], buffer, sizeof(buffer) - 1)) > 0) {
-        buffer[bytes_read] = '\0';
-        cgiOutput.append(buffer);
+    int status = 0;
+    bool timedOut = false;
+    bool childExited = false;
+
+    time_t startTime = time(nullptr);
+    const time_t cgiTimeoutSeconds = 5;
+
+    // Loop combining reading and checking child status/timeout
+    while (true) {
+        // 1. Check overall timeout
+        if (!timedOut && (time(nullptr) - startTime >= cgiTimeoutSeconds)) {
+            Logger::getInstance().logLevel("WARNING", "CGI script timed out", 504);
+            kill(pid, SIGKILL); // Kill the child process forcefully
+            timedOut = true;
+        }
+        // 2. Check if child has exited (non-blocking)
+        int wait_ret = waitpid(pid, &status, WNOHANG);
+        if (wait_ret == pid) {
+            childExited = true;
+            break;
+        } else if (wait_ret < 0 && errno != ECHILD) {
+            Logger::getInstance().logLevel("ERROR", "waitpid(WNOHANG) failed during CGI loop", 500);
+            break ; // errno not after read/write 
+        }
+        // 3. Poll the read pipe with short timeout
+        struct pollfd pfd; pfd.fd = pipe_out[0]; pfd.events = POLLIN;
+        int poll_ret = poll(&pfd, 1, 100); // 100ms timeout
+
+        if (poll_ret > 0) {
+            if (pfd.revents & POLLIN) {
+                bytes_read = read(pipe_out[0], buffer, sizeof(buffer) - 1);
+                if (bytes_read > 0) {
+                    buffer[bytes_read] = '\0'; cgiOutput.append(buffer);
+                } else {
+                    if (bytes_read < 0) Logger::getInstance().logLevel("ERROR", "Read failed for CGI pipe_out", 500);
+                    break ; // EOF or read error, exit loop
+                }
+            } else if (pfd.revents & (POLLHUP | POLLERR)) { break; } // Pipe closed/error
+        } else if (poll_ret < 0) {
+             Logger::getInstance().logLevel("ERROR", "Poll failed during CGI read", 500);
+             break ;
+        }
+        if (timedOut) {
+            break ;
+        }
     }
-    if (bytes_read < 0) {
-        Logger::getInstance().logLevel("ERROR", "Read failed for a pipe.", 0);
-    }
+
     close(pipe_out[0]);
-    int status;
-    waitpid(pid, &status, 0);
 
-    if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-        for (size_t i = 0; i < envVector.size(); ++i) free(envp[i]);
-        delete[] envp;
-        return INTERNAL + Logger::getInstance().logLevel("ERROR", "CGI script execution failed", 500);
+    if (!childExited) {
+        int final_wait_ret = waitpid(pid, &status, 0);
+        if (final_wait_ret == pid) {
+            childExited = true;
+        } else if (final_wait_ret < 0) {
+            Logger::getInstance().logLevel("ERROR", "Final blocking waitpid failed", 500);
+        }
     }
 
-    for (size_t i = 0; i < envVector.size(); ++i) free(envp[i]);
-    delete[] envp;
+    // Free ENV vars
+    for (size_t i = 0; envp[i] != nullptr; ++i) free(envp[i]); delete[] envp;
 
-    std::string mimeType = Types::getInstance().getMimeType(cgiOutput);
+    // Check status based on whether it timed out or exited
+    if (timedOut) {
+        return GATEWAY_TIMEOUT + Logger::getInstance().logLevel("ERROR", "Gateway Timeout", 504);
+    } // Return 504
+
+    // Check exit status only if we successfully retrieved status (childExited is true) and the script wasn't killed by timeout.
+    if (!childExited || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+        std::ostringstream logStream;
+        logStream << "CGI script execution failed or returned non-zero.";
+        if (childExited) {
+             if (WIFSIGNALED(status)) { logStream << " Terminated by signal: " << WTERMSIG(status); }
+             else if (WIFEXITED(status)) { logStream << " Exit status: " << WEXITSTATUS(status); }
+        } else {
+             logStream << " Status could not be determined.";
+        }
+        Logger::getInstance().logLevel("ERROR", logStream.str(), 500);
+        return INTERNAL + Logger::getInstance().logLevel("ERROR", "Final blocking waitpid failed", 500);
+    }
+
+    std::string::size_type header_end = cgiOutput.find("\r\n\r\n");
+    std::string cgiBody = cgiOutput;
+    std::string contentType = "text/html"; std::string statusCode = "200 OK";
+    if (header_end != std::string::npos) {
+        std::string headers_part = cgiOutput.substr(0, header_end);
+        cgiBody = cgiOutput.substr(header_end + 4);
+        std::string::size_type ct_pos = headers_part.find("Content-Type: ");
+        if (ct_pos != std::string::npos) { std::string::size_type ct_end = headers_part.find("\r\n", ct_pos); contentType = (ct_end != std::string::npos) ? headers_part.substr(ct_pos + 14, ct_end - (ct_pos + 14)) : headers_part.substr(ct_pos + 14); }
+        std::string::size_type st_pos = headers_part.find("Status: ");
+        if (st_pos != std::string::npos) { std::string::size_type st_end = headers_part.find("\r\n", st_pos); statusCode = (st_end != std::string::npos) ? headers_part.substr(st_pos + 8, st_end - (st_pos + 8)) : headers_part.substr(st_pos + 8); }
+    }
+
     std::ostringstream responseStream;
-    responseStream << "HTTP/1.1 200 OK\r\n"
-                   << "Content-Length: " << cgiOutput.size() << "\r\n"
-                   << "Content-Type: " << "text/html" << "\r\n"
-                   << "\r\n"
-                   << cgiOutput;
-
+    responseStream << "HTTP/1.1 " << statusCode << "\r\n"
+                   << "Content-Length: " << cgiBody.size() << "\r\n"
+                   << "Content-Type: " << contentType << "\r\n" << "\r\n" << cgiBody;
     return responseStream.str();
 }
-

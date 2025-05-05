@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 11:10:03 by asalo             #+#    #+#             */
-/*   Updated: 2025/04/09 19:33:55 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/05 10:22:13 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -74,6 +74,7 @@
 #define UNSUPPORTED "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/html\r\n\r\n"
 #define REQ_LIMIT   "HTTP/1.1 429 Too Many Requests\r\nContent-Type: text/html\r\n\r\n"
 #define INTERNAL    "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n"
+#define GATEWAY_TIMEOUT "HTTP/1.1 504 Gateway Timeout\r\nContent-Type: text/plain\r\n\r\nGateway Timeout"
 
 /* SERVER LOOP */
 #define MAX_CLIENTS 100

@@ -1,10 +1,5 @@
 Arttu: Greetings!
 This: Seems to work. 
-That: Is it.
-That: Is it.
-That: Is it.
-asd: asd
-df: asd
-ee: ee
-d: sd
-TestUser: Hello from curl
+That: Is it.Ukko1: curl CURL curl
+Ukko1: curl CURL curl
+Herra: Terve.

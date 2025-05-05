@@ -37,10 +37,11 @@ Logger::Logger() {
     _errorPages[413] = loadFileContent(baseDir + "413.html");
     _errorPages[429] = loadFileContent(baseDir + "429.html");
     _errorPages[500] = loadFileContent(baseDir + "500.html");
+    _errorPages[504] = loadFileContent(baseDir + "504.html");
     _defaultErrorPage = loadFileContent(baseDir + "default.html");
     _defaultErrorPages = _errorPages;
-    _responses[301] = std::pair<std::string, std::string>(MOVED_TEMP, "Moved permanently");
-    _responses[302] = std::pair<std::string, std::string>(MOVED_PERM, "Moved temporarily");
+    _responses[301] = std::pair<std::string, std::string>(MOVED_PERM, "Moved permanently");
+    _responses[302] = std::pair<std::string, std::string>(MOVED_TEMP, "Moved temporarily");
     _responses[400] = std::pair<std::string, std::string>(BAD_REQ, " Bad Request");
     _responses[403] = std::pair<std::string, std::string>(FORBIDDEN, " Forbidden");
     _responses[404] = std::pair<std::string, std::string>(NOT_FOUND, " Not Found");
@@ -50,6 +51,7 @@ Logger::Logger() {
     _responses[415] = std::pair<std::string, std::string>(UNSUPPORTED, " Unsupported media Type");
     _responses[429] = std::pair<std::string, std::string>(REQ_LIMIT, "Too Many requests");
     _responses[500] = std::pair<std::string, std::string>(INTERNAL, "Internal Server Error");
+    _responses[504] = std::pair<std::string, std::string>(GATEWAY_TIMEOUT, "Gateway Timedout");
 
     // Fallback option if any file fails to load
     if (_errorPages[400].empty())
@@ -64,6 +66,8 @@ Logger::Logger() {
         _errorPages[429] = "<html><body><h1>429 Too Many Requests</h1><p>The server can't accept more requests at this time</p></body></html>";
     if (_errorPages[500].empty())
         _errorPages[500] = "<html><body><h1>500 Internal Server Error</h1><p>An unexpected error occurred.</p></body></html>";
+    if (_errorPages[504].empty())
+        _errorPages[504] = "<html><body><h1>504 Gateway Timedout</h1><p></p></body></html>";
 
     if (_defaultErrorPage.empty())
         _defaultErrorPage = "<html><body><h1>Error</h1><p>An error occurred.</p></body></html>";

@@ -39,7 +39,7 @@
   * curl -X GET http://localhost:8080/uploads/
 
 * HTTP Redirection (301/302)
-  * <fill_a_test_here>
+  * curl -i http://127.0.0.1:8080/redirect
 
 * Prevent Binding Same Port Multiple Times
  * <IS_THIS_REAL>
