@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:42:49 by eleppala          #+#    #+#             */
-/*   Updated: 2025/05/01 16:07:35 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/06 10:41:00 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -98,6 +98,8 @@ bool HttpParser::isFullRequest(std::string &input, ssize_t bytes) {
         if (hostEnd != std::string::npos) {
             std::string hostStr = input.substr(hostPos + 6, hostEnd - (hostPos + 6));
             _headerHost = hostStr;
+            if (hostStr == "localhost")
+                _headerHost = "127.0.0.1";
         }
     }
     size_t tePos = input.find("Transfer-Encoding: chunked");

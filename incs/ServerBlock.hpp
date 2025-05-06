@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:44:23 by eleppala          #+#    #+#             */
-/*   Updated: 2025/04/10 21:32:50 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/06 09:16:21 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -22,7 +22,6 @@ private:
     std::string                     _serverName;
     std::string                     _host; 
     std::string                     _root;
-    // std::string                     _index;
     bool                            _autoIndex;
     size_t                          _bodySize;
     std::vector<int>                _ports;

@@ -1,0 +1,38 @@
+[2025-05-06 11:00:12][SYSTEM]: No arguments detected, using default.conf
+[2025-05-06 11:00:12][SYSTEM]: File validation OK
+[2025-05-06 11:00:12][SYSTEM]: Server configurations OK
+[2025-05-06 11:00:12][SYSTEM]: Server loop started (testiservu.com), listening on port 8080 (fd: 4)
+[2025-05-06 11:00:38][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 5)
+[2025-05-06 11:00:38][INFO]: Client disconnected (fd: 5)
+[2025-05-06 11:00:38][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 5)
+[2025-05-06 11:00:38][INFO]: Empty body.
+[2025-05-06 11:00:38][INFO]: Filepath: /home/asalo/testi-vogs-webserv/www/style.css exists (not a dir)
+[2025-05-06 11:00:38][INFO]: URI before check: /style.css, Root: /home/asalo/testi-vogs-webserv/www
+[2025-05-06 11:00:38][INFO]: Client disconnected (fd: 5)
+[2025-05-06 11:00:38][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 5)
+[2025-05-06 11:00:41][INFO]: Empty body.
+[2025-05-06 11:00:41][INFO]: URI before check: /uploads/, Root: /home/asalo/testi-vogs-webserv/www
+[2025-05-06 11:00:41][INFO]: Returning directory listing
+[2025-05-06 11:00:41][INFO]: Client disconnected (fd: 5)
+[2025-05-06 11:00:41][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 5)
+[2025-05-06 11:00:41][INFO]: Empty body.
+[2025-05-06 11:00:41][INFO]: Filepath: /home/asalo/testi-vogs-webserv/www/style.css exists (not a dir)
+[2025-05-06 11:00:41][INFO]: URI before check: /style.css, Root: /home/asalo/testi-vogs-webserv/www
+[2025-05-06 11:00:41][INFO]: Client disconnected (fd: 5)
+[2025-05-06 11:00:41][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 5)
+[2025-05-06 11:00:43][INFO]: Empty body.
+[2025-05-06 11:00:43][INFO]: Filepath: /home/asalo/testi-vogs-webserv/www/index.html exists (not a dir)
+[2025-05-06 11:00:43][INFO]: URI before check: /index.html, Root: /home/asalo/testi-vogs-webserv/www
+[2025-05-06 11:00:43][INFO]: Client disconnected (fd: 5)
+[2025-05-06 11:00:43][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 5)
+[2025-05-06 11:00:43][INFO]: Empty body.
+[2025-05-06 11:00:43][INFO]: Filepath: /home/asalo/testi-vogs-webserv/www/style.css exists (not a dir)
+[2025-05-06 11:00:43][INFO]: URI before check: /style.css, Root: /home/asalo/testi-vogs-webserv/www
+[2025-05-06 11:00:43][INFO]: Client disconnected (fd: 5)
+[2025-05-06 11:00:44][INFO]: New client connected from 127.0.0.1 on port 8080 (fd: 5)
+[2025-05-06 11:00:48][SYSTEM]: Signal (2)  received, stopping server...
+[2025-05-06 11:00:48][SYSTEM]: poll() interrupted.
+[2025-05-06 11:00:48][SYSTEM]: Terminating server loop (testiservu.com)
+[2025-05-06 11:00:48][SYSTEM]: Terminating server loop (testiservu.com)
+[2025-05-06 11:00:48][SYSTEM]: Resources cleaned.
+[2025-05-06 11:00:48][SYSTEM]: Resources cleaned.

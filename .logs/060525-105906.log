@@ -1,0 +1,7 @@
+[2025-05-06 10:59:06][SYSTEM]: No arguments detected, using default.conf
+[2025-05-06 10:59:06][SYSTEM]: File validation OK
+[2025-05-06 10:59:06][SYSTEM]: Server configurations OK
+[2025-05-06 10:59:06][SYSTEM]: Failed to bind socket for port 8080
+[2025-05-06 10:59:06][ERROR]: No server sockets were successfully set up. Exiting.
+[2025-05-06 10:59:06][ERROR]: Server setup failed. Cannot start loop.
+[2025-05-06 10:59:06][SYSTEM]: Resources cleaned.

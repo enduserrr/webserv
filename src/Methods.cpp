@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 11:38:38 by asalo             #+#    #+#             */
-/*   Updated: 2025/05/05 18:04:21 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/06 10:11:49 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -99,8 +99,9 @@ std::string Methods::mGet(HttpRequest &req) {
     std::string uri = req.getUri();
     if (uri.length() >= 4 && uri.substr(uri.length() - 4) == ".ico") {
         std::string newUri = req.getHeader("Referer");
-        if (newUri.find("/uploads/") != std::string::npos)
-            uri = "/uploads/";
+        std::string upload_store = req.getLocation().getUploadStore();
+        if (newUri.find(upload_store) != std::string::npos)
+            uri = upload_store;
     }
 
     std::string basePath = req.getLocation().getRoot();
@@ -112,6 +113,8 @@ std::string Methods::mGet(HttpRequest &req) {
     if (stat(filePath.c_str(), &st) == 0) {
         if (S_ISDIR(st.st_mode)) {
             isDirectory = true;
+            if (isDirectory && uri.back() != '/')
+                return BAD_REQ + Logger::getInstance().logLevel("ERROR", "Bad Request", 400);
         } else {
             std::ostringstream logStream;
             logStream << "Filepath: " << filePath << " exists (not a dir)";
