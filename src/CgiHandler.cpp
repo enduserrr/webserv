@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/05/05 18:34:52 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/06 08:46:02 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -131,13 +131,13 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
 
      // ↓↓↓ READ & CHECK CHILD STATUS/TIMEOUT ↓↓↓
     while (true) {
-        // 1. Overall timeout
+        // ↓↓↓ 1. OVERALL TIMEOUT ↓↓↓
         if (!timedOut && (time(nullptr) - startTime >= cgiTimeoutSeconds)) {
             Logger::getInstance().logLevel("WARNING", "CGI script timed out", 504);
             kill(pid, SIGKILL); // Kill the child process forcefully
             timedOut = true;
         }
-        // 2. Has child has exited (non-blocking)
+        // ↓↓↓ 2. HAS CHILD EXITED (NON BLOCKING) ↓↓↓
         int wait_ret = waitpid(pid, &status, WNOHANG);
         if (wait_ret == pid) {
             childExited = true;
@@ -146,9 +146,9 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
             Logger::getInstance().logLevel("ERROR", "Error during CGI loop", 500);
             break ;
         }
-        // 3. Poll the read pipe with short timeout
+        // ↓↓↓ 3. POLL READ PIPE WITH 100MS TIMEOUT ↓↓↓
         struct pollfd pfd; pfd.fd = pipe_out[0]; pfd.events = POLLIN;
-        int poll_ret = poll(&pfd, 1, 100); // 100ms timeout
+        int poll_ret = poll(&pfd, 1, 100);
 
         if (poll_ret > 0) {
             if (pfd.revents & POLLIN) {
@@ -180,26 +180,27 @@ std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &r
         }
     }
 
-    // Free ENV vars
+    // ↓↓↓ FREE ENV VARIABLES ↓↓↓
     for (size_t i = 0; envp[i] != nullptr; ++i) free(envp[i]); delete[] envp;
 
-    // Check status based on whether it timed out or exited
+    // ↓↓↓ CHECK FOR TIMEOUT ↓↓↓
     if (timedOut) {
         return GATEWAY_TIMEOUT + Logger::getInstance().logLevel("ERROR", "Gateway Timeout", 504);
-    } // Return 504
+    }
 
-    // Check exit status only if we successfully retrieved status (childExited is true) and the script wasn't killed by timeout.
+    // ↓↓↓ CHECK IF STATUS RETRIEVED (childExited == true) & DIDN'T TIMEOUT ↓↓↓
     if (!childExited || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
         std::ostringstream logStream;
         logStream << "CGI script execution failed or returned non-zero.";
-        if (childExited) {
+        if (childExited) { // Log details only if we have valid status
              if (WIFSIGNALED(status)) { logStream << " Terminated by signal: " << WTERMSIG(status); }
              else if (WIFEXITED(status)) { logStream << " Exit status: " << WEXITSTATUS(status); }
         } else {
-             logStream << " Status could not be determined.";
+             // Happens only if the final blocking waitpid failed earlier
+             logStream << " Status could not be determined (waitpid failed).";
         }
         Logger::getInstance().logLevel("ERROR", logStream.str(), 500);
-        return INTERNAL + Logger::getInstance().logLevel("ERROR", "Final blocking waitpid failed", 500);
+        return INTERNAL;
     }
 
     std::string::size_type header_end = cgiOutput.find("\r\n\r\n");

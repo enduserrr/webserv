@@ -1,1 +1,1 @@
-<?php trigger_error("Fatal Error", E_USER_ERROR);
+<?php trigger_error("Iso Virhe 5: ", E_USER_ERROR);
