@@ -11,7 +11,7 @@
           --data-binary "text=Hello%20world"
 
 * Routing to Different Locations/Directories:
-  * curl http://localhost:8080/empty.html
+  * curl http://localhost:8080/index.html
   * curl http://localhost:8080/cgi-bin/guestbook_display.php
 
 * Custom Error Page Handling (404):
@@ -99,17 +99,17 @@
 
 ## STRESS TEST - SIEGE
 * Stress Test: Basic GET Availability:
-  * siege -b -c50 -t30s http://localhost:8080/empty.html
+  * siege -b -c50 -t30s http://localhost:8080/index.html
 
 * Stress Test: Server Stability During Continuous Load (Siege)
-  * siege -b -c10 http://localhost:8080/empty.html
+  * siege -b -c10 http://localhost:8080/index.html
 
 ## OTHER
 * Handling Abrupt Client Disconnect During Upload
   * read_err.py
 
 * Big header:
-  * curl -v -H "Host: $(printf 'a%.0s' {1..100000}).testiservu1.com" http://127.0.0.1:8080/empty.html
+  * curl -v -H "Host: $(printf 'a%.0s' {1..100000}).testiservu1.com" http://127.0.0.1:8080/index.html
 
 * Open FD's:
   * valgrind --leak-check=full --track-fds=yes ./webserv

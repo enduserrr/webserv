@@ -1,6 +1,2 @@
-Arttu: Greetings!
 This: Seems to work. 
-That: Is it.Ukko1: curl CURL curl
-Ukko1: curl CURL curl
-Herra: Terve.
 TestUser: Hello from curl

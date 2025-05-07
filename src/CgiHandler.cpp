@@ -6,7 +6,7 @@
 /*   By: asalo <asalo@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 10:38:49 by asalo             #+#    #+#             */
-/*   Updated: 2025/05/06 08:41:52 by asalo            ###   ########.fr       */
+/*   Updated: 2025/05/06 11:57:56 by asalo            ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -57,6 +57,12 @@ char **CgiHandler::convertEnvVectorToArray(const std::vector<std::string> &env) 
     return envp;
 }
 
+/**
+ * @brief   Setup cgi env, create pipes for parent/child comms, forks a child process,
+ *          child process pipe handling, parent process (closes unused pipes), writes the request to childs pipe,
+ *          in parent loo: checks for timeout, checks if child has exited, check it's output with poll, takes the output
+ *          from child out pipe, makes a response
+ */
 std::string CgiHandler::executeCgi(const std::string &scriptPath, HttpRequest &req) {
     std::vector<std::string> envVector = buildCgiEnvironment(req);
     size_t queryPos = req.getUri().find('?');
