@@ -1,10 +1,8 @@
 # WEBSERV
 
-*"This is when you finally understand why a URL starts with HTTP"*
-
 ## Project Overview
 
-The aim of this project was developing relatively simple HTTP/1.1 server in C++. The server is designed to handle client requests, serve static content, process CGI scripts, manage file uploads and deletions, and support GET, POST & DELETE HTTP methods and configurations.
+The aim of this project was developing relatively simple HTTP/1.1 server in C++. Our server is designed to handle client requests, serve static content, process CGI scripts, manage file uploads and deletions, and handle any possible errors ensuring server stays up persistently.
 
 ## Table of Contents
 
@@ -71,18 +69,18 @@ Server behavior is defined using a configuration file that enables:
 
 ### HTTP Status Codes Implemented
 * Error:
-  * 400 Bad Request              (The request is malformed or invalid)
-  * 403 Forbidden                (The client lacks permission to access the resource)
-  * 404 Not Found                (The reguested resource doesn't exist)
-  * 405 Method Not Allowed       (The requested method isn't allowed for the resource)
-  * 413 Payload Too Large        (The request body size is too large)
-  * 429 Too Many Requests        (Exceeded client or per client request limit)
-  * 500 Internal Server Error    (Unexpected server failure)
-  * 504 Gateway Timeout          (CGI script timed out)
+  * 400 Bad Request
+  * 403 Forbidden
+  * 404 Not Found
+  * 405 Method Not Allowed
+  * 408 Request Time Out
+  * 413 Payload Too Large
+  * 415 Unsupported Media Type
+  * 429 Too Many Requests
+  * 500 Internal Server Error
+  * 504 Gateway Timeout
 * Success:
   * 200 OK
-  * 201 Created
-  * 202 Accepted
 * Redirection:
   * 301 Moved Permanently
   * 302 Found
@@ -120,6 +118,6 @@ Server behavior is defined using a configuration file that enables:
 ## Team
 
 *   [enduserrr](https://github.com/enduserrr)
-*   [eleppala] (https://github.com/eleppala)
+*   [eleppala](https://github.com/eleppala)
 
 *(This project was completed by a team of two, while it is designed to be done by a group of three.)*
